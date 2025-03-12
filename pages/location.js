@@ -52,13 +52,18 @@ navigator.geolocation.getCurrentPosition(
     setLocation(e.target.value);
   };
 
-  const handleNext = () => {
-    if (location.trim()) {
-      router.push(`/place-type?location=${encodeURIComponent(location)}`);
-    } else {
-      setError("Please enter a valid location.");
-    }
-  };
+const handleNext = () => {
+  if (location.trim()) {
+    // Store location in localStorage so other pages can access it
+    localStorage.setItem("userLocation", location);
+
+    // Navigate to the next page
+    router.push(`/place-type`);
+  } else {
+    setError("Please enter a valid location.");
+  }
+};
+
 
   return (
     <div style={styles.container}>

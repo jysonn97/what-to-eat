@@ -2,7 +2,7 @@ export default function Home() {
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>🍽️ What to Eat?</h1>
-      <p style={styles.subheading}>Let’s find the perfect meal for you!</p>
+      <p style={styles.subheading}>Let’s find the perfect place for you!</p>
       <button style={styles.button} onClick={() => window.location.href = "/location"}>
         Start
       </button>
@@ -18,23 +18,23 @@ const styles = {
     alignItems: "center",
     height: "100vh",
     background: "linear-gradient(135deg, #f8f9fa, #e9ecef)",
-    fontFamily: "'Poppins', sans-serif",
+    fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
   heading: {
     fontSize: "48px",
     fontWeight: "bold",
-    marginBottom: "10px",
+    marginBottom: "20px", // Increased space between heading & text
     color: "#333",
   },
   subheading: {
-    fontSize: "20px",
-    marginBottom: "20px",
+    fontSize: "22px", // Slightly bigger for better readability
+    marginBottom: "30px", // More space before button
     color: "#555",
   },
   button: {
     fontSize: "20px",
-    padding: "12px 24px",
+    padding: "14px 28px", // Slightly bigger for a premium feel
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",

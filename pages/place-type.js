@@ -4,20 +4,27 @@ import { useState, useEffect } from "react";
 export default function PlaceTypePage() {
   const router = useRouter();
   const [userLocation, setUserLocation] = useState("");
+  const placeTypes = [
+    { name: "Restaurant", emoji: "🍽️" },
+    { name: "Café", emoji: "☕" },
+    { name: "Bar", emoji: "🍸" },
+    { name: "Fast Food", emoji: "🍔" },
+    { name: "Bakery", emoji: "🥐" },
+  ];
 
   useEffect(() => {
-    // Retrieve location from localStorage
     const storedLocation = localStorage.getItem("userLocation");
     if (storedLocation) setUserLocation(storedLocation);
   }, []);
 
-  // Handle selection
   const handleSelect = (placeType) => {
-    // Store user's choice
     localStorage.setItem("placeType", placeType);
-
-    // Navigate to the next page
     router.push("/preferences");
+  };
+
+  const handleGoBack = () => {
+    localStorage.removeItem("userLocation");
+    router.push("/location");
   };
 
   return (
@@ -26,12 +33,14 @@ export default function PlaceTypePage() {
       <p style={styles.subheading}>📍 Searching near: <strong>{userLocation || "..."}</strong></p>
 
       <div style={styles.optionsContainer}>
-        {["Restaurant", "Café", "Bar", "Fast Food", "Bakery"].map((type) => (
-          <button key={type} style={styles.button} onClick={() => handleSelect(type)}>
-            {type}
+        {placeTypes.map((type) => (
+          <button key={type.name} style={styles.choiceButton} onClick={() => handleSelect(type.name)}>
+            <span style={{ marginRight: "10px" }}>{type.emoji}</span> {type.name}
           </button>
         ))}
       </div>
+
+      <button style={styles.backButton} onClick={handleGoBack}>← Go Back</button>
     </div>
   );
 }
@@ -56,18 +65,31 @@ const styles = {
     marginBottom: "20px",
   },
   optionsContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
+    display: "grid",
+    gap: "12px",
   },
-  button: {
-    fontSize: "18px",
-    padding: "10px 20px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
+  choiceButton: {
+    fontSize: "16px",
+    padding: "12px 24px",
+    backgroundColor: "#ffffff",
+    color: "#333",
+    border: "1px solid #ddd",
+    borderRadius: "12px",
     cursor: "pointer",
-    width: "200px",
+    width: "220px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "0.2s",
+  },
+  backButton: {
+    marginTop: "20px",
+    fontSize: "14px",
+    color: "#555",
+    backgroundColor: "transparent",
+    border: "none",
+    cursor: "pointer",
+    textDecoration: "underline",
   },
 };
+

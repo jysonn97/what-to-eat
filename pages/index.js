@@ -24,17 +24,17 @@ const styles = {
   heading: {
     fontSize: "48px",
     fontWeight: "bold",
-    marginBottom: "20px", // Increased space between heading & text
+    marginBottom: "15px", // Less space between heading & subheading
     color: "#333",
   },
   subheading: {
-    fontSize: "22px", // Slightly bigger for better readability
-    marginBottom: "30px", // More space before button
+    fontSize: "18px", // Slightly smaller than before for balance
+    marginBottom: "30px", // Extra space before button
     color: "#555",
   },
   button: {
     fontSize: "20px",
-    padding: "14px 28px", // Slightly bigger for a premium feel
+    padding: "14px 28px",
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",

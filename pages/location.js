@@ -1,70 +1,124 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export default function LocationPage() {
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
-  // Function to get user's location using the browser's Geolocation API
-  const handleUseCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation(`${latitude}, ${longitude}`);
-        },
-        (err) => {
-          setError("Failed to get location. Please enter manually.");
-        }
-      );
-    } else {
-      setError("Geolocation is not supported by your browser.");
-    }
+  useEffect(() => {
+    // Load Google Places API script dynamically
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_PLACES_API_KEY&libraries=places`;
+    script.async = true;
+    script.onload = () => initAutocomplete();
+    document.body.appendChild(script);
+  }, []);
+
+  const initAutocomplete = () => {
+    const input = document.getElementById("location-input");
+    if (!input) return;
+
+    const autocomplete = new window.google.maps.places.Autocomplete(input, {
+      types: ["(cities)"],
+      componentRestrictions: { country: "us" }, // Restricts to US; remove if global
+    });
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (place.geometry) {
+        setLocation(place.formatted_address);
+      }
+    });
   };
 
-  // Handle user input change
   const handleInputChange = (e) => {
     setLocation(e.target.value);
   };
 
-  // Navigate to the next page with the location data
   const handleNext = () => {
     if (location.trim()) {
       router.push(`/place-type?location=${encodeURIComponent(location)}`);
     } else {
-      setError("Please enter your location.");
+      setError("Please enter a valid location.");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-4">What is your location?</h1>
-      <p className="text-gray-600 mb-4">Enter your location or allow GPS access.</p>
+    <div style={styles.container}>
+      {/* Import Aptos Font */}
+      <Head>
+        <link href="https://fonts.googleapis.com/css2?family=Aptos:wght@400;700&display=swap" rel="stylesheet" />
+      </Head>
+
+      <h1 style={styles.heading}>📍 Where are you?</h1>
+      <p style={styles.subheading}>Enter your location or search for a place.</p>
 
       <input
+        id="location-input"
         type="text"
-        placeholder="Enter city, zip code, or address"
+        placeholder="Enter city or address"
         value={location}
         onChange={handleInputChange}
-        className="px-4 py-2 border rounded w-80"
+        style={styles.input}
       />
 
-      <button
-        onClick={handleUseCurrentLocation}
-        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Use My Current Location
-      </button>
+      {error && <p style={styles.error}>{error}</p>}
 
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-
-      <button
-        onClick={handleNext}
-        className="mt-4 px-6 py-2 bg-green-500 text-white rounded"
-      >
+      <button onClick={handleNext} style={styles.button}>
         Next
       </button>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    background: "linear-gradient(135deg, #f8f9fa, #e9ecef)",
+    fontFamily: "'Aptos', sans-serif",
+    textAlign: "center",
+  },
+  heading: {
+    fontSize: "42px",
+    fontWeight: "bold",
+    marginBottom: "10px",
+    color: "#333",
+  },
+  subheading: {
+    fontSize: "18px",
+    marginBottom: "20px",
+    color: "#555",
+  },
+  input: {
+    fontSize: "16px",
+    padding: "12px",
+    width: "300px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    outline: "none",
+    textAlign: "center",
+  },
+  button: {
+    fontSize: "18px",
+    padding: "12px 24px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginTop: "15px",
+    transition: "0.3s ease",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+  },
+  error: {
+    color: "red",
+    marginTop: "10px",
+    fontSize: "14px",
+  },
+};

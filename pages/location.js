@@ -20,10 +20,25 @@ export default function LocationPage() {
     const input = document.getElementById("location-input");
     if (!input) return;
 
-    const autocomplete = new window.google.maps.places.Autocomplete(input, {
-      types: ["(cities)"],
-      componentRestrictions: { country: "us" }, // Restricts to US; remove if global
+const autocomplete = new window.google.maps.places.Autocomplete(input, {
+  types: ["geocode"], // Allows full address search (cities, streets, etc.)
+});
+
+// Get user's location and set dynamic bias
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    const { latitude, longitude } = position.coords;
+    const circle = new google.maps.Circle({
+      center: { lat: latitude, lng: longitude },
+      radius: 100000, // Bias search within ~100km
     });
+
+    autocomplete.setBounds(circle.getBounds()); // Prioritize user's location
+  },
+  () => {
+    console.warn("Geolocation unavailable. Defaulting to global search.");
+  }
+);
 
     autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();

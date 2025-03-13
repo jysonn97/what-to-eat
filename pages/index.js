@@ -14,6 +14,9 @@ export default function Home() {
       <h1 style={styles.heading}>🍽️ What to Eat?</h1>
       <p style={styles.subheading}>Let’s find the perfect place for you!</p>
 
+      {/* Horizontal Line */}
+      <div style={styles.divider}></div>
+
       <button style={styles.button} onClick={() => window.location.href = "/location"}>
         Start
       </button>
@@ -28,22 +31,29 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #ffffff, #f7f8fa)", // Subtle modern gradient
+    background: "linear-gradient(135deg, #ffffff, #f7f8fa)", // Subtle gradient
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
   heading: {
-    fontSize: "50px", // Slightly larger for impact
+    fontSize: "50px",
     fontWeight: "bold",
     marginBottom: "12px",
     color: "#222",
-    textShadow: "1px 1px 3px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+    textShadow: "1px 1px 3px rgba(0, 0, 0, 0.1)",
   },
   subheading: {
     fontSize: "20px",
-    marginBottom: "32px",
+    marginBottom: "20px",
     color: "#555",
     letterSpacing: "0.5px",
+  },
+  divider: {
+    width: "60%", // Adjust the width based on your preference
+    height: "2px",
+    backgroundColor: "#ddd", // Light gray for a clean look
+    margin: "20px 0", // Adds spacing above and below
+    borderRadius: "1px",
   },
   button: {
     fontSize: "18px",
@@ -51,13 +61,13 @@ const styles = {
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
-    borderRadius: "50px", // Rounded for a softer look
+    borderRadius: "50px",
     cursor: "pointer",
     transition: "all 0.3s ease",
-    boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)", // Softer button shadow
+    boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
   },
   buttonHover: {
-    backgroundColor: "#0056b3", // Slightly darker blue on hover
-    transform: "scale(1.05)", // Slight lift effect
+    backgroundColor: "#0056b3",
+    transform: "scale(1.05)",
   },
 };

@@ -9,7 +9,7 @@ export default function LocationPage() {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_API_KEY&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCrLFehzKesmzXfSsh2mbFG-PUFEE3aLl0&libraries=places`;
     script.async = true;
     script.onload = () => initAutocomplete();
     document.body.appendChild(script);
@@ -98,7 +98,7 @@ const styles = {
     fontSize: "28px",
     fontWeight: "bold",
     color: "#222",
-    marginBottom: "20px",
+    marginBottom: "40px", // Moved higher on the page
   },
 
   box: {
@@ -144,18 +144,18 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: "20px",
+    marginTop: "40px", // Moved buttons slightly lower
   },
 
   nextButton: {
     fontSize: "18px",
-    padding: "12px 28px",
+    padding: "10px 24px", // Slightly reduced height
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginBottom: "10px", // Space between buttons
+    marginBottom: "12px", // Adjusted spacing
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
     minWidth: "140px",

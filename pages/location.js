@@ -39,10 +39,6 @@ export default function LocationPage() {
     }
   };
 
-  const handleGoBack = () => {
-    router.push("/");
-  };
-
   return (
     <div style={styles.container}>
       <Head>
@@ -52,30 +48,23 @@ export default function LocationPage() {
         />
       </Head>
 
-      {/* App Title (Acts as a Logo) */}
-      <h1 style={styles.title}>🍽️ What to Eat? 🥢</h1>
+      {/* Location Prompt */}
+      <h1 style={styles.heading}>Where area are you in or search for?</h1>
 
-      {/* Box Section */}
-      <div style={styles.box}>
-        <h1 style={styles.heading}>📍 Where are you?</h1>
-        <p style={styles.subheading}>Enter your location or search for a place.</p>
+      {/* Location Input Field */}
+      <input
+        id="location-input"
+        type="text"
+        placeholder="🔍 Enter your location or use current location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        style={styles.input}
+      />
 
-        <input
-          id="location-input"
-          type="text"
-          placeholder="Search for a city, address, or place..."
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          style={styles.input}
-        />
+      {error && <p style={styles.error}>{error}</p>}
 
-        {error && <p style={styles.error}>{error}</p>}
-
-        <div style={styles.buttonContainer}>
-          <button style={styles.nextButton} onClick={handleNext}>Next</button>
-          <button style={styles.backButton} onClick={handleGoBack}>Go Back</button>
-        </div>
-      </div>
+      {/* Next Button */}
+      <button style={styles.nextButton} onClick={handleNext}>Next</button>
     </div>
   );
 }
@@ -88,91 +77,50 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #f0f4f8, #dbe4ee)", 
+    backgroundColor: "#fff", // Clean white background
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
 
-  /* Title (Acts as Logo) */
-  title: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    color: "#222",
-    marginBottom: "40px", // Moved higher on the page
-  },
-
-  box: {
-    background: "#ffffff",
-    padding: "50px 60px",
-    borderRadius: "16px",
-    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)", 
-    textAlign: "center",
-    maxWidth: "450px",
-    width: "100%",
-    border: "1px solid #dde5ed",
-  },
-
   heading: {
-    fontSize: "32px",
-    fontWeight: "bold",
-    marginBottom: "12px",
-    color: "#222",
-  },
-  subheading: {
-    fontSize: "16px",
+    fontSize: "20px",
+    fontWeight: "500",
+    color: "#333",
     marginBottom: "20px",
-    color: "#555",
   },
 
   input: {
-    width: "100%",
+    width: "350px",
     padding: "12px",
     fontSize: "16px",
     borderRadius: "8px",
     border: "1px solid #ccc",
     outline: "none",
     transition: "0.3s ease",
+    textAlign: "center",
+    color: "#555",
+    backgroundColor: "#f9f9f9",
+    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
   },
+
   error: {
     color: "red",
     fontSize: "14px",
     marginTop: "10px",
   },
 
-  /* Button Container */
-  buttonContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginTop: "40px", // Moved buttons slightly lower
-  },
-
   nextButton: {
-    fontSize: "18px",
-    padding: "10px 24px", // Slightly reduced height
-    backgroundColor: "#007bff",
+    fontSize: "16px",
+    padding: "12px 28px",
+    backgroundColor: "#8B5A2B", // Elegant brown shade
     color: "#fff",
     border: "none",
-    borderRadius: "50px",
+    borderRadius: "8px",
     cursor: "pointer",
-    marginBottom: "12px", // Adjusted spacing
+    marginTop: "30px",
     transition: "all 0.3s ease",
-    boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
-    minWidth: "140px",
-    textAlign: "center",
-  },
-  backButton: {
-    fontSize: "14px",
-    padding: "8px 20px",
-    backgroundColor: "#6c757d",
-    color: "#fff",
-    border: "none",
-    borderRadius: "50px",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
-    minWidth: "140px",
-    textAlign: "center",
+    fontWeight: "500",
+    boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
   },
 };
 

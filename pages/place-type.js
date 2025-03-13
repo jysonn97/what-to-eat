@@ -5,7 +5,7 @@ import Head from "next/head";
 export default function PlaceTypePage() {
   const [selectedType, setSelectedType] = useState(null);
   const router = useRouter();
-  const { location } = router.query; // Get the location from the previous page
+  const { location } = router.query;
 
   const handleSelect = (type) => {
     setSelectedType(type);
@@ -31,7 +31,7 @@ export default function PlaceTypePage() {
       </Head>
 
       {/* Question */}
-      <h1 style={styles.heading}>🍽️ What type of place are you looking for?</h1>
+      <h1 style={styles.heading}>📌 What type of place are you looking for?</h1>
 
       {/* Place Type Options */}
       <div style={styles.optionsContainer}>
@@ -39,7 +39,7 @@ export default function PlaceTypePage() {
           style={{ ...styles.optionCard, borderColor: selectedType === "restaurant" ? "#8B5A2B" : "#ddd" }} 
           onClick={() => handleSelect("restaurant")}
         >
-          <span style={styles.icon}>🍽️</span>
+          <span style={styles.icon}>🍴</span>
           <p style={styles.optionText}>Restaurant</p>
         </div>
 
@@ -84,16 +84,16 @@ const styles = {
   },
 
   heading: {
-    fontSize: "24px",
-    fontWeight: "600",
+    fontSize: "26px", // Bigger for better readability
+    fontWeight: "700",
     color: "#222",
-    marginBottom: "30px",
+    marginBottom: "35px",
   },
 
   optionsContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "15px",
+    gap: "18px",
     alignItems: "center",
   },
 
@@ -101,8 +101,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "10px",
-    width: "300px",
+    gap: "12px",
+    width: "320px",
     padding: "15px",
     borderRadius: "12px",
     border: "2px solid #ddd",
@@ -110,15 +110,15 @@ const styles = {
     transition: "all 0.3s ease",
     fontSize: "18px",
     backgroundColor: "#f9f9f9",
-    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
   },
 
   icon: {
-    fontSize: "24px",
+    fontSize: "26px", // Slightly bigger for a more engaging UI
   },
 
   optionText: {
-    fontSize: "16px",
+    fontSize: "18px",
     fontWeight: "500",
     color: "#333",
   },
@@ -127,33 +127,33 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: "30px",
+    marginTop: "40px", // More balance
   },
 
   nextButton: {
     fontSize: "16px",
-    padding: "10px 24px",
+    padding: "12px 30px",
     backgroundColor: "#8B5A2B",
     color: "#fff",
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    marginBottom: "10px",
+    marginBottom: "12px",
     transition: "all 0.3s ease, transform 0.2s ease",
-    fontWeight: "500",
-    boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
+    fontWeight: "600",
+    boxShadow: "0px 4px 14px rgba(139, 90, 43, 0.25)",
   },
 
   backButton: {
     fontSize: "14px",
-    padding: "8px 20px",
+    padding: "8px 22px",
     backgroundColor: "#6c757d",
     color: "#fff",
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
     transition: "all 0.3s ease, transform 0.2s ease",
-    boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
+    boxShadow: "0px 4px 10px rgba(108, 117, 125, 0.2)",
   },
 
   /* Hover Effects */
@@ -168,7 +168,7 @@ const styles = {
   },
 };
 
-/* Add hover styles via JavaScript (for inline styles) */
+/* Add hover styles via JavaScript */
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.querySelector("button[style*='background-color: #8B5A2B']");

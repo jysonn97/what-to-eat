@@ -4,6 +4,7 @@ import Head from "next/head";
 
 export default function LocationPage() {
   const [location, setLocation] = useState("");
+  const [isValidLocation, setIsValidLocation] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -27,20 +28,23 @@ export default function LocationPage() {
       const place = autocomplete.getPlace();
       if (place.geometry) {
         setLocation(place.formatted_address);
+        setIsValidLocation(true);
+        setError(""); // Clear error if valid location is selected
       }
+    });
+
+    // Prevent manual invalid input
+    input.addEventListener("input", () => {
+      setIsValidLocation(false);
     });
   };
 
   const handleNext = () => {
-    if (location.trim()) {
+    if (isValidLocation) {
       router.push(`/place-type?location=${encodeURIComponent(location)}`);
     } else {
-      setError("Please enter a valid location.");
+      setError("Please select a valid location from the list.");
     }
-  };
-
-  const handleGoBack = () => {
-    router.push("/");
   };
 
   return (
@@ -61,7 +65,7 @@ export default function LocationPage() {
         type="text"
         placeholder="🔍 Enter a location or use current location"
         value={location}
-        onChange={(e) => setLocation(e.target.value)}
+        readOnly // Prevent manual typing
         style={styles.input}
       />
 
@@ -69,8 +73,13 @@ export default function LocationPage() {
 
       {/* Buttons Section */}
       <div style={styles.buttonContainer}>
-        <button style={styles.nextButton} onClick={handleNext}>Next</button>
-        <button style={styles.backButton} onClick={handleGoBack}>Go Back</button>
+        <button 
+          style={{ ...styles.nextButton, opacity: isValidLocation ? "1" : "0.6", cursor: isValidLocation ? "pointer" : "not-allowed" }} 
+          onClick={handleNext} 
+          disabled={!isValidLocation}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
@@ -109,7 +118,7 @@ const styles = {
     color: "#555",
     backgroundColor: "#f9f9f9",
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
-    marginBottom: "15px", // Reduced space between input and buttons
+    cursor: "pointer",
   },
 
   error: {
@@ -118,12 +127,11 @@ const styles = {
     marginTop: "10px",
   },
 
-  /* Button Container */
   buttonContainer: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: "20px", // Reduced space between input and buttons
+    marginTop: "20px",
   },
 
   nextButton: {
@@ -134,62 +142,9 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    marginBottom: "10px", 
     transition: "all 0.3s ease, transform 0.2s ease",
     fontWeight: "500",
     boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
   },
-
-  backButton: {
-    fontSize: "14px",
-    padding: "8px 20px",
-    backgroundColor: "#6c757d",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    transition: "all 0.3s ease, transform 0.2s ease",
-    boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
-  },
-
-  /* Hover Effects */
-  nextButtonHover: {
-    backgroundColor: "#9c6d3d",
-    transform: "scale(1.05)",
-  },
-
-  backButtonHover: {
-    backgroundColor: "#5a6268",
-    transform: "scale(1.05)",
-  },
 };
 
-/* Add hover styles via JavaScript (for inline styles) */
-if (typeof document !== "undefined") {
-  document.addEventListener("DOMContentLoaded", () => {
-    const nextBtn = document.querySelector("button[style*='background-color: #8B5A2B']");
-    const backBtn = document.querySelector("button[style*='background-color: #6c757d']");
-
-    if (nextBtn) {
-      nextBtn.addEventListener("mouseenter", () => {
-        nextBtn.style.backgroundColor = styles.nextButtonHover.backgroundColor;
-        nextBtn.style.transform = styles.nextButtonHover.transform;
-      });
-      nextBtn.addEventListener("mouseleave", () => {
-        nextBtn.style.backgroundColor = styles.nextButton.backgroundColor;
-        nextBtn.style.transform = "scale(1)";
-      });
-    }
-
-    if (backBtn) {
-      backBtn.addEventListener("mouseenter", () => {
-        backBtn.style.backgroundColor = styles.backButtonHover.backgroundColor;
-        backBtn.style.transform = styles.backButtonHover.transform;
-      });
-      backBtn.addEventListener("mouseleave", () => {
-        backBtn.style.backgroundColor = styles.backButton.backgroundColor;
-        backBtn.style.transform = "scale(1)";
-      });
-    }
-  });
-}

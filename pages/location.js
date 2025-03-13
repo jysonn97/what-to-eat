@@ -20,7 +20,7 @@ export default function LocationPage() {
     if (!input) return;
 
     const autocomplete = new window.google.maps.places.Autocomplete(input, {
-      types: ["geocode"], // Supports cities & detailed addresses
+      types: ["geocode"], 
     });
 
     autocomplete.addListener("place_changed", () => {
@@ -52,6 +52,12 @@ export default function LocationPage() {
         />
       </Head>
 
+      {/* Logo & Branding */}
+      <div style={styles.logoContainer}>
+        <img src="/logo.png" alt="What to Eat Logo" style={styles.logo} />
+        <h2 style={styles.brandName}>What to Eat?</h2>
+      </div>
+
       {/* Box Section */}
       <div style={styles.box}>
         <h1 style={styles.heading}>📍 Where are you?</h1>
@@ -80,6 +86,7 @@ export default function LocationPage() {
   );
 }
 
+/* Styling */
 const styles = {
   container: {
     display: "flex",
@@ -87,20 +94,41 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #f0f4f8, #dbe4ee)", // Subtle, clean gradient
+    background: "linear-gradient(135deg, #f0f4f8, #dbe4ee)", 
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
+  
+  /* Logo & Branding */
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: "20px",
+    gap: "10px",
+  },
+  logo: {
+    width: "50px",
+    height: "50px",
+    objectFit: "contain",
+  },
+  brandName: {
+    fontSize: "24px",
+    fontWeight: "700",
+    color: "#222",
+  },
+
   box: {
     background: "#ffffff",
-    padding: "50px 60px", // Slightly increased size
+    padding: "50px 60px",
     borderRadius: "16px",
-    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)", // Softer, modern shadow
+    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)", 
     textAlign: "center",
     maxWidth: "450px",
     width: "100%",
-    border: "1px solid #dde5ed", // Adds slight definition
+    border: "1px solid #dde5ed",
   },
+
   heading: {
     fontSize: "38px",
     fontWeight: "bold",
@@ -112,6 +140,7 @@ const styles = {
     marginBottom: "20px",
     color: "#555",
   },
+
   input: {
     width: "100%",
     padding: "12px",
@@ -126,6 +155,8 @@ const styles = {
     fontSize: "14px",
     marginTop: "10px",
   },
+
+  /* Buttons */
   nextButton: {
     fontSize: "18px",
     padding: "12px 28px",
@@ -137,7 +168,7 @@ const styles = {
     marginTop: "20px",
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
-    minWidth: "140px", // Natural button width
+    minWidth: "140px",
     textAlign: "center",
   },
   backButton: {
@@ -148,10 +179,11 @@ const styles = {
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginTop: "12px", // Space below "Next" button
+    marginTop: "12px", 
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
-    minWidth: "140px", // Matches "Next" button width
+    minWidth: "140px",
     textAlign: "center",
   },
 };
+

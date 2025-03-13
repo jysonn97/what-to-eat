@@ -20,7 +20,7 @@ export default function LocationPage() {
     if (!input) return;
 
     const autocomplete = new window.google.maps.places.Autocomplete(input, {
-      types: ["(cities)"],
+      types: ["geocode"], // Supports both cities & detailed addresses
     });
 
     autocomplete.addListener("place_changed", () => {
@@ -53,34 +53,31 @@ export default function LocationPage() {
         />
       </Head>
 
-      {/* Top Divider */}
-      <div style={styles.divider}></div>
+      {/* Text Box Section */}
+      <div style={styles.box}>
+        <h1 style={styles.heading}>📍 Where are you?</h1>
+        <p style={styles.subheading}>Enter your location or search for a place.</p>
 
-      <h1 style={styles.heading}>📍 Where are you?</h1>
-      <p style={styles.subheading}>Enter your location or search for a place.</p>
+        <input
+          id="location-input"
+          type="text"
+          placeholder="Search for a city, address, or place..."
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          style={styles.input}
+        />
 
-      <input
-        id="location-input"
-        type="text"
-        placeholder="Search for a city or place..."
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        style={styles.input}
-      />
+        {error && <p style={styles.error}>{error}</p>}
 
-      {error && <p style={styles.error}>{error}</p>}
+        <button style={styles.nextButton} onClick={handleNext}>
+          Next
+        </button>
 
-      <button style={styles.nextButton} onClick={handleNext}>
-        Next
-      </button>
-
-      {/* Go Back Button */}
-      <button style={styles.backButton} onClick={handleGoBack}>
-        Go Back
-      </button>
-
-      {/* Bottom Divider */}
-      <div style={styles.divider}></div>
+        {/* Go Back Button (Smaller Size) */}
+        <button style={styles.backButton} onClick={handleGoBack}>
+          Go Back
+        </button>
+      </div>
     </div>
   );
 }
@@ -96,27 +93,28 @@ const styles = {
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
+  box: {
+    background: "#ffffff",
+    padding: "40px 50px",
+    borderRadius: "12px",
+    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.1)",
+    textAlign: "center",
+    maxWidth: "400px",
+    width: "100%",
+  },
   heading: {
-    fontSize: "48px",
+    fontSize: "36px",
     fontWeight: "bold",
     marginBottom: "12px",
     color: "#222",
-    textShadow: "1px 1px 3px rgba(0, 0, 0, 0.1)",
   },
   subheading: {
-    fontSize: "18px",
+    fontSize: "16px",
     marginBottom: "20px",
     color: "#555",
   },
-  divider: {
-    width: "60%",
-    height: "2px",
-    backgroundColor: "#ddd",
-    margin: "15px 0",
-    borderRadius: "1px",
-  },
   input: {
-    width: "300px",
+    width: "100%",
     padding: "12px",
     fontSize: "16px",
     borderRadius: "8px",
@@ -142,8 +140,8 @@ const styles = {
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
   },
   backButton: {
-    fontSize: "16px",
-    padding: "10px 24px",
+    fontSize: "14px",
+    padding: "8px 20px",
     backgroundColor: "#6c757d",
     color: "#fff",
     border: "none",
@@ -151,6 +149,6 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
     transition: "all 0.3s ease",
-    boxShadow: "0px 4px 10px rgba(108, 117, 125, 0.2)",
+    boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
   },
 };

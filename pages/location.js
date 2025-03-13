@@ -9,7 +9,7 @@ export default function LocationPage() {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCrLFehzKesmzXfSsh2mbFG-PUFEE3aLl0&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_API_KEY&libraries=places`;
     script.async = true;
     script.onload = () => initAutocomplete();
     document.body.appendChild(script);
@@ -52,11 +52,8 @@ export default function LocationPage() {
         />
       </Head>
 
-      {/* Logo & Branding */}
-      <div style={styles.logoContainer}>
-        <img src="/logo.png" alt="What to Eat Logo" style={styles.logo} />
-        <h2 style={styles.brandName}>What to Eat?</h2>
-      </div>
+      {/* App Title (Acts as a Logo) */}
+      <h1 style={styles.title}>🍽️ What to Eat? 🥢</h1>
 
       {/* Box Section */}
       <div style={styles.box}>
@@ -74,13 +71,10 @@ export default function LocationPage() {
 
         {error && <p style={styles.error}>{error}</p>}
 
-        <button style={styles.nextButton} onClick={handleNext}>
-          Next
-        </button>
-
-        <button style={styles.backButton} onClick={handleGoBack}>
-          Go Back
-        </button>
+        <div style={styles.buttonContainer}>
+          <button style={styles.nextButton} onClick={handleNext}>Next</button>
+          <button style={styles.backButton} onClick={handleGoBack}>Go Back</button>
+        </div>
       </div>
     </div>
   );
@@ -98,24 +92,13 @@ const styles = {
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
-  
-  /* Logo & Branding */
-  logoContainer: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: "20px",
-    gap: "10px",
-  },
-  logo: {
-    width: "50px",
-    height: "50px",
-    objectFit: "contain",
-  },
-  brandName: {
-    fontSize: "24px",
-    fontWeight: "700",
+
+  /* Title (Acts as Logo) */
+  title: {
+    fontSize: "28px",
+    fontWeight: "bold",
     color: "#222",
+    marginBottom: "20px",
   },
 
   box: {
@@ -130,7 +113,7 @@ const styles = {
   },
 
   heading: {
-    fontSize: "38px",
+    fontSize: "32px",
     fontWeight: "bold",
     marginBottom: "12px",
     color: "#222",
@@ -156,8 +139,15 @@ const styles = {
     marginTop: "10px",
   },
 
-  /* Buttons */
-nextButton: {
+  /* Button Container */
+  buttonContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginTop: "20px",
+  },
+
+  nextButton: {
     fontSize: "18px",
     padding: "12px 28px",
     backgroundColor: "#007bff",
@@ -165,12 +155,11 @@ nextButton: {
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginTop: "20px",
+    marginBottom: "10px", // Space between buttons
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
     minWidth: "140px",
     textAlign: "center",
-    display: "block",  // Ensures buttons are stacked
   },
   backButton: {
     fontSize: "14px",
@@ -180,12 +169,10 @@ nextButton: {
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginTop: "10px",  // Space between buttons
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
     minWidth: "140px",
     textAlign: "center",
-    display: "block",
   },
 };
 

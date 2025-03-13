@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
 export default function PlaceTypePage() {
-  const [selectedType, setSelectedType] = useState(null);
   const router = useRouter();
-  const { location } = router.query;
+  const { location } = router.query; // Retrieve previous user input
+
+  // Retrieve stored selection if user goes back and forth
+  const [selectedType, setSelectedType] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("placeType") || null;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (selectedType) {
+      localStorage.setItem("placeType", selectedType); // Save user selection
+    }
+  }, [selectedType]);
 
   const handleSelect = (type) => {
     setSelectedType(type);
@@ -13,12 +26,12 @@ export default function PlaceTypePage() {
 
   const handleNext = () => {
     if (selectedType) {
-      router.push(`/next-page?location=${encodeURIComponent(location)}&placeType=${encodeURIComponent(selectedType)}`);
+      router.push(`/next-step?location=${encodeURIComponent(location)}&placeType=${encodeURIComponent(selectedType)}`);
     }
   };
 
   const handleGoBack = () => {
-    router.push("/location");
+    router.push(`/location`);
   };
 
   return (
@@ -39,7 +52,7 @@ export default function PlaceTypePage() {
           style={{ ...styles.optionCard, borderColor: selectedType === "restaurant" ? "#8B5A2B" : "#ddd" }} 
           onClick={() => handleSelect("restaurant")}
         >
-          <span style={styles.icon}>🍴</span>
+          <span style={styles.icon}>🥩</span>
           <p style={styles.optionText}>Restaurant</p>
         </div>
 
@@ -62,8 +75,12 @@ export default function PlaceTypePage() {
 
       {/* Buttons Section */}
       <div style={styles.buttonContainer}>
-        <button style={{ ...styles.nextButton, opacity: selectedType ? "1" : "0.6", cursor: selectedType ? "pointer" : "not-allowed" }} onClick={handleNext} disabled={!selectedType}>Next</button>
-        <button style={styles.backButton} onClick={handleGoBack}>Go Back</button>
+        <button style={styles.nextButton} onClick={handleNext}>
+          Next
+        </button>
+        <button style={styles.backButton} onClick={handleGoBack}>
+          Go Back
+        </button>
       </div>
     </div>
   );
@@ -84,16 +101,16 @@ const styles = {
   },
 
   heading: {
-    fontSize: "26px", // Bigger for better readability
+    fontSize: "26px", 
     fontWeight: "700",
     color: "#222",
-    marginBottom: "35px",
+    marginBottom: "30px",
   },
 
   optionsContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "18px",
+    gap: "15px",
     alignItems: "center",
   },
 
@@ -107,14 +124,15 @@ const styles = {
     borderRadius: "12px",
     border: "2px solid #ddd",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "all 0.3s ease, transform 0.2s ease",
     fontSize: "18px",
     backgroundColor: "#f9f9f9",
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+    textAlign: "center",
   },
 
   icon: {
-    fontSize: "26px", // Slightly bigger for a more engaging UI
+    fontSize: "26px",
   },
 
   optionText: {
@@ -127,7 +145,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: "40px", // More balance
+    marginTop: "30px",
   },
 
   nextButton: {
@@ -138,7 +156,6 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    marginBottom: "12px",
     transition: "all 0.3s ease, transform 0.2s ease",
     fontWeight: "600",
     boxShadow: "0px 4px 14px rgba(139, 90, 43, 0.25)",

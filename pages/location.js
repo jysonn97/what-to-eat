@@ -126,7 +126,7 @@ const styles = {
     fontSize: "14px",
     marginTop: "10px",
   },
-  nextButton: {
+   nextButton: {
     fontSize: "18px",
     padding: "12px 28px",
     backgroundColor: "#007bff",
@@ -137,6 +137,7 @@ const styles = {
     marginTop: "20px",
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
+    width: "100%", // Ensure full width for better alignment
   },
   backButton: {
     fontSize: "14px",
@@ -146,8 +147,10 @@ const styles = {
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginTop: "12px",
+    marginTop: "12px", // Added space below the "Next" button
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
+    display: "block", // Forces it onto a new line
+    width: "100%", // Matches the "Next" button width
   },
 };

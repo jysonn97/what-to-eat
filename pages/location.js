@@ -30,16 +30,16 @@ export default function LocationPage() {
       if (place.geometry) {
         setLocation(place.formatted_address);
         setIsValidLocation(true);
-        setError(""); // Clear error if valid location is selected
+        setError(""); // Clear error when a valid location is selected
       } else {
         setIsValidLocation(false);
       }
     });
 
-    // Prevent users from just typing anything without selection
+    // Reset validity when user starts typing manually
     input.addEventListener("input", () => {
       setIsValidLocation(false);
-      setError(""); // Remove error when user starts typing
+      setError(""); // Remove error message while typing
     });
   };
 
@@ -49,11 +49,12 @@ export default function LocationPage() {
       return;
     }
 
-    if (isValidLocation) {
-      router.push(`/place-type?location=${encodeURIComponent(location)}`);
-    } else {
-      setError("📍 Please select a location from the dropdown.");
+    if (!isValidLocation) {
+      setError("📍 Please select a valid location from the suggestions.");
+      return;
     }
+
+    router.push(`/place-type?location=${encodeURIComponent(location)}`);
   };
 
   return (
@@ -86,9 +87,8 @@ export default function LocationPage() {
       {/* Buttons Section */}
       <div style={styles.buttonContainer}>
         <button 
-          style={{ ...styles.nextButton, opacity: isValidLocation ? "1" : "0.6", cursor: isValidLocation ? "pointer" : "not-allowed" }} 
-          onClick={handleNext} 
-          disabled={!isValidLocation}
+          style={styles.nextButton} 
+          onClick={handleNext}
         >
           Next
         </button>
@@ -125,7 +125,7 @@ const styles = {
     borderRadius: "8px",
     border: "2px solid #ccc",
     outline: "none",
-    transition: "all 0.3s ease",
+    transition: "0.3s ease",
     textAlign: "center",
     color: "#555",
     backgroundColor: "#f9f9f9",

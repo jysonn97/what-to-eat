@@ -87,14 +87,14 @@ const styles = {
     backgroundColor: "#fff", 
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
-    padding: "20px", // Extra padding for better spacing
+    padding: "20px",
   },
 
   heading: {
-    fontSize: "24px", // Bigger and more noticeable
+    fontSize: "24px",
     fontWeight: "600",
     color: "#222",
-    marginBottom: "25px",
+    marginBottom: "20px",
   },
 
   input: {
@@ -109,6 +109,7 @@ const styles = {
     color: "#555",
     backgroundColor: "#f9f9f9",
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+    marginBottom: "15px", // Reduced space between input and buttons
   },
 
   error: {
@@ -122,19 +123,19 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: "40px", // Spaced lower to balance layout
+    marginTop: "20px", // Reduced space between input and buttons
   },
 
   nextButton: {
     fontSize: "16px",
     padding: "10px 24px",
-    backgroundColor: "#8B5A2B", // Elegant brown shade
+    backgroundColor: "#8B5A2B",
     color: "#fff",
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    marginBottom: "12px", 
-    transition: "all 0.3s ease",
+    marginBottom: "10px", 
+    transition: "all 0.3s ease, transform 0.2s ease",
     fontWeight: "500",
     boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
   },
@@ -147,8 +148,48 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "all 0.3s ease, transform 0.2s ease",
     boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
+  },
+
+  /* Hover Effects */
+  nextButtonHover: {
+    backgroundColor: "#9c6d3d",
+    transform: "scale(1.05)",
+  },
+
+  backButtonHover: {
+    backgroundColor: "#5a6268",
+    transform: "scale(1.05)",
   },
 };
 
+/* Add hover styles via JavaScript (for inline styles) */
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    const nextBtn = document.querySelector("button[style*='background-color: #8B5A2B']");
+    const backBtn = document.querySelector("button[style*='background-color: #6c757d']");
+
+    if (nextBtn) {
+      nextBtn.addEventListener("mouseenter", () => {
+        nextBtn.style.backgroundColor = styles.nextButtonHover.backgroundColor;
+        nextBtn.style.transform = styles.nextButtonHover.transform;
+      });
+      nextBtn.addEventListener("mouseleave", () => {
+        nextBtn.style.backgroundColor = styles.nextButton.backgroundColor;
+        nextBtn.style.transform = "scale(1)";
+      });
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener("mouseenter", () => {
+        backBtn.style.backgroundColor = styles.backButtonHover.backgroundColor;
+        backBtn.style.transform = styles.backButtonHover.transform;
+      });
+      backBtn.addEventListener("mouseleave", () => {
+        backBtn.style.backgroundColor = styles.backButton.backgroundColor;
+        backBtn.style.transform = "scale(1)";
+      });
+    }
+  });
+}

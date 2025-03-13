@@ -6,6 +6,7 @@ export default function LocationPage() {
   const [location, setLocation] = useState("");
   const [isValidLocation, setIsValidLocation] = useState(false);
   const [error, setError] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,10 +43,15 @@ export default function LocationPage() {
   };
 
   const handleNext = () => {
+    if (!location.trim()) {
+      setError("📍 Please enter a valid location.");
+      return;
+    }
+
     if (isValidLocation) {
       router.push(`/place-type?location=${encodeURIComponent(location)}`);
     } else {
-      setError("Please select a valid location from the list.");
+      setError("📍 Please select a location from the dropdown.");
     }
   };
 
@@ -65,9 +71,11 @@ export default function LocationPage() {
       <input
         id="location-input"
         type="text"
-        placeholder="🔍 Enter a location or use current location"
+        placeholder={isFocused ? "" : "🔍 Enter a location or use current location"}
         value={location}
-        onChange={(e) => setLocation(e.target.value)} // Allow typing but require selection
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onChange={(e) => setLocation(e.target.value)}
         style={styles.input}
       />
 
@@ -102,10 +110,10 @@ const styles = {
   },
 
   heading: {
-    fontSize: "24px",
-    fontWeight: "600",
+    fontSize: "26px",
+    fontWeight: "700",
     color: "#222",
-    marginBottom: "20px",
+    marginBottom: "25px",
   },
 
   input: {
@@ -113,9 +121,9 @@ const styles = {
     padding: "12px",
     fontSize: "16px",
     borderRadius: "8px",
-    border: "1px solid #ccc",
+    border: "2px solid #ccc",
     outline: "none",
-    transition: "0.3s ease",
+    transition: "all 0.3s ease",
     textAlign: "center",
     color: "#555",
     backgroundColor: "#f9f9f9",

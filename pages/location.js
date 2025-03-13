@@ -36,9 +36,10 @@ export default function LocationPage() {
       }
     });
 
-    // Ensure manual typing doesn't allow invalid input
+    // Prevent users from just typing anything without selection
     input.addEventListener("input", () => {
       setIsValidLocation(false);
+      setError(""); // Remove error when user starts typing
     });
   };
 
@@ -79,6 +80,7 @@ export default function LocationPage() {
         style={styles.input}
       />
 
+      {/* Error Message */}
       {error && <p style={styles.error}>{error}</p>}
 
       {/* Buttons Section */}
@@ -135,6 +137,7 @@ const styles = {
     color: "red",
     fontSize: "14px",
     marginTop: "10px",
+    fontWeight: "500",
   },
 
   buttonContainer: {

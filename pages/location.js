@@ -9,7 +9,7 @@ export default function LocationPage() {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_API_KEY&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCrLFehzKesmzXfSsh2mbFG-PUFEE3aLl0&libraries=places`;
     script.async = true;
     script.onload = () => initAutocomplete();
     document.body.appendChild(script);
@@ -39,6 +39,10 @@ export default function LocationPage() {
     }
   };
 
+  const handleGoBack = () => {
+    router.push("/");
+  };
+
   return (
     <div style={styles.container}>
       {/* Import Aptos Font */}
@@ -49,11 +53,11 @@ export default function LocationPage() {
         />
       </Head>
 
+      {/* Top Divider */}
+      <div style={styles.divider}></div>
+
       <h1 style={styles.heading}>📍 Where are you?</h1>
       <p style={styles.subheading}>Enter your location or search for a place.</p>
-
-      {/* Horizontal Divider */}
-      <div style={styles.divider}></div>
 
       <input
         id="location-input"
@@ -69,6 +73,14 @@ export default function LocationPage() {
       <button style={styles.nextButton} onClick={handleNext}>
         Next
       </button>
+
+      {/* Go Back Button */}
+      <button style={styles.backButton} onClick={handleGoBack}>
+        Go Back
+      </button>
+
+      {/* Bottom Divider */}
+      <div style={styles.divider}></div>
     </div>
   );
 }
@@ -100,7 +112,7 @@ const styles = {
     width: "60%",
     height: "2px",
     backgroundColor: "#ddd",
-    margin: "20px 0",
+    margin: "15px 0",
     borderRadius: "1px",
   },
   input: {
@@ -128,5 +140,17 @@ const styles = {
     marginTop: "20px",
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
+  },
+  backButton: {
+    fontSize: "16px",
+    padding: "10px 24px",
+    backgroundColor: "#6c757d",
+    color: "#fff",
+    border: "none",
+    borderRadius: "50px",
+    cursor: "pointer",
+    marginTop: "10px",
+    transition: "all 0.3s ease",
+    boxShadow: "0px 4px 10px rgba(108, 117, 125, 0.2)",
   },
 };

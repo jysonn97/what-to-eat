@@ -10,7 +10,7 @@ export default function LocationPage() {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_API_KEY&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCrLFehzKesmzXfSsh2mbFG-PUFEE3aLl0&libraries=places`;
     script.async = true;
     script.onload = () => initAutocomplete();
     document.body.appendChild(script);
@@ -30,10 +30,12 @@ export default function LocationPage() {
         setLocation(place.formatted_address);
         setIsValidLocation(true);
         setError(""); // Clear error if valid location is selected
+      } else {
+        setIsValidLocation(false);
       }
     });
 
-    // Prevent manual invalid input
+    // Ensure manual typing doesn't allow invalid input
     input.addEventListener("input", () => {
       setIsValidLocation(false);
     });
@@ -65,7 +67,7 @@ export default function LocationPage() {
         type="text"
         placeholder="🔍 Enter a location or use current location"
         value={location}
-        readOnly // Prevent manual typing
+        onChange={(e) => setLocation(e.target.value)} // Allow typing but require selection
         style={styles.input}
       />
 

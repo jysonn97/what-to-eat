@@ -39,6 +39,10 @@ export default function LocationPage() {
     }
   };
 
+  const handleGoBack = () => {
+    router.push("/");
+  };
+
   return (
     <div style={styles.container}>
       <Head>
@@ -48,14 +52,14 @@ export default function LocationPage() {
         />
       </Head>
 
-      {/* Location Prompt */}
-      <h1 style={styles.heading}>Where area are you in or search for?</h1>
+      {/* Location Question */}
+      <h1 style={styles.heading}>📍 Where are you looking to eat?</h1>
 
       {/* Location Input Field */}
       <input
         id="location-input"
         type="text"
-        placeholder="🔍 Enter your location or use current location"
+        placeholder="🔍 Enter a location or use current location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         style={styles.input}
@@ -63,8 +67,11 @@ export default function LocationPage() {
 
       {error && <p style={styles.error}>{error}</p>}
 
-      {/* Next Button */}
-      <button style={styles.nextButton} onClick={handleNext}>Next</button>
+      {/* Buttons Section */}
+      <div style={styles.buttonContainer}>
+        <button style={styles.nextButton} onClick={handleNext}>Next</button>
+        <button style={styles.backButton} onClick={handleGoBack}>Go Back</button>
+      </div>
     </div>
   );
 }
@@ -77,16 +84,17 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundColor: "#fff", // Clean white background
+    backgroundColor: "#fff", 
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
+    padding: "20px", // Extra padding for better spacing
   },
 
   heading: {
-    fontSize: "20px",
-    fontWeight: "500",
-    color: "#333",
-    marginBottom: "20px",
+    fontSize: "24px", // Bigger and more noticeable
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: "25px",
   },
 
   input: {
@@ -109,18 +117,38 @@ const styles = {
     marginTop: "10px",
   },
 
+  /* Button Container */
+  buttonContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginTop: "40px", // Spaced lower to balance layout
+  },
+
   nextButton: {
     fontSize: "16px",
-    padding: "12px 28px",
+    padding: "10px 24px",
     backgroundColor: "#8B5A2B", // Elegant brown shade
     color: "#fff",
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    marginTop: "30px",
+    marginBottom: "12px", 
     transition: "all 0.3s ease",
     fontWeight: "500",
     boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
+  },
+
+  backButton: {
+    fontSize: "14px",
+    padding: "8px 20px",
+    backgroundColor: "#6c757d",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
   },
 };
 

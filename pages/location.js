@@ -20,7 +20,7 @@ export default function LocationPage() {
     if (!input) return;
 
     const autocomplete = new window.google.maps.places.Autocomplete(input, {
-      types: ["geocode"], // Supports both cities & detailed addresses
+      types: ["geocode"], // Supports cities & detailed addresses
     });
 
     autocomplete.addListener("place_changed", () => {
@@ -45,7 +45,6 @@ export default function LocationPage() {
 
   return (
     <div style={styles.container}>
-      {/* Import Aptos Font */}
       <Head>
         <link 
           href="https://fonts.googleapis.com/css2?family=Aptos:wght@400;700&display=swap" 
@@ -53,7 +52,7 @@ export default function LocationPage() {
         />
       </Head>
 
-      {/* Text Box Section */}
+      {/* Box Section */}
       <div style={styles.box}>
         <h1 style={styles.heading}>📍 Where are you?</h1>
         <p style={styles.subheading}>Enter your location or search for a place.</p>
@@ -73,7 +72,6 @@ export default function LocationPage() {
           Next
         </button>
 
-        {/* Go Back Button (Smaller Size) */}
         <button style={styles.backButton} onClick={handleGoBack}>
           Go Back
         </button>
@@ -89,21 +87,22 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    background: "linear-gradient(135deg, #ffffff, #f7f8fa)",
+    background: "linear-gradient(135deg, #f0f4f8, #dbe4ee)", // Subtle, clean gradient
     fontFamily: "'Aptos', sans-serif",
     textAlign: "center",
   },
   box: {
     background: "#ffffff",
-    padding: "40px 50px",
-    borderRadius: "12px",
-    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.1)",
+    padding: "50px 60px", // Slightly increased size
+    borderRadius: "16px",
+    boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)", // Softer, modern shadow
     textAlign: "center",
-    maxWidth: "400px",
+    maxWidth: "450px",
     width: "100%",
+    border: "1px solid #dde5ed", // Adds slight definition
   },
   heading: {
-    fontSize: "36px",
+    fontSize: "38px",
     fontWeight: "bold",
     marginBottom: "12px",
     color: "#222",
@@ -147,7 +146,7 @@ const styles = {
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginTop: "10px",
+    marginTop: "12px",
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
   },

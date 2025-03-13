@@ -157,7 +157,7 @@ const styles = {
   },
 
   /* Buttons */
-  nextButton: {
+nextButton: {
     fontSize: "18px",
     padding: "12px 28px",
     backgroundColor: "#007bff",
@@ -170,6 +170,7 @@ const styles = {
     boxShadow: "0px 4px 12px rgba(0, 123, 255, 0.2)",
     minWidth: "140px",
     textAlign: "center",
+    display: "block",  // Ensures buttons are stacked
   },
   backButton: {
     fontSize: "14px",
@@ -179,11 +180,12 @@ const styles = {
     border: "none",
     borderRadius: "50px",
     cursor: "pointer",
-    marginTop: "12px", 
+    marginTop: "10px",  // Space between buttons
     transition: "all 0.3s ease",
     boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
     minWidth: "140px",
     textAlign: "center",
+    display: "block",
   },
 };
 

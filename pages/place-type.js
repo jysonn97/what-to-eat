@@ -1,50 +1,75 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import Head from "next/head";
 
 export default function PlaceTypePage() {
+  const [selectedType, setSelectedType] = useState(null);
   const router = useRouter();
-  const [userLocation, setUserLocation] = useState("");
-  const placeTypes = [
-    { name: "Restaurant", emoji: "🍽️" },
-    { name: "Café", emoji: "☕" },
-    { name: "Bar", emoji: "🍸" },
-    { name: "Fast Food", emoji: "🍔" },
-    { name: "Bakery", emoji: "🥐" },
-  ];
+  const { location } = router.query; // Get the location from the previous page
 
-  useEffect(() => {
-    const storedLocation = localStorage.getItem("userLocation");
-    if (storedLocation) setUserLocation(storedLocation);
-  }, []);
+  const handleSelect = (type) => {
+    setSelectedType(type);
+  };
 
-  const handleSelect = (placeType) => {
-    localStorage.setItem("placeType", placeType);
-    router.push("/preferences");
+  const handleNext = () => {
+    if (selectedType) {
+      router.push(`/next-page?location=${encodeURIComponent(location)}&placeType=${encodeURIComponent(selectedType)}`);
+    }
   };
 
   const handleGoBack = () => {
-    localStorage.removeItem("userLocation");
     router.push("/location");
   };
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.heading}>What kind of place are you looking for?</h1>
-      <p style={styles.subheading}>📍 Searching near: <strong>{userLocation || "..."}</strong></p>
+      <Head>
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Aptos:wght@400;700&display=swap" 
+          rel="stylesheet" 
+        />
+      </Head>
 
+      {/* Question */}
+      <h1 style={styles.heading}>🍽️ What type of place are you looking for?</h1>
+
+      {/* Place Type Options */}
       <div style={styles.optionsContainer}>
-        {placeTypes.map((type) => (
-          <button key={type.name} style={styles.choiceButton} onClick={() => handleSelect(type.name)}>
-            <span style={{ marginRight: "10px" }}>{type.emoji}</span> {type.name}
-          </button>
-        ))}
+        <div 
+          style={{ ...styles.optionCard, borderColor: selectedType === "restaurant" ? "#8B5A2B" : "#ddd" }} 
+          onClick={() => handleSelect("restaurant")}
+        >
+          <span style={styles.icon}>🍽️</span>
+          <p style={styles.optionText}>Restaurant</p>
+        </div>
+
+        <div 
+          style={{ ...styles.optionCard, borderColor: selectedType === "bar" ? "#8B5A2B" : "#ddd" }} 
+          onClick={() => handleSelect("bar")}
+        >
+          <span style={styles.icon}>🍺</span>
+          <p style={styles.optionText}>Bar / Pub</p>
+        </div>
+
+        <div 
+          style={{ ...styles.optionCard, borderColor: selectedType === "cafe" ? "#8B5A2B" : "#ddd" }} 
+          onClick={() => handleSelect("cafe")}
+        >
+          <span style={styles.icon}>☕</span>
+          <p style={styles.optionText}>Cafe / Dessert</p>
+        </div>
       </div>
 
-      <button style={styles.backButton} onClick={handleGoBack}>← Go Back</button>
+      {/* Buttons Section */}
+      <div style={styles.buttonContainer}>
+        <button style={{ ...styles.nextButton, opacity: selectedType ? "1" : "0.6", cursor: selectedType ? "pointer" : "not-allowed" }} onClick={handleNext} disabled={!selectedType}>Next</button>
+        <button style={styles.backButton} onClick={handleGoBack}>Go Back</button>
+      </div>
     </div>
   );
 }
 
+/* Styling */
 const styles = {
   container: {
     display: "flex",
@@ -52,44 +77,123 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundColor: "#f8f9fa",
-    fontFamily: "Aptos, sans-serif",
+    backgroundColor: "#fff",
+    fontFamily: "'Aptos', sans-serif",
+    textAlign: "center",
+    padding: "20px",
   },
+
   heading: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    marginBottom: "10px",
+    fontSize: "24px",
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: "30px",
   },
-  subheading: {
-    fontSize: "16px",
-    marginBottom: "20px",
-  },
+
   optionsContainer: {
-    display: "grid",
-    gap: "12px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+    alignItems: "center",
   },
-  choiceButton: {
-    fontSize: "16px",
-    padding: "12px 24px",
-    backgroundColor: "#ffffff",
-    color: "#333",
-    border: "1px solid #ddd",
-    borderRadius: "12px",
-    cursor: "pointer",
-    width: "220px",
+
+  optionCard: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "0.2s",
-  },
-  backButton: {
-    marginTop: "20px",
-    fontSize: "14px",
-    color: "#555",
-    backgroundColor: "transparent",
-    border: "none",
+    gap: "10px",
+    width: "300px",
+    padding: "15px",
+    borderRadius: "12px",
+    border: "2px solid #ddd",
     cursor: "pointer",
-    textDecoration: "underline",
+    transition: "all 0.3s ease",
+    fontSize: "18px",
+    backgroundColor: "#f9f9f9",
+    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+  },
+
+  icon: {
+    fontSize: "24px",
+  },
+
+  optionText: {
+    fontSize: "16px",
+    fontWeight: "500",
+    color: "#333",
+  },
+
+  buttonContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginTop: "30px",
+  },
+
+  nextButton: {
+    fontSize: "16px",
+    padding: "10px 24px",
+    backgroundColor: "#8B5A2B",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    marginBottom: "10px",
+    transition: "all 0.3s ease, transform 0.2s ease",
+    fontWeight: "500",
+    boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
+  },
+
+  backButton: {
+    fontSize: "14px",
+    padding: "8px 20px",
+    backgroundColor: "#6c757d",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "all 0.3s ease, transform 0.2s ease",
+    boxShadow: "0px 4px 8px rgba(108, 117, 125, 0.2)",
+  },
+
+  /* Hover Effects */
+  nextButtonHover: {
+    backgroundColor: "#9c6d3d",
+    transform: "scale(1.05)",
+  },
+
+  backButtonHover: {
+    backgroundColor: "#5a6268",
+    transform: "scale(1.05)",
   },
 };
 
+/* Add hover styles via JavaScript (for inline styles) */
+if (typeof document !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    const nextBtn = document.querySelector("button[style*='background-color: #8B5A2B']");
+    const backBtn = document.querySelector("button[style*='background-color: #6c757d']");
+
+    if (nextBtn) {
+      nextBtn.addEventListener("mouseenter", () => {
+        nextBtn.style.backgroundColor = styles.nextButtonHover.backgroundColor;
+        nextBtn.style.transform = styles.nextButtonHover.transform;
+      });
+      nextBtn.addEventListener("mouseleave", () => {
+        nextBtn.style.backgroundColor = styles.nextButton.backgroundColor;
+        nextBtn.style.transform = "scale(1)";
+      });
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener("mouseenter", () => {
+        backBtn.style.backgroundColor = styles.backButtonHover.backgroundColor;
+        backBtn.style.transform = styles.backButtonHover.transform;
+      });
+      backBtn.addEventListener("mouseleave", () => {
+        backBtn.style.backgroundColor = styles.backButton.backgroundColor;
+        backBtn.style.transform = "scale(1)";
+      });
+    }
+  });
+}

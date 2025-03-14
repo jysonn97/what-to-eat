@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { GOOGLE_API_KEY } from "../config"; // ✅ Import from local config.js
 
 export default function LocationPage() {
   const [location, setLocation] = useState("");
@@ -7,11 +8,15 @@ export default function LocationPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCrLFehzKesmzXfSsh2mbFG-PUFEE3aLl0&libraries=places`;
-    script.async = true;
-    script.onload = () => initAutocomplete();
-    document.body.appendChild(script);
+    if (!window.google) {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+      script.async = true;
+      script.onload = () => initAutocomplete();
+      document.body.appendChild(script);
+    } else {
+      initAutocomplete();
+    }
   }, []);
 
   const initAutocomplete = () => {
@@ -26,14 +31,14 @@ export default function LocationPage() {
       const place = autocomplete.getPlace();
       if (place.geometry) {
         setLocation(place.formatted_address);
-        setError(""); // Clear error if valid location is selected
+        setError(""); // ✅ Clear error if valid location is selected
       }
     });
   };
 
   const handleNext = () => {
     if (!location.trim()) {
-      setError("📍 Please enter a valid location.");
+      setError("📍 Please enter a valid location from the dropdown.");
       return;
     }
 
@@ -52,7 +57,12 @@ export default function LocationPage() {
         style={styles.input}
       />
       {error && <p style={styles.error}>{error}</p>}
-      <button style={styles.nextButton} onClick={handleNext}>
+      <button
+        style={styles.nextButton}
+        onClick={handleNext}
+        onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+        onMouseLeave={(e) => (e.target.style.opacity = "1")}
+      >
         Next
       </button>
     </div>
@@ -72,7 +82,7 @@ const styles = {
     textAlign: "center",
   },
   heading: {
-    fontSize: "26px",
+    fontSize: "28px",
     fontWeight: "bold",
     marginBottom: "20px",
   },
@@ -83,6 +93,7 @@ const styles = {
     borderRadius: "8px",
     border: "2px solid #ccc",
     textAlign: "center",
+    outline: "none",
   },
   error: {
     color: "red",
@@ -97,6 +108,8 @@ const styles = {
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "opacity 0.3s ease",
+    marginTop: "15px",
+    boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
   },
 };

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { GOOGLE_API_KEY } from "../config"; // ✅ Import from local config.js
 
-console.log("Google API Key:", GOOGLE_API_KEY);
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY; // ✅ Get from Vercel
 
 export default function LocationPage() {
   const [location, setLocation] = useState("");

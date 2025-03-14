@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { GOOGLE_API_KEY } from "../config"; // ✅ Import from local config.js
 
+console.log("Google API Key:", GOOGLE_API_KEY);
+
 export default function LocationPage() {
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");

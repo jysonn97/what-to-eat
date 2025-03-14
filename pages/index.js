@@ -28,15 +28,16 @@ const styles = {
     backgroundColor: "#fff",
     fontFamily: "Aptos, sans-serif",
     textAlign: "center",
-    padding: "0 20px", // Adds some padding for mobile
+    padding: "0 20px",
   },
   title: {
     fontSize: "clamp(28px, 4vw, 40px)", // Responsive font size
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "30px", // Increased space below title
+    marginTop: "-10vh", // Moves the title up
   },
   startButton: {
-    fontSize: "clamp(16px, 2vw, 20px)", // Responsive button size
+    fontSize: "clamp(16px, 2vw, 20px)",
     padding: "14px 28px",
     backgroundColor: "#8B5A2B",
     color: "#fff",
@@ -47,7 +48,7 @@ const styles = {
     boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
   },
   startButtonHover: {
-    backgroundColor: "#6F4221", // Darker brown on hover
-    transform: "scale(1.05)", // Slight zoom effect
+    backgroundColor: "#6F4221",
+    transform: "scale(1.05)",
   },
 };

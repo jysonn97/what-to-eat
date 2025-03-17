@@ -1,8 +1,14 @@
-import { NextResponse } from "next/server";
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" }); // ✅ Prevents GET requests
+  }
 
-export async function POST(req) {
   try {
-    const { previousAnswers } = await req.json();
+    const { previousAnswers } = req.body;
+    if (!previousAnswers) {
+      return res.status(400).json({ error: "Missing previous answers" }); // ✅ Error handling
+    }
+
     const prompt = generatePrompt(previousAnswers);
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -18,9 +24,10 @@ export async function POST(req) {
     });
 
     const data = await response.json();
-    return NextResponse.json({ nextQuestion: data.choices?.[0]?.message?.content || "Error generating question" });
+    return res.status(200).json({ nextQuestion: data.choices?.[0]?.message?.content || "Error generating question" });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to generate question" }, { status: 500 });
+    console.error("API Error:", error);
+    return res.status(500).json({ error: "Failed to generate question" });
   }
 }
 

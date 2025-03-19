@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 
-export default async function handler(req) {  // ✅ Use "export default"
+export default async function handler(req) {
   if (req.method !== "POST") {
     return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
   }
 
   try {
-    const { previousAnswers } = await req.json();
+    // ✅ Correctly parse the request body
+    const body = await req.json(); // <-- FIXED: Ensure the request is properly parsed
+    const { previousAnswers } = body;
+    
     console.log("📥 Received API Request - Answers:", previousAnswers);
 
     const prompt = generatePrompt(previousAnswers);

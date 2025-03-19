@@ -7,7 +7,7 @@ export default function AppPage() {
 
   // State variables
   const [question, setQuestion] = useState("📍 Where are you looking to eat?");
-  const [options, setOptions] = useState(["Restaurant", "Cafe", "Bar", "Food Truck"]); // ✅ Give users choices
+  const [options, setOptions] = useState(["Restaurant", "Cafe", "Bar", "Food Truck"]); // ✅ Initial choices
   const [answers, setAnswers] = useState(location ? [{ question: "Location", answer: location }] : []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,7 +21,7 @@ export default function AppPage() {
     console.log("📩 Sending API Request with:", updatedAnswers); // ✅ Debugging Log
 
     try {
-      const response = await fetch("/api/generateQuestion", { // ✅ FIXED API CALL
+      const response = await fetch(`${window.location.origin}/api/generateQuestion`, { // ✅ Uses absolute URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ previousAnswers: updatedAnswers }),
@@ -32,12 +32,12 @@ export default function AppPage() {
       }
 
       const data = await response.json();
-      console.log("📩 API Response:", data); // ✅ Debugging Log
+      console.log("📤 API Response:", data); // ✅ Debugging Log
 
       if (data.nextQuestion) {
         setQuestion(data.nextQuestion);
         setAnswers(updatedAnswers);
-        setOptions(data.options || []); // ✅ Update options dynamically from API
+        setOptions(data.options || []); // ✅ Ensure options update dynamically
       } else {
         router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(updatedAnswers))}`);
       }
@@ -54,13 +54,17 @@ export default function AppPage() {
       <h1 style={styles.title}>{question}</h1>
       {error && <p style={styles.error}>{error}</p>}
 
-      {/* ✅ Render options as buttons instead of text input */}
+      {/* ✅ Render options as buttons */}
       <div style={styles.optionsContainer}>
-        {options.map((option, index) => (
-          <button key={index} style={styles.optionButton} onClick={() => handleOptionClick(option)} disabled={loading}>
-            {option}
-          </button>
-        ))}
+        {options.length > 0 ? (
+          options.map((option, index) => (
+            <button key={index} style={styles.optionButton} onClick={() => handleOptionClick(option)} disabled={loading}>
+              {option}
+            </button>
+          ))
+        ) : (
+          <p>⏳ Loading...</p>
+        )}
       </div>
 
       {loading && <p>⏳ Loading next question...</p>}
@@ -82,7 +86,7 @@ const styles = {
     padding: "0 20px",
   },
   title: {
-    fontSize: "clamp(22px, 3vw, 36px)", // Responsive size
+    fontSize: "clamp(22px, 3vw, 36px)",
     fontWeight: "bold",
     marginBottom: "15px",
   },

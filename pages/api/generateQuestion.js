@@ -1,26 +1,16 @@
 import { NextResponse } from "next/server";
 
-export async function POST(req) {
+export default async function handler(req) {  // ✅ Use "export default"
+  if (req.method !== "POST") {
+    return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
+  }
+
   try {
-    console.log("✅ API HIT: Received a POST request to /api/generateQuestion");
-
-    // Check if request body is valid
-    const bodyText = await req.text();
-    console.log("📩 Raw Request Body:", bodyText);
-
-    let previousAnswers;
-    try {
-      previousAnswers = JSON.parse(bodyText);
-    } catch (error) {
-      console.error("🚨 JSON Parse Error:", error);
-      return NextResponse.json({ error: "Invalid JSON format in request" }, { status: 400 });
-    }
-
+    const { previousAnswers } = await req.json();
     console.log("📥 Received API Request - Answers:", previousAnswers);
 
     const prompt = generatePrompt(previousAnswers);
 
-    console.log("🛠 Sending request to OpenAI...");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -32,11 +22,6 @@ export async function POST(req) {
         messages: [{ role: "user", content: prompt }],
       }),
     });
-
-    if (!response.ok) {
-      console.error("🚨 OpenAI API Error:", response.status, await response.text());
-      return NextResponse.json({ error: "OpenAI API Error" }, { status: response.status });
-    }
 
     const data = await response.json();
     console.log("📤 OpenAI Response:", data);
@@ -50,7 +35,7 @@ export async function POST(req) {
     });
   } catch (error) {
     console.error("⚠️ API Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to generate question" }, { status: 500 });
   }
 }
 

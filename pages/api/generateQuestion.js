@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server";
 
-export default async function handler(req) {
-  if (req.method !== "POST") {
-    return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
-  }
-
+export async function POST(req) {
   try {
-    // ✅ Correctly parse the request body
-    const body = await req.json(); // <-- FIXED: Ensure the request is properly parsed
-    const { previousAnswers } = body;
-    
+    const { previousAnswers } = await req.json();
     console.log("📥 Received API Request - Answers:", previousAnswers);
 
     const prompt = generatePrompt(previousAnswers);
@@ -26,7 +19,18 @@ export default async function handler(req) {
       }),
     });
 
-    const data = await response.json();
+    if (!response.ok) {
+      const errorText = await response.text(); // Read error message from OpenAI
+      throw new Error(`OpenAI API Error: ${response.status} - ${errorText}`);
+    }
+
+    let data;
+    try {
+      data = await response.json(); // Ensure JSON parsing
+    } catch (jsonError) {
+      throw new Error("Failed to parse JSON response from OpenAI.");
+    }
+
     console.log("📤 OpenAI Response:", data);
 
     if (!data.choices || data.choices.length === 0) {
@@ -36,9 +40,10 @@ export default async function handler(req) {
     return NextResponse.json({
       nextQuestion: data.choices[0].message.content || "Error generating question",
     });
+
   } catch (error) {
-    console.error("⚠️ API Error:", error);
-    return NextResponse.json({ error: "Failed to generate question" }, { status: 500 });
+    console.error("⚠️ API Error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 

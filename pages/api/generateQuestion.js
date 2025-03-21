@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-export async function POST(req) {
+export default async function handler(req) {
+  if (req.method !== "POST") {
+    return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
+  }
+
   try {
     const { previousAnswers } = await req.json();
     console.log("📥 Received API Request - Answers:", previousAnswers);
@@ -19,8 +23,6 @@ export async function POST(req) {
         messages: [{ role: "user", content: prompt }],
       }),
     });
-
-    console.log("🔹 OpenAI API response received:", response);
 
     if (!response.ok) {
       console.error("❌ OpenAI API Error:", response.status, response.statusText);

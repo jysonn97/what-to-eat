@@ -4,12 +4,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = await new Response(req.body).json(); // ✅ Fix: Manually parse JSON
-    console.log("📥 Received API Request - Answers:", body);
+    const { previousAnswers } = req.body; // ✅ use req.body directly (DO NOT parse again)
+    console.log("📥 Received API Request - Answers:", previousAnswers);
 
-    const prompt = generatePrompt(body.previousAnswers);
+    const prompt = generatePrompt(previousAnswers);
 
-    console.log("🔹 Sending request to OpenAI API...");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -23,28 +22,25 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      console.error("❌ OpenAI API Error:", response.status, response.statusText);
-      return res.status(response.status).json({ error: `OpenAI API Error: ${response.statusText}` });
+      const text = await response.text(); // get full error string
+      console.error("❌ OpenAI API Error:", text);
+      return res.status(500).json({ error: text });
     }
 
     const data = await response.json();
-    console.log("📤 OpenAI Response Data:", data);
-
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error("No response from OpenAI.");
-    }
+    console.log("📤 OpenAI Response:", data);
 
     return res.status(200).json({
-      nextQuestion: data.choices[0].message.content || "Error generating question",
+      nextQuestion: data.choices[0].message.content,
     });
 
   } catch (error) {
-    console.error("⚠️ API Error:", error);
-    return res.status(500).json({ error: `Server Error: ${error.message}` });
+    console.error("⚠️ API Error:", error.message);
+    return res.status(500).json({ error: error.message });
   }
 }
 
-// 🔹 Generates the prompt based on user answers
+// 🧠 Prompt Generator
 function generatePrompt(answers) {
-  return `Based on the user's previous answers, generate the next food-related question:\n\n${JSON.stringify(answers)}`;
+  return `Based on the user's previous answers, generate the next food-related question.\n\n${JSON.stringify(answers)}`;
 }

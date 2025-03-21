@@ -7,6 +7,7 @@ export async function POST(req) {
 
     const prompt = generatePrompt(previousAnswers);
 
+    console.log("🔹 Sending request to OpenAI API...");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -19,19 +20,15 @@ export async function POST(req) {
       }),
     });
 
+    console.log("🔹 OpenAI API response received:", response);
+
     if (!response.ok) {
-      const errorText = await response.text(); // Read error message from OpenAI
-      throw new Error(`OpenAI API Error: ${response.status} - ${errorText}`);
+      console.error("❌ OpenAI API Error:", response.status, response.statusText);
+      return NextResponse.json({ error: `OpenAI API Error: ${response.statusText}` }, { status: response.status });
     }
 
-    let data;
-    try {
-      data = await response.json(); // Ensure JSON parsing
-    } catch (jsonError) {
-      throw new Error("Failed to parse JSON response from OpenAI.");
-    }
-
-    console.log("📤 OpenAI Response:", data);
+    const data = await response.json();
+    console.log("📤 OpenAI Response Data:", data);
 
     if (!data.choices || data.choices.length === 0) {
       throw new Error("No response from OpenAI.");
@@ -42,8 +39,8 @@ export async function POST(req) {
     });
 
   } catch (error) {
-    console.error("⚠️ API Error:", error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("⚠️ API Error:", error);
+    return NextResponse.json({ error: `Server Error: ${error.message}` }, { status: 500 });
   }
 }
 

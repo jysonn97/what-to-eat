@@ -10,11 +10,14 @@ export default function AppPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (location) {
-      fetchNextQuestion(answers);
-    }
-  }, [location]);
+useEffect(() => {
+  if (location && answers.length === 0) {
+    const initialAnswers = [{ key: "location", answer: location }];
+    setAnswers(initialAnswers);
+    fetchNextQuestion(initialAnswers);
+  }
+}, [location, answers.length]);
+
 
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);

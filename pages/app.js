@@ -28,6 +28,7 @@ export default function AppPage() {
       });
 
       const data = await response.json();
+      console.log("🧠 API Response:", data);
 
       if (data.nextQuestion) {
         setQuestionData(data.nextQuestion); // { key, question, options }

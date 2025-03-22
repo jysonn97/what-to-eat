@@ -19,7 +19,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ done: true }); // All questions done
     }
 
-    return res.status(200).json({ nextQuestion });
+    // ✅ Return full next question including options
+    return res.status(200).json({
+      nextQuestion: {
+        key: nextQuestion.key,
+        question: nextQuestion.question,
+        options: nextQuestion.options || [], // Include options!
+      },
+    });
   } catch (error) {
     console.error("⚠️ API Error:", error.message);
     return res.status(500).json({ error: error.message });

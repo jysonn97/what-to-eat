@@ -1,73 +1,67 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { questionFlow } from "../lib/questionFlow"; // ✅ Import our structured flow
 
 export default function AppPage() {
   const router = useRouter();
-  const { location } = router.query; // Get location from URL
+  const { location } = router.query;
 
-  // State variables
-  const [question, setQuestion] = useState("📍 Where are you looking to eat?");
-  const [options, setOptions] = useState(["Restaurant", "Cafe", "Bar", "Food Truck"]); // ✅ Initial choices
-  const [answers, setAnswers] = useState(location ? [{ question: "Location", answer: location }] : []);
-  const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState([]);
   const [error, setError] = useState("");
 
-  // Handle user selecting an option
-  const handleOptionClick = async (selectedAnswer) => {
-    setLoading(true);
+  const currentQuestion = questionFlow[currentStep];
+
+  // Handles conditional question skipping
+  useEffect(() => {
+    const step = questionFlow[currentStep];
+    if (step?.condition && !step.condition(answers)) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  }, [currentStep, answers]);
+
+  const handleOptionClick = (option) => {
+    if (!option) {
+      setError("⚠️ Please select an option.");
+      return;
+    }
+
+    const newAnswers = [...answers, { id: currentQuestion.id, question: currentQuestion.question, answer: option }];
+    setAnswers(newAnswers);
     setError("");
-    const updatedAnswers = [...answers, { question, answer: selectedAnswer }];
 
-    console.log("📩 Sending API Request with:", updatedAnswers); // ✅ Debugging Log
-
-    try {
-      const response = await fetch(`${window.location.origin}/api/generateQuestion`, { // ✅ Uses absolute URL
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ previousAnswers: updatedAnswers }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("📤 API Response:", data); // ✅ Debugging Log
-
-      if (data.nextQuestion) {
-        setQuestion(data.nextQuestion);
-        setAnswers(updatedAnswers);
-        setOptions(data.options || []); // ✅ Ensure options update dynamically
-      } else {
-        router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(updatedAnswers))}`);
-      }
-    } catch (error) {
-      console.error("❌ API Error:", error); // ✅ Debugging Log
-      setError("⚠️ Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+    const nextStep = currentStep + 1;
+    if (nextStep >= questionFlow.length) {
+      router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(newAnswers))}`);
+    } else {
+      setCurrentStep(nextStep);
     }
   };
 
+  useEffect(() => {
+    // Add location as first answer on first load
+    if (location && answers.length === 0) {
+      setAnswers([{ id: "location", question: "📍 Location", answer: location }]);
+    }
+  }, [location]);
+
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>{question}</h1>
+      <h1 style={styles.title}>{currentQuestion?.question}</h1>
+
       {error && <p style={styles.error}>{error}</p>}
 
-      {/* ✅ Render options as buttons */}
       <div style={styles.optionsContainer}>
-        {options.length > 0 ? (
-          options.map((option, index) => (
-            <button key={index} style={styles.optionButton} onClick={() => handleOptionClick(option)} disabled={loading}>
-              {option}
-            </button>
-          ))
-        ) : (
-          <p>⏳ Loading...</p>
-        )}
+        {currentQuestion?.options?.map((option, idx) => (
+          <button
+            key={idx}
+            style={styles.optionButton}
+            onClick={() => handleOptionClick(option)}
+          >
+            {option}
+          </button>
+        ))}
       </div>
-
-      {loading && <p>⏳ Loading next question...</p>}
     </div>
   );
 }
@@ -88,13 +82,14 @@ const styles = {
   title: {
     fontSize: "clamp(22px, 3vw, 36px)",
     fontWeight: "bold",
-    marginBottom: "15px",
+    marginBottom: "20px",
   },
   optionsContainer: {
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: "10px",
+    gap: "12px",
+    marginTop: "10px",
   },
   optionButton: {
     fontSize: "16px",
@@ -105,7 +100,6 @@ const styles = {
     borderRadius: "8px",
     cursor: "pointer",
     transition: "all 0.3s ease",
-    marginTop: "10px",
     boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
   },
   error: {

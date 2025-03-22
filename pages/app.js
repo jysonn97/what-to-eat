@@ -1,72 +1,77 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { questionFlow } from "../lib/questionFlow"; // ✅ Import our structured flow
 
 export default function AppPage() {
   const router = useRouter();
   const { location } = router.query;
 
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(location ? [{ key: "location", answer: location }] : []);
+  const [questionData, setQuestionData] = useState(null); // Stores { key, question, options }
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const currentQuestion = questionFlow[currentStep];
-
-  // Handles conditional question skipping
   useEffect(() => {
-    const step = questionFlow[currentStep];
-    if (step?.condition && !step.condition(answers)) {
-      setCurrentStep((prev) => prev + 1);
-    }
-  }, [currentStep, answers]);
-
-  const handleOptionClick = (option) => {
-    if (!option) {
-      setError("⚠️ Please select an option.");
-      return;
-    }
-
-    const newAnswers = [...answers, { id: currentQuestion.id, question: currentQuestion.question, answer: option }];
-    setAnswers(newAnswers);
-    setError("");
-
-    const nextStep = currentStep + 1;
-    if (nextStep >= questionFlow.length) {
-      router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(newAnswers))}`);
-    } else {
-      setCurrentStep(nextStep);
-    }
-  };
-
-  useEffect(() => {
-    // Add location as first answer on first load
-    if (location && answers.length === 0) {
-      setAnswers([{ id: "location", question: "📍 Location", answer: location }]);
+    if (location) {
+      fetchNextQuestion(answers);
     }
   }, [location]);
 
+  const fetchNextQuestion = async (currentAnswers) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/generateQuestion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ previousAnswers: currentAnswers }),
+      });
+
+      const data = await response.json();
+
+      if (data.nextQuestion) {
+        setQuestionData(data.nextQuestion); // { key, question, options }
+      } else {
+        router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
+      }
+    } catch (err) {
+      console.error("❌ API Error:", err);
+      setError("⚠️ Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOptionClick = (selectedAnswer) => {
+    if (!questionData?.key) return;
+    const updatedAnswers = [...answers, { key: questionData.key, answer: selectedAnswer }];
+    setAnswers(updatedAnswers);
+    fetchNextQuestion(updatedAnswers);
+  };
+
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>{currentQuestion?.question}</h1>
-
+      {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
       {error && <p style={styles.error}>{error}</p>}
 
       <div style={styles.optionsContainer}>
-        {currentQuestion?.options?.map((option, idx) => (
+        {questionData?.options?.map((option, idx) => (
           <button
             key={idx}
             style={styles.optionButton}
             onClick={() => handleOptionClick(option)}
+            disabled={loading}
           >
             {option}
           </button>
         ))}
       </div>
+
+      {loading && <p>⏳ Loading next question...</p>}
     </div>
   );
 }
 
-/* Styling */
 const styles = {
   container: {
     display: "flex",
@@ -74,21 +79,21 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundColor: "#fff",
     fontFamily: "Aptos, sans-serif",
     textAlign: "center",
     padding: "0 20px",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: "clamp(22px, 3vw, 36px)",
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "15px",
   },
   optionsContainer: {
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: "12px",
+    gap: "10px",
     marginTop: "10px",
   },
   optionButton: {

@@ -5,26 +5,22 @@ export default function AppPage() {
   const router = useRouter();
   const { location } = router.query;
 
-  const [answers, setAnswers] = useState(location ? [{ key: "location", answer: location }] : []);
-  const [questionData, setQuestionData] = useState(null); // Stores { key, question, options }
+  const [answers, setAnswers] = useState([]);
+  const [questionData, setQuestionData] = useState(null); // { key, question, options }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [initialized, setInitialized] = useState(false); // ✅ Prevents blank screen
 
-useEffect(() => {
-  // If location is available in URL, include it in answers
-  if (location && answers.length === 0) {
-    const initialAnswers = [{ key: "location", answer: location }];
-    setAnswers(initialAnswers);
-    fetchNextQuestion(initialAnswers);
-  }
-
-  // If no location is provided, still proceed with questions
-  if (!location && answers.length === 0) {
-    fetchNextQuestion([]);
-  }
-}, [location, answers.length]);
-
-
+  useEffect(() => {
+    if (!initialized) {
+      const initialAnswers = location
+        ? [{ key: "location", answer: location }]
+        : [];
+      setAnswers(initialAnswers);
+      fetchNextQuestion(initialAnswers);
+      setInitialized(true);
+    }
+  }, [location, initialized]);
 
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);
@@ -43,7 +39,11 @@ useEffect(() => {
       if (data.nextQuestion) {
         setQuestionData(data.nextQuestion); // { key, question, options }
       } else {
-        router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
+        router.push(
+          `/recommendation?answers=${encodeURIComponent(
+            JSON.stringify(currentAnswers)
+          )}`
+        );
       }
     } catch (err) {
       console.error("❌ API Error:", err);
@@ -55,18 +55,23 @@ useEffect(() => {
 
   const handleOptionClick = (selectedAnswer) => {
     if (!questionData?.key) return;
-    const updatedAnswers = [...answers, { key: questionData.key, answer: selectedAnswer }];
+    const updatedAnswers = [
+      ...answers,
+      { key: questionData.key, answer: selectedAnswer },
+    ];
     setAnswers(updatedAnswers);
     fetchNextQuestion(updatedAnswers);
   };
 
+  if (!questionData) return <p>⏳ Loading...</p>; // ✅ Avoid blank screen
+
   return (
     <div style={styles.container}>
-      {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
+      <h1 style={styles.title}>{questionData.question}</h1>
       {error && <p style={styles.error}>{error}</p>}
 
       <div style={styles.optionsContainer}>
-        {questionData?.options?.map((option, idx) => (
+        {questionData.options.map((option, idx) => (
           <button
             key={idx}
             style={styles.optionButton}

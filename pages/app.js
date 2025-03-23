@@ -11,12 +11,19 @@ export default function AppPage() {
   const [error, setError] = useState("");
 
 useEffect(() => {
+  // If location is available in URL, include it in answers
   if (location && answers.length === 0) {
     const initialAnswers = [{ key: "location", answer: location }];
     setAnswers(initialAnswers);
     fetchNextQuestion(initialAnswers);
   }
+
+  // If no location is provided, still proceed with questions
+  if (!location && answers.length === 0) {
+    fetchNextQuestion([]);
+  }
 }, [location, answers.length]);
+
 
 
   const fetchNextQuestion = async (currentAnswers) => {

@@ -7,7 +7,6 @@ export default async function handler(req, res) {
     const { answers } = req.body;
     console.log("📥 Recommendation Request with Answers:", answers);
 
-    // 🛠️ Use `key` instead of `question`
     const locationAnswer = answers.find((a) => a.key === "location")?.answer;
     const cuisineAnswer = answers.find((a) => a.key === "cuisine")?.answer || "";
     const vibeAnswer = answers.find((a) => a.key === "vibe")?.answer || "";
@@ -17,15 +16,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing location input" });
     }
 
+    // 🔄 Step 1: Convert address to lat/lng
+    const geoRes = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        locationAnswer
+      )}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+    );
+
+    const geoData = await geoRes.json();
+    if (!geoData.results || geoData.results.length === 0) {
+      return res.status(400).json({ error: "Invalid address" });
+    }
+
+    const { lat, lng } = geoData.results[0].geometry.location;
+
+    // 🔍 Step 2: Build smart query
     const query = `${cuisineAnswer} ${vibeAnswer} ${budgetAnswer} restaurant`.trim();
     console.log("🔍 Final Google query:", query);
 
+    // 📍 Step 3: Use Places API with lat/lng
     const googleRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
-      )}&location=${encodeURIComponent(
-        locationAnswer
-      )}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+      )}&location=${lat},${lng}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
     );
 
     const googleData = await googleRes.json();

@@ -17,10 +17,13 @@ export default function RecommendationPage() {
       setError("");
 
       try {
+        const decodedAnswers = JSON.parse(answers); // ✅ Safely parse answers first
+        console.log("🔍 Sending answers to API:", decodedAnswers); // ✅ Debug log
+
         const res = await fetch("/api/recommendRestaurant", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: JSON.parse(answers) }),
+          body: JSON.stringify({ answers: decodedAnswers }),
         });
 
         if (!res.ok) {

@@ -47,16 +47,66 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "No restaurants found" });
     }
 
-    const topResults = googleData.results.slice(0, 5).map((place) => ({
+    // ✨ Step 4: Enhance with GPT
+    const restaurantSummaries = googleData.results.slice(0, 10).map((place) => ({
       name: place.name,
       address: place.formatted_address,
       rating: place.rating,
       priceLevel: place.price_level,
-      placeId: place.place_id,
+      userRatingsTotal: place.user_ratings_total,
       mapsUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
     }));
 
-    return res.status(200).json({ recommendations: topResults });
+    const prompt = `
+You are a food concierge assistant helping users find the best restaurant based on their preferences.
+
+User Preferences:
+${JSON.stringify(answers, null, 2)}
+
+Nearby Restaurants (from Google):
+${JSON.stringify(restaurantSummaries, null, 2)}
+
+Instructions:
+1. Select the BEST 3–5 restaurants that most closely match the user’s vibe, cuisine, budget, and situation.
+2. Output ONLY a JSON array with the final selected restaurants.
+3. Each object should include: name, address, rating, priceLevel, mapsUrl, and a short reason for why it fits.
+
+Respond ONLY with the JSON array. No explanations.
+`;
+
+    const gptRes = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful restaurant recommendation assistant.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    const gptData = await gptRes.json();
+    let finalRecommendations;
+
+    try {
+      finalRecommendations = JSON.parse(gptData.choices[0].message.content);
+    } catch (err) {
+      console.error("❌ GPT JSON Parse Error:", err);
+      return res.status(500).json({ error: "GPT response formatting error" });
+    }
+
+    return res.status(200).json({ recommendations: finalRecommendations });
   } catch (error) {
     console.error("❌ Recommendation API Error:", error);
     return res.status(500).json({ error: "Failed to fetch recommendations" });

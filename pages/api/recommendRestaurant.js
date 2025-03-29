@@ -1,11 +1,9 @@
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 import fetchPlaceDetails from "@/lib/fetchPlaceDetails";
 
-
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -16,85 +14,63 @@ export default async function handler(req, res) {
     const { answers } = req.body;
     console.log("📥 Recommendation Request with Answers:", answers);
 
-    const location = answers.find((a) => a.key === "location")?.answer;
-    const cuisine = answers.find((a) => a.key === "cuisine")?.answer;
-    const vibe = answers.find((a) => a.key === "vibe")?.answer;
-    const budget = answers.find((a) => a.key === "budget")?.answer;
-
-    if (!location) {
+    const locationAnswer = answers.find((a) => a.key === "location")?.answer;
+    if (!locationAnswer) {
       return res.status(400).json({ error: "Missing location input" });
     }
 
-    const query = `${cuisine || ""} ${vibe || ""} ${budget || ""} restaurant`.trim();
+    // Build Google Places query from answers
+    const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
+    const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
+    const budget = answers.find((a) => a.key === "budget")?.answer || "";
 
-    const textSearchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-      query
-    )}&location=${encodeURIComponent(
-      location
-    )}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`;
+    const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    const googleRes = await fetch(textSearchUrl);
-    const googleData = await googleRes.json();
+    const locationUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+      locationAnswer
+    )}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`;
+    const locRes = await fetch(locationUrl);
+    const locData = await locRes.json();
+    const location = locData.results[0]?.geometry?.location;
 
-    if (!googleData.results || googleData.results.length === 0) {
-      return res.status(404).json({ error: "No restaurants found" });
+    if (!location) {
+      return res.status(400).json({ error: "Invalid location provided" });
     }
 
-    const top5 = googleData.results.slice(0, 5);
-    const placeDetailsResults = await Promise.all(
-      top5.map((place) => fetchPlaceDetails(place.place_id))
+    const placesUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+      query
+    )}&location=${location.lat},${location.lng}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`;
+
+    const placesRes = await fetch(placesUrl);
+    const placesData = await placesRes.json();
+    const places = placesData.results?.slice(0, 5) || [];
+
+    // 🔍 Fetch detailed data for GPT to analyze
+    const placeDetails = await Promise.all(
+      places.map((place) => fetchPlaceDetails(place.place_id))
     );
 
-    // 🔒 FIXED: Prevent .map() error if placeDetailsResults is not an array
-    let detailedPlaces = [];
-    if (Array.isArray(placeDetailsResults)) {
-      detailedPlaces = placeDetailsResults.map((details, i) => ({
-        ...details,
-        relevanceScore: 1, // default to 1, to be updated by GPT
-      }));
-    } else {
-      console.error("⚠️ placeDetailsResults is not an array:", placeDetailsResults);
-      return res.status(500).json({ error: "Invalid data received from place details fetch" });
-    }
+    // 🧠 Send everything to GPT
+    const userContext = answers
+      .map((a) => `${a.key}: ${a.answer}`)
+      .join("\n");
 
-    // 🧠 Ask GPT to rank the places
-    const prompt = `
-You are a food-savvy assistant. A user answered the following preferences:
+    const placeContext = placeDetails
+      .map((p, i) => {
+        return `Restaurant ${i + 1}:\nName: ${p.name}\nRating: ${p.rating}\nPrice: ${p.price_level}\nAddress: ${p.address}\nReviews: ${p.reviews}\n\n`;
+      })
+      .join("\n");
 
-${answers.map((a) => `${a.key}: ${a.answer}`).join("\n")}
+    const prompt = `Given the user's preferences below, choose the 3 best restaurants and explain why:\n\nUser Preferences:\n${userContext}\n\nRestaurants:\n${placeContext}`;
 
-Here are restaurant options:
-${detailedPlaces
-  .map(
-    (place, i) => `Restaurant ${i + 1}:
-Name: ${place.name}
-Rating: ${place.rating}
-Price: ${place.price_level}
-Cuisine: ${place.cuisine || "N/A"}
-Vibe: ${place.vibe || "N/A"}
-Reviews: ${place.reviews?.slice(0, 2).join(" | ") || "No reviews"}`
-  )
-  .join("\n\n")}
-
-Rank the top 3 that best fit the user's preferences. Respond in JSON like:
-[
-  { "index": 2, "reason": "Perfect vibe and food quality" },
-  ...
-]
-`;
-
-    const gptResponse = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
     });
 
-    const parsed = JSON.parse(gptResponse.data.choices[0].message.content);
-    const final = parsed.map((r) => ({
-      ...detailedPlaces[r.index],
-      reason: r.reason,
-    }));
+    const gptReply = completion.choices[0].message.content;
 
-    return res.status(200).json({ recommendations: final });
+    return res.status(200).json({ recommendations: gptReply });
   } catch (error) {
     console.error("❌ Recommendation API Error:", error);
     return res.status(500).json({ error: "Failed to fetch recommendations" });

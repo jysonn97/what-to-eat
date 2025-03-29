@@ -12,79 +12,58 @@ export default async function handler(req, res) {
 
   try {
     const { answers } = req.body;
-    const locationAnswer = answers.find((a) => a.key === "location")?.answer;
-    const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
-    const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
-    const budget = answers.find((a) => a.key === "budget")?.answer || "";
+    console.log("📥 Recommendation Request Answers:", answers);
 
-    if (!locationAnswer) {
-      return res.status(400).json({ error: "Missing location input" });
+    const location = answers.find((a) => a.key === "location")?.answer;
+    const cuisine = answers.find((a) => a.key === "cuisine")?.answer;
+    const vibe = answers.find((a) => a.key === "vibe")?.answer;
+    const budget = answers.find((a) => a.key === "budget")?.answer;
+
+    if (!location) {
+      console.error("❌ Missing location in answers");
+      return res.status(400).json({ error: "Missing location" });
     }
 
-    // Construct search query
-    const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
+    // 🧠 Let GPT build a better search query
+    const gptPrompt = `You are helping a user find a restaurant based on their preferences.
+User's location: ${location}
+Cuisine: ${cuisine || "Any"}
+Vibe: ${vibe || "Any"}
+Budget: ${budget || "Any"}
+
+Generate a Google search query that would help find the most suitable restaurant.`
+
+    const gptResponse = await openai.createChatCompletion({
+      model: "gpt-4",
+      messages: [{ role: "user", content: gptPrompt }],
+    });
+
+    const searchQuery = gptResponse.data.choices[0].message.content;
+    console.log("🔍 GPT Search Query:", searchQuery);
 
     const googleRes = await fetch(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-        query
-      )}&location=${encodeURIComponent(
-        locationAnswer
-      )}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&location=${encodeURIComponent(location)}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
     );
+
     const googleData = await googleRes.json();
+    console.log("📦 Google Places Result:", googleData);
 
     if (!googleData.results || googleData.results.length === 0) {
       return res.status(404).json({ error: "No restaurants found" });
     }
 
-    const candidates = googleData.results.slice(0, 7).map((place) => ({
+    const topResults = googleData.results.slice(0, 5).map((place) => ({
       name: place.name,
-      address: place.formatted_address,
+      description: place.types?.join(", "),
       rating: place.rating,
-      price_level: place.price_level,
-      types: place.types,
+      priceLevel: place.price_level,
+      distance: place.vicinity,
+      mapsUrl: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
     }));
 
-    // 🧠 Use GPT to choose best matches
-    const gptPrompt = `
-You're a helpful restaurant matchmaker. Based on the user's inputs and the restaurant list, choose the top 3 most relevant options.
-
-User preferences:
-${JSON.stringify(answers, null, 2)}
-
-Restaurant candidates:
-${JSON.stringify(candidates, null, 2)}
-
-Reply in JSON format like this:
-[
-  {
-    "name": "...",
-    "reason": "why this fits the user's preferences",
-    "rating": ...,
-    "price_level": ...,
-    "address": "..."
-  }
-]
-    `.trim();
-
-    const chatRes = await openai.createChatCompletion({
-      model: "gpt-4",
-      messages: [{ role: "user", content: gptPrompt }],
-    });
-
-    const gptReply = chatRes.data.choices[0].message.content;
-
-    let parsed;
-    try {
-      parsed = JSON.parse(gptReply);
-    } catch (err) {
-      console.error("❌ GPT response parsing failed:", gptReply);
-      return res.status(500).json({ error: "Failed to parse GPT response." });
-    }
-
-    return res.status(200).json({ recommendations: parsed });
+    return res.status(200).json({ recommendations: topResults });
   } catch (err) {
-    console.error("❌ recommendRestaurant.js error:", err);
-    return res.status(500).json({ error: "Something went wrong." });
+    console.error("❌ Final Recommendation API Error:", err.message || err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }

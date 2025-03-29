@@ -17,8 +17,8 @@ export default function RecommendationPage() {
       setError("");
 
       try {
-        const decodedAnswers = JSON.parse(answers); // ✅ Safely parse answers first
-        console.log("🔍 Sending answers to API:", decodedAnswers); // ✅ Debug log
+        const decodedAnswers = JSON.parse(answers);
+        console.log("🔍 Sending answers to API:", decodedAnswers);
 
         const res = await fetch("/api/recommendRestaurant", {
           method: "POST",
@@ -30,11 +30,17 @@ export default function RecommendationPage() {
           throw new Error(`API returned status ${res.status}`);
         }
 
-const data = await res.json();
-console.log("✅ FULL GPT Response:", data); // NEW!
-console.log("✅ data.recommendations:", data.recommendations); // NEW!
-setRecommendations(data.recommendations || []);
+        const data = await res.json();
+        console.log("✅ FULL GPT Response:", data);
+        console.log("✅ data.recommendations:", data.recommendations);
 
+        // ✅ Safe check before setting state
+        if (Array.isArray(data.recommendations)) {
+          setRecommendations(data.recommendations);
+        } else {
+          console.error("⚠️ GPT returned non-array recommendations:", data.recommendations);
+          setRecommendations([]);
+        }
       } catch (err) {
         console.error("❌ Error fetching recommendations:", err);
         setError("Failed to fetch recommendations. Please try again.");

@@ -30,9 +30,11 @@ export default function RecommendationPage() {
           throw new Error(`API returned status ${res.status}`);
         }
 
-        const data = await res.json();
-        console.log("✅ Recommendations received:", data);
-        setRecommendations(data.recommendations || []);
+const data = await res.json();
+console.log("✅ FULL GPT Response:", data); // NEW!
+console.log("✅ data.recommendations:", data.recommendations); // NEW!
+setRecommendations(data.recommendations || []);
+
       } catch (err) {
         console.error("❌ Error fetching recommendations:", err);
         setError("Failed to fetch recommendations. Please try again.");

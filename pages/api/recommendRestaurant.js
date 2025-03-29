@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
-import fetchPlaceDetails from "../../../lib/fetchPlaceDetails";
+import fetchPlaceDetails from "@/lib/fetchPlaceDetails";
+
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,

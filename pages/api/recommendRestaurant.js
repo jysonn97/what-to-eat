@@ -37,7 +37,7 @@ Generate a concise Google-style search query to find the best matching restauran
 `;
 
     const gptResponse = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-turbo",
       messages: [{ role: "user", content: prompt }],
     });
 

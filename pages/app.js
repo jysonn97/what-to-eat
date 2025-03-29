@@ -6,21 +6,20 @@ export default function AppPage() {
   const { location } = router.query;
 
   const [answers, setAnswers] = useState([]);
-  const [questionData, setQuestionData] = useState(null); // { key, question, options }
+  const [questionData, setQuestionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [initialized, setInitialized] = useState(false); // ✅ Prevents blank screen
 
   useEffect(() => {
-    if (!initialized) {
-      const initialAnswers = location
-        ? [{ key: "location", answer: location }]
-        : [];
+    if (location && answers.length === 0) {
+      const initialAnswers = [{ key: "location", answer: location }];
       setAnswers(initialAnswers);
       fetchNextQuestion(initialAnswers);
-      setInitialized(true);
     }
-  }, [location, initialized]);
+    if (!location && answers.length === 0) {
+      fetchNextQuestion([]);
+    }
+  }, [location, answers.length]);
 
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);
@@ -34,19 +33,12 @@ export default function AppPage() {
       });
 
       const data = await response.json();
-      console.log("🧠 API Response:", data);
-
       if (data.nextQuestion) {
-        setQuestionData(data.nextQuestion); // { key, question, options }
+        setQuestionData(data.nextQuestion);
       } else {
-        router.push(
-          `/recommendation?answers=${encodeURIComponent(
-            JSON.stringify(currentAnswers)
-          )}`
-        );
+        router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
       }
     } catch (err) {
-      console.error("❌ API Error:", err);
       setError("⚠️ Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -55,35 +47,32 @@ export default function AppPage() {
 
   const handleOptionClick = (selectedAnswer) => {
     if (!questionData?.key) return;
-    const updatedAnswers = [
-      ...answers,
-      { key: questionData.key, answer: selectedAnswer },
-    ];
+    const updatedAnswers = [...answers, { key: questionData.key, answer: selectedAnswer }];
     setAnswers(updatedAnswers);
     fetchNextQuestion(updatedAnswers);
   };
 
-  if (!questionData) return <p>⏳ Loading...</p>; // ✅ Avoid blank screen
-
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>{questionData.question}</h1>
-      {error && <p style={styles.error}>{error}</p>}
+      <div style={styles.card}>
+        {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
+        {error && <p style={styles.error}>{error}</p>}
 
-      <div style={styles.optionsContainer}>
-        {questionData.options.map((option, idx) => (
-          <button
-            key={idx}
-            style={styles.optionButton}
-            onClick={() => handleOptionClick(option)}
-            disabled={loading}
-          >
-            {option}
-          </button>
-        ))}
+        <div style={styles.optionsContainer}>
+          {questionData?.options?.map((option, idx) => (
+            <button
+              key={idx}
+              style={styles.optionButton}
+              onClick={() => handleOptionClick(option)}
+              disabled={loading}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+
+        {loading && <p style={styles.loading}>⏳ Loading...</p>}
       </div>
-
-      {loading && <p>⏳ Loading next question...</p>}
     </div>
   );
 }
@@ -91,41 +80,48 @@ export default function AppPage() {
 const styles = {
   container: {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    fontFamily: "Aptos, sans-serif",
-    textAlign: "center",
-    padding: "0 20px",
+    backgroundColor: "#f5f5f5",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  },
+  card: {
     backgroundColor: "#fff",
+    borderRadius: "12px",
+    padding: "40px 30px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+    maxWidth: "500px",
+    width: "100%",
+    textAlign: "center",
   },
   title: {
-    fontSize: "clamp(22px, 3vw, 36px)",
-    fontWeight: "bold",
-    marginBottom: "15px",
+    fontSize: "24px",
+    marginBottom: "24px",
+    fontWeight: 600,
+    color: "#333",
   },
   optionsContainer: {
     display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "10px",
-    marginTop: "10px",
+    flexDirection: "column",
+    gap: "12px",
   },
   optionButton: {
+    padding: "12px 20px",
     fontSize: "16px",
-    padding: "12px 24px",
-    backgroundColor: "#8B5A2B",
-    color: "#fff",
-    border: "none",
+    border: "1px solid #ccc",
     borderRadius: "8px",
+    backgroundColor: "#fff",
     cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
+    transition: "0.2s",
+  },
+  loading: {
+    marginTop: "16px",
+    fontSize: "14px",
+    color: "#888",
   },
   error: {
     color: "red",
-    fontSize: "14px",
-    marginTop: "8px",
+    marginBottom: "10px",
   },
 };

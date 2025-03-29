@@ -32,14 +32,16 @@ export default function RecommendationPage() {
 
         const data = await res.json();
         console.log("✅ FULL GPT Response:", data);
-        console.log("✅ data.recommendations:", data.recommendations);
 
-        // ✅ Safe check before setting state
-        if (Array.isArray(data.recommendations)) {
-          setRecommendations(data.recommendations);
+        const output = data?.recommendations;
+
+        // ✅ STRONG safety check
+        if (Array.isArray(output)) {
+          setRecommendations(output);
         } else {
-          console.error("⚠️ GPT returned non-array recommendations:", data.recommendations);
-          setRecommendations([]);
+          console.warn("⚠️ Invalid response format from GPT:", output);
+          setRecommendations([]); // Prevent crash
+          setError("Invalid recommendation format. Please try again.");
         }
       } catch (err) {
         console.error("❌ Error fetching recommendations:", err);
@@ -59,24 +61,30 @@ export default function RecommendationPage() {
       {loading && <p>⏳ Finding your perfect spot...</p>}
       {error && <p style={styles.error}>{error}</p>}
 
-      {!loading && !error && recommendations.length === 0 && (
+      {!loading && !error && (!Array.isArray(recommendations) || recommendations.length === 0) && (
         <p>No matches found. Try adjusting your preferences!</p>
       )}
 
       <ul style={styles.list}>
-        {recommendations.map((place, index) => (
-          <li key={index} style={styles.card}>
-            <h3>{place.name}</h3>
-            <p>{place.description}</p>
-            <p>
-              ⭐ {place.rating} | 💵 {place.priceLevel || "N/A"} | 📍{" "}
-              {place.distance || "Distance not available"}
-            </p>
-            <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
-              View on Google Maps
-            </a>
-          </li>
-        ))}
+        {Array.isArray(recommendations) &&
+          recommendations.map((place, index) => (
+            <li key={index} style={styles.card}>
+              <h3>{place.name}</h3>
+              <p>{place.description}</p>
+              <p>
+                ⭐ {place.rating} | 💵 {place.priceLevel || "N/A"} | 📍{" "}
+                {place.distance || "Distance not available"}
+              </p>
+              <a
+                href={place.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.link}
+              >
+                View on Google Maps
+              </a>
+            </li>
+          ))}
       </ul>
     </div>
   );

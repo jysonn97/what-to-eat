@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import styles from "../styles/QuestionScreen.module.css";
 
 export default function AppPage() {
   const router = useRouter();
   const { location } = router.query;
 
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(location ? [{ key: "location", answer: location }] : []);
   const [questionData, setQuestionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,7 +25,6 @@ export default function AppPage() {
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);
     setError("");
-
     try {
       const response = await fetch("/api/generateQuestion", {
         method: "POST",
@@ -33,12 +33,15 @@ export default function AppPage() {
       });
 
       const data = await response.json();
+      console.log("🧠 API Response:", data);
+
       if (data.nextQuestion) {
         setQuestionData(data.nextQuestion);
       } else {
         router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
       }
     } catch (err) {
+      console.error("❌ API Error:", err);
       setError("⚠️ Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -53,16 +56,16 @@ export default function AppPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
-        {error && <p style={styles.error}>{error}</p>}
+    <div className={styles.container}>
+      <div className={styles.content}>
+        {questionData && <h1 className={styles.question}>{questionData.question}</h1>}
+        {error && <p className={styles.error}>{error}</p>}
 
-        <div style={styles.optionsContainer}>
+        <div className={styles.options}>
           {questionData?.options?.map((option, idx) => (
             <button
               key={idx}
-              style={styles.optionButton}
+              className={styles.optionButton}
               onClick={() => handleOptionClick(option)}
               disabled={loading}
             >
@@ -71,57 +74,8 @@ export default function AppPage() {
           ))}
         </div>
 
-        {loading && <p style={styles.loading}>⏳ Loading...</p>}
+        {loading && <p className={styles.loading}>⏳ Loading next question...</p>}
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    backgroundColor: "#f5f5f5",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: "12px",
-    padding: "40px 30px",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
-    maxWidth: "500px",
-    width: "100%",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: "24px",
-    marginBottom: "24px",
-    fontWeight: 600,
-    color: "#333",
-  },
-  optionsContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-  },
-  optionButton: {
-    padding: "12px 20px",
-    fontSize: "16px",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    backgroundColor: "#fff",
-    cursor: "pointer",
-    transition: "0.2s",
-  },
-  loading: {
-    marginTop: "16px",
-    fontSize: "14px",
-    color: "#888",
-  },
-  error: {
-    color: "red",
-    marginBottom: "10px",
-  },
-};

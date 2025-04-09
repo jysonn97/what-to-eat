@@ -12,10 +12,11 @@ export default function AppPage() {
 
   useEffect(() => {
     if (location && answers.length === 0) {
-      const initial = [{ key: "location", answer: location }];
-      setAnswers(initial);
-      fetchNextQuestion(initial);
-    } else if (!location && answers.length === 0) {
+      const initialAnswers = [{ key: "location", answer: location }];
+      setAnswers(initialAnswers);
+      fetchNextQuestion(initialAnswers);
+    }
+    if (!location && answers.length === 0) {
       fetchNextQuestion([]);
     }
   }, [location, answers.length]);
@@ -54,92 +55,35 @@ export default function AppPage() {
   };
 
   return (
-    <div className="app-container">
-      <div className="question-box">
+    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center px-4 py-10 font-sans">
+      <div className="w-full max-w-xl">
         {questionData && (
-          <h1 className="question-title">🍽️ {questionData.question}</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">
+            {questionData.question}
+          </h1>
         )}
+        {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
 
-        {error && <p className="error-text">{error}</p>}
-
-        <div className="options-stack">
+        <div className="grid grid-cols-1 gap-4">
           {questionData?.options?.map((option, idx) => (
-            <button
+            <label
               key={idx}
-              className="option-button"
+              className="flex items-center justify-between border rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
               onClick={() => handleOptionClick(option)}
-              disabled={loading}
             >
-              {option}
-            </button>
+              <span className="text-base">{option}</span>
+              <input
+                type="radio"
+                name="option"
+                className="accent-black"
+                readOnly
+              />
+            </label>
           ))}
         </div>
 
-        {loading && <p className="loading-text">⏳ Loading...</p>}
+        {loading && <p className="mt-4 text-gray-600 text-center">⏳ Loading next question...</p>}
       </div>
-
-      <style jsx>{`
-        .app-container {
-          min-height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: #f8f8f8;
-          padding: 40px 20px;
-          font-family: 'Inter', sans-serif;
-        }
-
-        .question-box {
-          background: #fff;
-          padding: 40px 30px;
-          border-radius: 12px;
-          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-          width: 100%;
-          max-width: 600px;
-        }
-
-        .question-title {
-          font-size: 24px;
-          font-weight: 600;
-          margin-bottom: 30px;
-          text-align: center;
-        }
-
-        .options-stack {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-
-        .option-button {
-          padding: 14px 20px;
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          font-size: 16px;
-          font-weight: 500;
-          background-color: white;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: left;
-        }
-
-        .option-button:hover {
-          background-color: #f0f0f0;
-        }
-
-        .error-text {
-          color: red;
-          text-align: center;
-          font-weight: 500;
-          margin-top: 10px;
-        }
-
-        .loading-text {
-          margin-top: 20px;
-          text-align: center;
-          font-size: 15px;
-        }
-      `}</style>
     </div>
   );
 }

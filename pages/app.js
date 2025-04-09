@@ -5,37 +5,32 @@ export default function AppPage() {
   const router = useRouter();
   const { location } = router.query;
 
-  const [answers, setAnswers] = useState([]);
+  const [answers, setAnswers] = useState(location ? [{ key: "location", answer: location }] : []);
   const [questionData, setQuestionData] = useState(null);
+  const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (location && answers.length === 0) {
-      const initialAnswers = [{ key: "location", answer: location }];
-      setAnswers(initialAnswers);
-      fetchNextQuestion(initialAnswers);
+    if (location) {
+      fetchNextQuestion([{ key: "location", answer: location }]);
     }
-    if (!location && answers.length === 0) {
-      fetchNextQuestion([]);
-    }
-  }, [location, answers.length]);
+  }, [location]);
 
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);
     setError("");
-
     try {
       const res = await fetch("/api/generateQuestion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ previousAnswers: currentAnswers }),
       });
-
       const data = await res.json();
 
       if (data.nextQuestion) {
         setQuestionData(data.nextQuestion);
+        setSelected(""); // Reset selection
       } else {
         router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
       }
@@ -47,43 +42,112 @@ export default function AppPage() {
     }
   };
 
-  const handleOptionClick = (selectedAnswer) => {
-    if (!questionData?.key) return;
-    const updatedAnswers = [...answers, { key: questionData.key, answer: selectedAnswer }];
-    setAnswers(updatedAnswers);
-    fetchNextQuestion(updatedAnswers);
+  const handleNext = () => {
+    if (!selected || !questionData?.key) return;
+    const updated = [...answers, { key: questionData.key, answer: selected }];
+    setAnswers(updated);
+    fetchNextQuestion(updated);
+  };
+
+  const handleBack = () => {
+    if (answers.length <= 1) return; // Keep location
+    const updated = [...answers];
+    updated.pop(); // Remove last answer
+    setAnswers(updated);
+    fetchNextQuestion(updated);
   };
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center px-4 py-10 font-sans">
-      <div className="w-full max-w-xl">
-        {questionData && (
-          <h1 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">
-            {questionData.question}
-          </h1>
-        )}
-        {error && <p className="text-red-600 text-sm text-center mb-4">{error}</p>}
+    <div style={styles.container}>
+      {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
+      {error && <p style={styles.error}>{error}</p>}
 
-        <div className="grid grid-cols-1 gap-4">
-          {questionData?.options?.map((option, idx) => (
-            <label
-              key={idx}
-              className="flex items-center justify-between border rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition"
-              onClick={() => handleOptionClick(option)}
-            >
-              <span className="text-base">{option}</span>
-              <input
-                type="radio"
-                name="option"
-                className="accent-black"
-                readOnly
-              />
-            </label>
-          ))}
-        </div>
+      <div style={styles.options}>
+        {questionData?.options?.map((option, index) => (
+          <label key={index} style={styles.optionItem}>
+            <input
+              type="radio"
+              name="answer"
+              value={option}
+              checked={selected === option}
+              onChange={() => setSelected(option)}
+              style={styles.radio}
+            />
+            {option}
+          </label>
+        ))}
+      </div>
 
-        {loading && <p className="mt-4 text-gray-600 text-center">⏳ Loading next question...</p>}
+      <div style={styles.buttons}>
+        <button onClick={handleBack} style={styles.backButton}>← Go Back</button>
+        <button onClick={handleNext} disabled={!selected || loading} style={styles.nextButton}>
+          {loading ? "Loading..." : "Next →"}
+        </button>
       </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "'Inter', sans-serif",
+    padding: "20px",
+    backgroundColor: "#fff",
+    color: "#1f1f1f",
+    textAlign: "center",
+  },
+  title: {
+    fontSize: "clamp(22px, 4vw, 36px)",
+    marginBottom: "30px",
+    fontWeight: 600,
+  },
+  options: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "14px",
+    width: "100%",
+    maxWidth: "400px",
+    alignItems: "flex-start",
+  },
+  optionItem: {
+    fontSize: "18px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+  radio: {
+    width: "18px",
+    height: "18px",
+  },
+  buttons: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+    marginTop: "30px",
+  },
+  nextButton: {
+    padding: "10px 24px",
+    backgroundColor: "#000",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "16px",
+  },
+  backButton: {
+    padding: "10px 24px",
+    backgroundColor: "#f1f1f1",
+    color: "#000",
+    border: "1px solid #ccc",
+    borderRadius: "6px",
+    fontSize: "16px",
+  },
+  error: {
+    color: "red",
+    marginTop: "10px",
+  },
+};

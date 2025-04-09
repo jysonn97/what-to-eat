@@ -58,14 +58,16 @@ export default function LocationPage() {
           style={styles.input}
         />
         {error && <p style={styles.error}>{error}</p>}
-        <button
-          style={styles.button}
-          onClick={handleNext}
-          onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
-          onMouseLeave={(e) => (e.target.style.opacity = "1")}
-        >
-          Next
-        </button>
+        <div style={styles.buttonWrapper}>
+          <button
+            style={styles.button}
+            onClick={handleNext}
+            onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
+            onMouseLeave={(e) => (e.target.style.opacity = "1")}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -105,11 +107,15 @@ const styles = {
     fontSize: "14px",
     marginTop: "8px",
   },
+  buttonWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "20px",
+  },
   button: {
-    width: "100%",
-    padding: "14px",
+    width: "160px",
+    padding: "12px 0",
     fontSize: "16px",
-    marginTop: "15px",
     backgroundColor: "#000",
     color: "#fff",
     border: "none",

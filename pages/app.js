@@ -50,7 +50,10 @@ export default function AppPage() {
   };
 
   const handleBack = () => {
-    if (answers.length <= 1) return; // Keep location
+    if (answers.length <= 1) {
+      router.push("/location"); // ✅ Go back to location if at first question
+      return;
+    }
     const updated = [...answers];
     updated.pop(); // Remove last answer
     setAnswers(updated);

@@ -26,23 +26,16 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) {
-          throw new Error(`API returned status ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`API returned status ${res.status}`);
 
         const data = await res.json();
-        console.log("✅ FULL GPT Response:", data);
+        console.log("✅ Recommendations received:", data);
 
-        const output = data?.recommendations;
-
-        // ✅ STRONG safety check
-        if (Array.isArray(output)) {
-          setRecommendations(output);
-        } else {
-          console.warn("⚠️ Invalid response format from GPT:", output);
-          setRecommendations([]); // Prevent crash
-          setError("Invalid recommendation format. Please try again.");
+        if (!Array.isArray(data.recommendations)) {
+          throw new Error("Invalid recommendation format");
         }
+
+        setRecommendations(data.recommendations);
       } catch (err) {
         console.error("❌ Error fetching recommendations:", err);
         setError("Failed to fetch recommendations. Please try again.");
@@ -61,31 +54,30 @@ export default function RecommendationPage() {
       {loading && <p>⏳ Finding your perfect spot...</p>}
       {error && <p style={styles.error}>{error}</p>}
 
-      {!loading && !error && (!Array.isArray(recommendations) || recommendations.length === 0) && (
-        <p>No matches found. Try adjusting your preferences!</p>
-      )}
-
-      <ul style={styles.list}>
-        {Array.isArray(recommendations) &&
+      <div style={styles.cardContainer}>
+        {!loading &&
+          !error &&
           recommendations.map((place, index) => (
-            <li key={index} style={styles.card}>
-              <h3>{place.name}</h3>
-              <p>{place.description}</p>
-              <p>
-                ⭐ {place.rating} | 💵 {place.priceLevel || "N/A"} | 📍{" "}
-                {place.distance || "Distance not available"}
+            <div key={index} style={styles.card}>
+              <div style={styles.cardHeader}>
+                <h2 style={styles.name}>{place.name}</h2>
+                <a
+                  href={place.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.link}
+                >
+                  View ↗
+                </a>
+              </div>
+              <p style={styles.details}>
+                {place.cuisine} • {place.priceLevel || "N/A"} • ⭐ {place.rating} • 📍{" "}
+                {place.distance || "N/A"}
               </p>
-              <a
-                href={place.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.link}
-              >
-                View on Google Maps
-              </a>
-            </li>
+              <p style={styles.description}>{place.description}</p>
+            </div>
           ))}
-      </ul>
+      </div>
     </div>
   );
 }
@@ -93,36 +85,58 @@ export default function RecommendationPage() {
 const styles = {
   container: {
     padding: "40px 20px",
-    fontFamily: "'Aptos', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     textAlign: "center",
+    backgroundColor: "#fff",
+    color: "#1f1f1f",
+    minHeight: "100vh",
   },
   heading: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    marginBottom: "20px",
+    fontSize: "32px",
+    fontWeight: 600,
+    marginBottom: "30px",
   },
   error: {
     color: "red",
     fontWeight: "bold",
   },
-  list: {
-    listStyle: "none",
-    padding: 0,
-    marginTop: "30px",
+  cardContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+    maxWidth: "700px",
+    margin: "0 auto",
   },
   card: {
     backgroundColor: "#f9f9f9",
     padding: "20px",
-    margin: "10px auto",
-    borderRadius: "8px",
-    maxWidth: "600px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    borderRadius: "10px",
+    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.05)",
     textAlign: "left",
   },
+  cardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  name: {
+    fontSize: "20px",
+    fontWeight: 600,
+    margin: 0,
+  },
   link: {
-    display: "inline-block",
-    marginTop: "10px",
-    color: "#0070f3",
-    textDecoration: "underline",
+    fontSize: "14px",
+    color: "#0066cc",
+    textDecoration: "none",
+  },
+  details: {
+    fontSize: "14px",
+    color: "#666",
+    margin: "8px 0",
+  },
+  description: {
+    fontSize: "15px",
+    lineHeight: 1.5,
+    color: "#333",
   },
 };

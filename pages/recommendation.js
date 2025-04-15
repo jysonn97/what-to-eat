@@ -18,24 +18,18 @@ export default function RecommendationPage() {
 
       try {
         const decodedAnswers = JSON.parse(answers);
-        console.log("🔍 Sending answers to API:", decodedAnswers);
-
         const res = await fetch("/api/recommendRestaurant", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) throw new Error(`API returned status ${res.status}`);
-
-        const data = await res.json();
-        console.log("✅ Recommendations received:", data);
-
-        if (!Array.isArray(data.recommendations)) {
-          throw new Error("Invalid recommendation format");
+        if (!res.ok) {
+          throw new Error(`API returned status ${res.status}`);
         }
 
-        setRecommendations(data.recommendations);
+        const data = await res.json();
+        setRecommendations(data.recommendations || []);
       } catch (err) {
         console.error("❌ Error fetching recommendations:", err);
         setError("Failed to fetch recommendations. Please try again.");
@@ -49,35 +43,30 @@ export default function RecommendationPage() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.heading}>🍽️ Top Matches for You</h1>
+      <h1 style={styles.heading}>Your Top Restaurant Picks</h1>
 
-      {loading && <p>⏳ Finding your perfect spot...</p>}
+      {loading && <p style={styles.message}>⏳ Finding your perfect match...</p>}
       {error && <p style={styles.error}>{error}</p>}
 
-      <div style={styles.cardContainer}>
-        {!loading &&
-          !error &&
-          recommendations.map((place, index) => (
-            <div key={index} style={styles.card}>
-              <div style={styles.cardHeader}>
-                <h2 style={styles.name}>{place.name}</h2>
-                <a
-                  href={place.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={styles.link}
-                >
-                  View ↗
-                </a>
-              </div>
-              <p style={styles.details}>
-                {place.cuisine} • {place.priceLevel || "N/A"} • ⭐ {place.rating} • 📍{" "}
-                {place.distance || "N/A"}
-              </p>
-              <p style={styles.description}>{place.description}</p>
-            </div>
-          ))}
-      </div>
+      {!loading && !error && recommendations.length === 0 && (
+        <p style={styles.message}>No matches found. Try adjusting your preferences!</p>
+      )}
+
+      <ul style={styles.list}>
+        {recommendations.map((place, index) => (
+          <li key={index} style={styles.card}>
+            <h3 style={styles.name}>{place.name}</h3>
+            <p style={styles.description}>{place.description}</p>
+            <p style={styles.meta}>
+              ⭐ {place.rating} | 💵 {place.priceLevel || "N/A"} | 📍{" "}
+              {place.distance || "Distance not available"}
+            </p>
+            <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
+              View on Google Maps →
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -86,57 +75,60 @@ const styles = {
   container: {
     padding: "40px 20px",
     fontFamily: "'Inter', sans-serif",
-    textAlign: "center",
     backgroundColor: "#fff",
-    color: "#1f1f1f",
     minHeight: "100vh",
+    textAlign: "center",
   },
   heading: {
-    fontSize: "32px",
-    fontWeight: 600,
+    fontSize: "clamp(24px, 4vw, 36px)",
+    fontWeight: "600",
+    marginBottom: "24px",
+    color: "#1f1f1f",
+  },
+  message: {
+    fontSize: "16px",
+    color: "#333",
     marginBottom: "30px",
   },
   error: {
     color: "red",
     fontWeight: "bold",
+    fontSize: "16px",
   },
-  cardContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-    maxWidth: "700px",
-    margin: "0 auto",
+  list: {
+    listStyle: "none",
+    padding: 0,
+    marginTop: "20px",
   },
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: "20px",
+    backgroundColor: "#fafafa",
+    padding: "24px",
+    margin: "12px auto",
     borderRadius: "10px",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.05)",
+    maxWidth: "600px",
+    boxShadow: "0 4px 14px rgba(0, 0, 0, 0.06)",
     textAlign: "left",
-  },
-  cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
   },
   name: {
     fontSize: "20px",
-    fontWeight: 600,
-    margin: 0,
-  },
-  link: {
-    fontSize: "14px",
-    color: "#0066cc",
-    textDecoration: "none",
-  },
-  details: {
-    fontSize: "14px",
-    color: "#666",
-    margin: "8px 0",
+    fontWeight: "600",
+    marginBottom: "8px",
+    color: "#111",
   },
   description: {
-    fontSize: "15px",
-    lineHeight: 1.5,
-    color: "#333",
+    fontSize: "16px",
+    marginBottom: "10px",
+    color: "#444",
+  },
+  meta: {
+    fontSize: "14px",
+    color: "#666",
+  },
+  link: {
+    display: "inline-block",
+    marginTop: "12px",
+    color: "#000",
+    fontWeight: "500",
+    textDecoration: "underline",
   },
 };

@@ -128,7 +128,8 @@ You are an intelligent restaurant recommendation assistant. Based on the restaur
       "Recent review: 'Perfect for a quiet date night'",
       "Within 6-minute walk from your location"
     ],
-    "mapsUrl": "https://maps.google.com/?q=..."
+    mapsUrl: `https://www.google.com/maps/place/?q=place_id:${details.place_id}`,
+
   }
 ]
 

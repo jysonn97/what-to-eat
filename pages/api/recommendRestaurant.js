@@ -12,98 +12,89 @@ export default async function handler(req, res) {
 
   try {
     const { answers } = req.body;
-    console.log("📥 Recommendation Request with Answers:", answers);
+    const locationAnswer = answers.find((a) => a.key === "location")?.answer;
+    if (!locationAnswer) {
+      return res.status(400).json({ error: "Missing location input" });
+    }
 
-    const location = answers.find((a) => a.key === "location")?.answer;
     const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
     const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
     const budget = answers.find((a) => a.key === "budget")?.answer || "";
-    const distancePref = answers.find((a) => a.key === "distance")?.answer || "";
-    const minRating = answers.find((a) => a.key === "minRating")?.answer || "";
+    const distance = answers.find((a) => a.key === "distance")?.answer || "";
     const occasion = answers.find((a) => a.key === "occasion")?.answer || "";
     const hunger = answers.find((a) => a.key === "hunger")?.answer || "";
     const reviewImportance = answers.find((a) => a.key === "review_importance")?.answer || "";
 
-    if (!location) {
-      return res.status(400).json({ error: "Missing location input" });
-    }
+    const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    // Get lat/lng
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-        location
+        locationAnswer
       )}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
     );
     const geoData = await geoRes.json();
-    const coordinates = geoData.results[0]?.geometry?.location;
-    if (!coordinates) {
-      return res.status(400).json({ error: "Invalid location input" });
+    const location = geoData.results[0]?.geometry?.location;
+    if (!location) {
+      return res.status(400).json({ error: "Invalid location" });
     }
 
-    const searchQuery = `${cuisine} ${vibe} ${budget} restaurant`;
-    const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
-      searchQuery
-    )}&location=${coordinates.lat},${coordinates.lng}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`;
-
-    const searchRes = await fetch(searchUrl);
+    const searchRes = await fetch(
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+        query
+      )}&location=${location.lat},${location.lng}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+    );
     const searchData = await searchRes.json();
-    const places = searchData.results?.slice(0, 15) || [];
+    const rawPlaces = searchData.results?.slice(0, 10) || [];
 
-    const details = await Promise.all(
-      places.map((p) => fetchPlaceDetails(p.place_id, coordinates))
+    const placeDetails = await Promise.all(
+      rawPlaces.map((p) => fetchPlaceDetails(p.place_id, location))
     );
 
-    // Apply filters (rating, price, distance)
-    const filtered = details.filter((place) => {
-      const meetsRating = !minRating || (place.rating >= parseFloat(minRating));
-      const meetsBudget = !budget || (place.price_description === budget);
-      const meetsDistance = !distancePref || (place.distanceValue <= distanceToMinutes(distancePref));
-      return meetsRating && meetsBudget && meetsDistance;
-    });
-
-    if (filtered.length === 0) {
-      return res.status(200).json({ recommendations: [] });
-    }
-
-    const restaurant_context = filtered
-      .map((p, i) => {
-        return `Restaurant ${i + 1}:
+    const restaurantContext = placeDetails
+      .map(
+        (p, i) => `Restaurant ${i + 1}:
 Name: ${p.name}
-Rating: ${p.rating} (${p.reviewCount} reviews)
-Price: ${p.price_description}
+Rating: ${p.rating}
+Review Count: ${p.reviewCount}
+Price: ${p.price}
 Cuisine: ${p.cuisine}
-Distance: ${p.distanceText}
-Address: ${p.address}
-Reviews: ${p.reviews.join(" / ")}
-Maps URL: ${p.mapsUrl}
-`;
-      })
-      .join("\n");
+Distance: ${p.distance}
+Reviews: ${p.reviews.join(" | ")}`
+      )
+      .join("\n\n");
 
-    const prompt = `You are an intelligent restaurant recommendation assistant.
+    const prompt = `
+You are an intelligent restaurant recommendation assistant.
 
 Your job is to analyze real restaurant data and carefully select the best 3 options that match the user's preferences.
 
 User Preferences:
-- Location: ${location}
+- Location: ${locationAnswer}
 - Cuisine: ${cuisine}
 - Budget: ${budget}
 - Vibe: ${vibe}
-- Distance limit: ${distancePref}
+- Distance limit: ${distance}
 - Occasion: ${occasion}
 - Hunger level: ${hunger}
 - Review preference: ${reviewImportance}
 
 Restaurant Candidates:
-${restaurant_context}
+${restaurantContext}
 
-🧠 Carefully read each restaurant's reviews, price, rating, and vibe.
+🧠 Carefully read each restaurant's reviews, price, rating, cuisine, and distance.
 
-✅ Recommend ONLY if the restaurant clearly fits the user's intent (e.g., romantic, cozy, under 10 min walk, etc.).
+✅ Prioritize:
+- Vibe, occasion, and cuisine first
+- Price and rating second
+- Distance and hunger as flexible filters
 
-❌ If no place fits well, return fewer than 3 — do not force results.
+🔍 If the restaurant is an excellent match overall, it's okay if one aspect is slightly off (e.g., 12 min walk instead of 10, 4.4 stars instead of 4.5).
 
-Format:
+❌ Do NOT include restaurants that clearly mismatch the core preferences (wrong cuisine, extremely far, bad reviews).
+
+Return ONLY the most relevant 1–3 options.
+
+FORMAT (must be a JSON array like below):
 [
   {
     "name": "Restaurant Name",
@@ -129,22 +120,13 @@ Format:
     try {
       parsed = JSON.parse(gptText);
     } catch (err) {
-      console.error("⚠️ Failed to parse GPT response:", gptText);
-      return res.status(200).json({ error: "Invalid GPT format" });
+      console.warn("⚠️ Invalid GPT format:", gptText);
+      return res.status(200).json({ recommendations: [] });
     }
 
     return res.status(200).json({ recommendations: parsed });
-  } catch (error) {
-    console.error("❌ API Error:", error.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+  } catch (err) {
+    console.error("❌ Recommendation error:", err);
+    return res.status(500).json({ error: "Failed to generate recommendations" });
   }
-}
-
-function distanceToMinutes(text) {
-  if (!text) return 999;
-  if (text.includes("walk")) {
-    const match = text.match(/\d+/);
-    return match ? parseInt(match[0]) : 999;
-  }
-  return 999;
 }

@@ -105,33 +105,40 @@ Top Reviews:\n${p.reviews?.join("\n") || ""}
       .join("\n");
 
     // GPT PROMPT
-    const prompt = `You are an intelligent restaurant recommendation assistant.
+  const prompt = `
+You are an intelligent restaurant recommendation assistant. Based on the restaurant data and user's preferences below, return the top 3 recommended restaurants.
 
-Based on the user's preferences and the restaurant data below, recommend the BEST 3 restaurants. Be accurate and thoughtful.
+❗IMPORTANT:
+- ONLY return valid JSON in the format below.
+- DO NOT include commentary or extra text.
+- Highlights must be a JSON array of bullet points.
+- If no good match exists, return fewer than 3 items.
 
-User Preferences:
-${userPrefs}
-
-Restaurant Candidates:
-${context}
-
-✅ Format:
+📋 JSON Format Example:
 [
   {
     "name": "Restaurant Name",
     "rating": 4.6,
-    "reviewCount": 312,
+    "reviewCount": 301,
     "price": "$$",
     "cuisine": "Japanese",
-    "distance": "8 min walk",
-    "mapsUrl": "https://maps.google.com/?q=...",
+    "distance": "9 min walk",
     "highlights": [
-      "Cozy, romantic vibe with ambient lighting",
+      "Cozy and romantic vibe",
       "Recent review: 'Perfect for a quiet date night'",
-      "Within 8-minute walk from user's location"
-    ]
+      "Within 6-minute walk from your location"
+    ],
+    "mapsUrl": "https://maps.google.com/?q=..."
   }
-]`;
+]
+
+👤 User Preferences:
+${userPrefs}
+
+🏢 Candidate Restaurants:
+${context}
+`;
+
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",

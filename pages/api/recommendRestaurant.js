@@ -1,6 +1,20 @@
 import { OpenAI } from "openai";
 import fetchPlaceDetails from "@/lib/fetchPlaceDetails";
 
+// Haversine formula for distance
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius (km)
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -12,6 +26,8 @@ export default async function handler(req, res) {
 
   try {
     const { answers } = req.body;
+    console.log("📥 Recommendation Request with Answers:", answers);
+
     const locationAnswer = answers.find((a) => a.key === "location")?.answer;
     if (!locationAnswer) {
       return res.status(400).json({ error: "Missing location input" });
@@ -20,93 +36,83 @@ export default async function handler(req, res) {
     const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
     const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
     const budget = answers.find((a) => a.key === "budget")?.answer || "";
-    const distance = answers.find((a) => a.key === "distance")?.answer || "";
-    const occasion = answers.find((a) => a.key === "occasion")?.answer || "";
-    const hunger = answers.find((a) => a.key === "hunger")?.answer || "";
-    const reviewImportance = answers.find((a) => a.key === "review_importance")?.answer || "";
+    const distancePref = answers.find((a) => a.key === "distance")?.answer || "";
 
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
+    // Step 1: Geocode user location
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
       )}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
     );
     const geoData = await geoRes.json();
-    const location = geoData.results[0]?.geometry?.location;
-    if (!location) {
+    const userLoc = geoData.results[0]?.geometry?.location;
+    if (!userLoc) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
+    // Step 2: Google Places search
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
-      )}&location=${location.lat},${location.lng}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
+      )}&location=${userLoc.lat},${userLoc.lng}&radius=3000&type=restaurant&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`
     );
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 10) || [];
 
+    // Step 3: Fetch place details + walking distance
     const placeDetails = await Promise.all(
-      rawPlaces.map((p) => fetchPlaceDetails(p.place_id, location))
+      rawPlaces.map(async (p) => {
+        const details = await fetchPlaceDetails(p.place_id);
+
+        const placeLoc = p.geometry?.location;
+        let walkDistance = null;
+        if (placeLoc?.lat && placeLoc?.lng) {
+          const km = haversineDistance(userLoc.lat, userLoc.lng, placeLoc.lat, placeLoc.lng);
+          const minutes = Math.round((km * 1000) / 80); // assume ~80m/min
+          walkDistance = `${minutes} min walk`;
+        }
+
+        return {
+          ...details,
+          distance: walkDistance || "N/A",
+        };
+      })
     );
 
-    const restaurantContext = placeDetails
+    const userPrefs = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
+    const context = placeDetails
       .map(
-        (p, i) => `Restaurant ${i + 1}:
-Name: ${p.name}
-Rating: ${p.rating}
-Review Count: ${p.reviewCount}
-Price: ${p.price}
-Cuisine: ${p.cuisine}
-Distance: ${p.distance}
-Reviews: ${p.reviews.join(" | ")}`
+        (p, i) =>
+          `Restaurant ${i + 1}:\nName: ${p.name}\nRating: ${p.rating}\nPrice: ${p.price_level}\nAddress: ${p.address}\nCuisine: ${p.cuisine}\nDistance: ${p.distance}\nReviews:\n${p.reviews}\n`
       )
-      .join("\n\n");
+      .join("\n");
 
-    const prompt = `
-You are an intelligent restaurant recommendation assistant.
+    const prompt = `You are a smart restaurant recommendation assistant.
 
-Your job is to analyze real restaurant data and carefully select the best 3 options that match the user's preferences.
+Analyze these restaurants and choose the BEST 3 based on the user's needs.
+If nothing fits well, return fewer than 3.
 
-User Preferences:
-- Location: ${locationAnswer}
-- Cuisine: ${cuisine}
-- Budget: ${budget}
-- Vibe: ${vibe}
-- Distance limit: ${distance}
-- Occasion: ${occasion}
-- Hunger level: ${hunger}
-- Review preference: ${reviewImportance}
-
-Restaurant Candidates:
-${restaurantContext}
-
-🧠 Carefully read each restaurant's reviews, price, rating, cuisine, and distance.
-
-✅ Prioritize:
-- Vibe, occasion, and cuisine first
-- Price and rating second
-- Distance and hunger as flexible filters
-
-🔍 If the restaurant is an excellent match overall, it's okay if one aspect is slightly off (e.g., 12 min walk instead of 10, 4.4 stars instead of 4.5).
-
-❌ Do NOT include restaurants that clearly mismatch the core preferences (wrong cuisine, extremely far, bad reviews).
-
-Return ONLY the most relevant 1–3 options.
-
-FORMAT (must be a JSON array like below):
+Respond in valid JSON format like:
 [
   {
     "name": "Restaurant Name",
-    "description": "Tailored explanation of why this is a great match.",
+    "description": "Why this fits the user's input.",
     "rating": 4.6,
-    "reviewCount": 301,
+    "reviewCount": 312,
     "price": "$$",
     "cuisine": "Japanese",
     "distance": "9 min walk",
     "mapsUrl": "https://maps.google.com/?q=..."
   }
 ]
+
+User Preferences:
+${userPrefs}
+
+Candidate Restaurants:
+${context}
 `;
 
     const completion = await openai.chat.completions.create({
@@ -116,17 +122,19 @@ FORMAT (must be a JSON array like below):
     });
 
     const gptText = completion.choices[0].message.content;
+    console.log("✅ GPT Raw Output:", gptText);
+
     let parsed;
     try {
       parsed = JSON.parse(gptText);
     } catch (err) {
-      console.warn("⚠️ Invalid GPT format:", gptText);
-      return res.status(200).json({ recommendations: [] });
+      console.warn("⚠️ GPT returned invalid JSON:", gptText);
+      return res.status(200).json({ error: "Invalid GPT format" });
     }
 
     return res.status(200).json({ recommendations: parsed });
   } catch (err) {
-    console.error("❌ Recommendation error:", err);
+    console.error("❌ Recommendation API Error:", err);
     return res.status(500).json({ error: "Failed to generate recommendations" });
   }
 }

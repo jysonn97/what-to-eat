@@ -30,7 +30,7 @@ export default function AppPage() {
 
       if (data.nextQuestion) {
         setQuestionData(data.nextQuestion);
-        setSelected(""); // Reset selection
+        setSelected("");
       } else {
         router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
       }
@@ -51,11 +51,11 @@ export default function AppPage() {
 
   const handleBack = () => {
     if (answers.length <= 1) {
-      router.push("/location"); // ✅ Go back to location if at first question
+      router.push("/location");
       return;
     }
     const updated = [...answers];
-    updated.pop(); // Remove last answer
+    updated.pop();
     setAnswers(updated);
     fetchNextQuestion(updated);
   };
@@ -99,23 +99,24 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     fontFamily: "'Inter', sans-serif",
-    padding: "20px",
+    padding: "40px 20px",
     backgroundColor: "#fff",
     color: "#1f1f1f",
     textAlign: "center",
   },
   title: {
-    fontSize: "clamp(22px, 4vw, 36px)",
-    marginBottom: "30px",
+    fontSize: "clamp(24px, 4vw, 36px)",
     fontWeight: 600,
+    marginBottom: "40px",
   },
   options: {
     display: "flex",
     flexDirection: "column",
-    gap: "14px",
+    gap: "16px",
     width: "100%",
     maxWidth: "400px",
     alignItems: "flex-start",
+    marginBottom: "40px",
   },
   optionItem: {
     fontSize: "18px",
@@ -126,28 +127,31 @@ const styles = {
   radio: {
     width: "18px",
     height: "18px",
+    cursor: "pointer",
   },
   buttons: {
     display: "flex",
     justifyContent: "center",
     gap: "15px",
-    marginTop: "30px",
+    marginTop: "20px",
   },
   nextButton: {
-    padding: "10px 24px",
+    padding: "10px 26px",
     backgroundColor: "#000",
     color: "#fff",
     border: "none",
     borderRadius: "6px",
     fontSize: "16px",
+    cursor: "pointer",
   },
   backButton: {
-    padding: "10px 24px",
+    padding: "10px 26px",
     backgroundColor: "#f1f1f1",
     color: "#000",
     border: "1px solid #ccc",
     borderRadius: "6px",
     fontSize: "16px",
+    cursor: "pointer",
   },
   error: {
     color: "red",

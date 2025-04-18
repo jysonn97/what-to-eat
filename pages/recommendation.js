@@ -59,16 +59,24 @@ export default function RecommendationPage() {
       <ul style={styles.list}>
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
-            <h3 style={styles.name}>
-              {index + 1}. {place.name}
-              <span style={styles.rating}> ⭐ {place.rating} ({place.reviewCount} reviews)</span>
-            </h3>
+            <div style={styles.headerRow}>
+              <h2 style={styles.name}>
+                {index + 1}. {place.name}
+              </h2>
+              <span style={styles.rating}>
+                ⭐ {place.rating} ({place.reviewCount} reviews)
+              </span>
+            </div>
 
-            <p style={styles.description}>{place.description}</p>
+            <ul style={styles.highlights}>
+              {place.highlights?.map((line, idx) => (
+                <li key={idx} style={styles.bullet}>{line}</li>
+              ))}
+            </ul>
 
-            <p><strong>💰 Price:</strong> {place.price}</p>
-            <p><strong>🍽️ Cuisine:</strong> {place.cuisine}</p>
-            <p><strong>📍 Distance:</strong> {place.distance}</p>
+            <p><span style={styles.label}>💰 Price:</span> {place.price}</p>
+            <p><span style={styles.label}>🍽️ Cuisine:</span> {place.cuisine}</p>
+            <p><span style={styles.label}>📍 Distance:</span> {place.distance}</p>
 
             {place.mapsUrl && (
               <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
@@ -91,7 +99,7 @@ const styles = {
   heading: {
     fontSize: "28px",
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "30px",
   },
   error: {
     color: "red",
@@ -104,31 +112,42 @@ const styles = {
   },
   card: {
     backgroundColor: "#f9f9f9",
-    padding: "24px",
-    margin: "16px auto",
-    borderRadius: "10px",
+    padding: "25px",
+    margin: "20px auto",
+    borderRadius: "12px",
     maxWidth: "620px",
-    boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
     textAlign: "left",
+  },
+  headerRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    flexWrap: "wrap",
   },
   name: {
     fontSize: "20px",
     fontWeight: "600",
-    marginBottom: "6px",
+    margin: 0,
   },
   rating: {
-    fontSize: "16px",
-    fontWeight: "normal",
-    marginLeft: "10px",
+    fontSize: "15px",
+    color: "#555",
   },
-  description: {
-    fontSize: "16px",
-    lineHeight: 1.5,
-    margin: "12px 0",
+  highlights: {
+    margin: "15px 0 10px",
+    paddingLeft: "20px",
+    color: "#333",
+  },
+  bullet: {
+    marginBottom: "6px",
+  },
+  label: {
+    fontWeight: 600,
   },
   link: {
     display: "inline-block",
-    marginTop: "12px",
+    marginTop: "15px",
     color: "#0070f3",
     textDecoration: "underline",
   },

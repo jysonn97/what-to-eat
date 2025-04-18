@@ -24,11 +24,9 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch recommendations.");
-        }
-
+        if (!res.ok) throw new Error("Failed to fetch recommendations.");
         const data = await res.json();
+
         if (Array.isArray(data.recommendations)) {
           setRecommendations(data.recommendations);
         } else {
@@ -59,37 +57,27 @@ export default function RecommendationPage() {
       <ul style={styles.list}>
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
-            <h3 style={styles.name}>
-              {index + 1}. {place.name}{" "}
+            <h2 style={styles.name}>
+              {index + 1}. {place.name}
               <span style={styles.rating}>
                 ⭐ {place.rating} ({place.reviewCount} reviews)
               </span>
-            </h3>
+            </h2>
 
-            <div style={styles.bullets}>
-              <div>✅ {place.vibe}</div>
-              {place.topReviews?.[0] && (
-                <div>✅ Recent review: “{place.topReviews[0]}”</div>
-              )}
-              {place.highlight && <div>✅ {place.highlight}</div>}
+            <div style={styles.description}>
+              {place.highlights?.map((point, idx) => (
+                <p key={idx} style={styles.point}>✅ {point}</p>
+              ))}
             </div>
 
-            <p>
-              <strong>💰 Price:</strong> {place.price || "N/A"}
-            </p>
-            <p>
-              <strong>🍽 Cuisine:</strong> {place.cuisine || "N/A"}
-            </p>
-            <p>
-              <strong>📍 Distance:</strong> {place.distance || "N/A"}
-            </p>
+            <div style={styles.meta}>
+              <p><span style={styles.label}>💰 Price:</span> {place.price || "N/A"}</p>
+              <p><span style={styles.label}>🍽️ Cuisine:</span> {place.cuisine || "N/A"}</p>
+              <p><span style={styles.label}>📍 Distance:</span> {place.distance || "N/A"}</p>
+            </div>
+
             {place.mapsUrl && (
-              <a
-                href={place.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.link}
-              >
+              <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
                 View on Google Maps
               </a>
             )}
@@ -109,7 +97,7 @@ const styles = {
   heading: {
     fontSize: "28px",
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "30px",
   },
   error: {
     color: "red",
@@ -118,35 +106,45 @@ const styles = {
   list: {
     listStyle: "none",
     padding: 0,
-    marginTop: "30px",
+    marginTop: "20px",
   },
   card: {
     backgroundColor: "#f9f9f9",
-    padding: "20px",
+    padding: "24px",
     margin: "20px auto",
     borderRadius: "10px",
-    maxWidth: "600px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    maxWidth: "700px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     textAlign: "left",
   },
   name: {
     fontSize: "20px",
-    fontWeight: "600",
-    marginBottom: "10px",
+    fontWeight: 600,
+    marginBottom: "8px",
   },
   rating: {
-    fontSize: "16px",
-    fontWeight: "normal",
+    fontSize: "14px",
+    fontWeight: 400,
     marginLeft: "10px",
     color: "#555",
   },
-  bullets: {
-    marginBottom: "15px",
-    lineHeight: "1.6",
+  description: {
+    margin: "10px 0 18px",
+  },
+  point: {
+    fontSize: "15px",
+    margin: "4px 0",
+  },
+  meta: {
+    fontSize: "15px",
+    lineHeight: 1.6,
+  },
+  label: {
+    fontWeight: 600,
   },
   link: {
     display: "inline-block",
-    marginTop: "10px",
+    marginTop: "14px",
     color: "#0070f3",
     textDecoration: "underline",
   },

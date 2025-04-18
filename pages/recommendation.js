@@ -25,8 +25,8 @@ export default function RecommendationPage() {
         });
 
         if (!res.ok) throw new Error("Failed to fetch recommendations.");
-        const data = await res.json();
 
+        const data = await res.json();
         if (Array.isArray(data.recommendations)) {
           setRecommendations(data.recommendations);
         } else {
@@ -58,12 +58,18 @@ export default function RecommendationPage() {
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
             <h3 style={styles.name}>
-              {index + 1}. {place.name} ★ {place.rating} ({place.reviewCount} reviews)
+              {index + 1}. {place.name}
+              {place.rating && ` ⭐ ${place.rating}`}
+              {place.reviewCount && ` (${place.reviewCount} reviews)`}
             </h3>
-            <p style={styles.description}>{place.description}</p>
-            <p><strong>Price:</strong> {place.price}</p>
-            <p><strong>Cuisine:</strong> {place.cuisine || "N/A"}</p>
-            <p><strong>Distance:</strong> {place.distance || "Unknown"}</p>
+            <p>{place.description}</p>
+
+            <div style={styles.meta}>
+              {place.price && <p>💰 <strong>Price:</strong> {place.price}</p>}
+              {place.cuisine && <p>🍽 <strong>Cuisine:</strong> {place.cuisine}</p>}
+              {place.distance && <p>📍 <strong>Distance:</strong> {place.distance}</p>}
+            </div>
+
             {place.mapsUrl && (
               <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
                 View on Google Maps
@@ -81,11 +87,13 @@ const styles = {
     padding: "40px 20px",
     fontFamily: "'Inter', sans-serif",
     textAlign: "center",
+    backgroundColor: "#fff",
+    color: "#1f1f1f",
   },
   heading: {
     fontSize: "28px",
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "30px",
   },
   error: {
     color: "red",
@@ -94,30 +102,34 @@ const styles = {
   list: {
     listStyle: "none",
     padding: 0,
-    marginTop: "30px",
+    marginTop: "20px",
   },
   card: {
     backgroundColor: "#f9f9f9",
-    padding: "20px",
-    margin: "10px auto",
-    borderRadius: "8px",
-    maxWidth: "650px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    padding: "24px",
+    margin: "15px auto",
+    borderRadius: "10px",
+    maxWidth: "600px",
+    boxShadow: "0 4px 14px rgba(0, 0, 0, 0.08)",
     textAlign: "left",
   },
   name: {
-    fontSize: "18px",
-    fontWeight: "bold",
+    fontSize: "20px",
+    fontWeight: 600,
     marginBottom: "10px",
   },
-  description: {
-    fontStyle: "italic",
-    marginBottom: "8px",
+  meta: {
+    marginTop: "10px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "6px",
+    fontSize: "15px",
   },
   link: {
     display: "inline-block",
-    marginTop: "10px",
+    marginTop: "12px",
     color: "#0070f3",
+    fontWeight: "500",
     textDecoration: "underline",
   },
 };

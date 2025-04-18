@@ -32,6 +32,7 @@ export default async function handler(req, res) {
     );
     const geoData = await geoRes.json();
     const location = geoData.results[0]?.geometry?.location;
+
     if (!location) {
       return res.status(400).json({ error: "Invalid location" });
     }
@@ -49,10 +50,18 @@ export default async function handler(req, res) {
     );
 
     const userPrefs = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
+
     const context = placeDetails
       .map(
-        (p, i) =>
-          `Restaurant ${i + 1}:\nName: ${p.name}\nRating: ${p.rating}\nPrice: ${p.price_level}\nAddress: ${p.address}\nReviews:\n${p.reviews}\n`
+        (p, i) => `
+Restaurant ${i + 1}:
+Name: ${p.name}
+Rating: ${p.rating} (${p.reviewCount} reviews)
+Price: ${p.price_level}
+Vibe: ${p.vibe}
+Address: ${p.address}
+Reviews: ${p.reviews.join(" | ")}
+`
       )
       .join("\n");
 

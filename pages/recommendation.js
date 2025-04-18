@@ -135,13 +135,19 @@ const styles = {
     fontSize: "15px",
     color: "#555",
   },
-  highlights: {
-    margin: "14px 0",
-    paddingLeft: "20px",
-    color: "#333",
-  },
-  bullet: {
-    marginBottom: "6px",
+ highlights: {
+  margin: "15px 0 10px",
+  padding: 0,
+  listStyle: "none",
+},
+bullet: {
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  marginBottom: "6px",
+  fontSize: "16px",
+},
+
   },
   label: {
     fontWeight: 600,

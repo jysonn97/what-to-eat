@@ -24,9 +24,7 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch recommendations.");
-        }
+        if (!res.ok) throw new Error("Failed to fetch recommendations.");
 
         const data = await res.json();
         if (Array.isArray(data.recommendations)) {
@@ -59,15 +57,19 @@ export default function RecommendationPage() {
       <ul style={styles.list}>
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
-            <h3 style={styles.name}>
-              {index + 1}. {place.name}
-            </h3>
-            <p>★ {place.rating} {place.reviewCount ? `(${place.reviewCount} reviews)` : ""}</p>
-            <p><strong>Price:</strong> {place.priceLevel || "N/A"}</p>
-            <p><strong>Distance:</strong> {place.distance || "N/A"}</p>
-            <p><strong>Why it's recommended:</strong> {place.description}</p>
+            <h3 style={styles.name}>{index + 1}. {place.name}</h3>
+            <p style={styles.detailLine}>⭐ {place.rating} ({place.reviewCount ?? "N/A"} reviews)</p>
+            <p style={styles.detailLine}><strong>Price:</strong> {place.price || "N/A"}</p>
+            <p style={styles.detailLine}><strong>Cuisine:</strong> {place.cuisine || "N/A"}</p>
+            <p style={styles.detailLine}><strong>Distance:</strong> {place.distance || "N/A"}</p>
+            <p style={styles.detailLine}><strong>Why it’s recommended:</strong> {place.description}</p>
             {place.mapsUrl && (
-              <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
+              <a
+                href={place.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.link}
+              >
                 View on Google Maps
               </a>
             )}
@@ -100,20 +102,27 @@ const styles = {
   },
   card: {
     backgroundColor: "#f9f9f9",
-    padding: "20px",
-    margin: "10px auto",
-    borderRadius: "8px",
-    maxWidth: "600px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    padding: "24px",
+    margin: "20px auto",
+    borderRadius: "10px",
+    maxWidth: "650px",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
     textAlign: "left",
   },
   name: {
-    marginBottom: "10px",
+    fontSize: "20px",
+    fontWeight: 600,
+    marginBottom: "8px",
+  },
+  detailLine: {
+    fontSize: "15px",
+    margin: "6px 0",
   },
   link: {
     display: "inline-block",
-    marginTop: "10px",
+    marginTop: "12px",
     color: "#0070f3",
     textDecoration: "underline",
+    fontWeight: 500,
   },
 };

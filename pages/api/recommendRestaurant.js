@@ -65,18 +65,27 @@ Reviews: ${p.reviews.join(" | ")}
       )
       .join("\n");
 
-    const prompt = `You are a smart restaurant recommendation assistant.
+const prompt = `You are a smart restaurant recommendation assistant.
 
-Based on the user's preferences and the restaurant info below, choose the BEST 3 restaurants.
+Your job is to read the user preferences and match them with the most relevant restaurants based on Google review details.
 
-👉 OUTPUT MUST be valid JSON array like this:
+✅ Your recommendation must:
+- Consider vibe, cuisine, price, etc.
+- Select 3 best-fitting restaurants from the data.
+- Pick and include the most **relevant reviews** (up to 2) for each restaurant that align with user preferences.
+- Format output as valid JSON.
+
+Output format:
 [
   {
     "name": "Restaurant Name",
-    "description": "Why this place is a great match based on user's preferences.",
+    "description": "Why it's a great fit",
     "rating": 4.6,
-    "priceLevel": "$$",
-    "distance": "10 min walk",
+    "reviewCount": 1402,
+    "price": "$$",
+    "vibe": "cozy, quiet, good for date night",
+    "topReviews": ["Short relevant review 1", "Short relevant review 2"],
+    "distance": "12 min walk",
     "mapsUrl": "https://maps.google.com/?q=..."
   }
 ]
@@ -87,6 +96,7 @@ ${userPrefs}
 Restaurant Data:
 ${context}
 `;
+
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",

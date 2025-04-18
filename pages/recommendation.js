@@ -24,7 +24,9 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) throw new Error("Failed to fetch recommendations.");
+        if (!res.ok) {
+          throw new Error("Failed to fetch recommendations.");
+        }
 
         const data = await res.json();
         if (Array.isArray(data.recommendations)) {
@@ -58,20 +60,36 @@ export default function RecommendationPage() {
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
             <h3 style={styles.name}>
-              {index + 1}. {place.name}
-              {place.rating && ` ⭐ ${place.rating}`}
-              {place.reviewCount && ` (${place.reviewCount} reviews)`}
+              {index + 1}. {place.name}{" "}
+              <span style={styles.rating}>
+                ⭐ {place.rating} ({place.reviewCount} reviews)
+              </span>
             </h3>
-            <p>{place.description}</p>
 
-            <div style={styles.meta}>
-              {place.price && <p>💰 <strong>Price:</strong> {place.price}</p>}
-              {place.cuisine && <p>🍽 <strong>Cuisine:</strong> {place.cuisine}</p>}
-              {place.distance && <p>📍 <strong>Distance:</strong> {place.distance}</p>}
+            <div style={styles.bullets}>
+              <div>✅ {place.vibe}</div>
+              {place.topReviews?.[0] && (
+                <div>✅ Recent review: “{place.topReviews[0]}”</div>
+              )}
+              {place.highlight && <div>✅ {place.highlight}</div>}
             </div>
 
+            <p>
+              <strong>💰 Price:</strong> {place.price || "N/A"}
+            </p>
+            <p>
+              <strong>🍽 Cuisine:</strong> {place.cuisine || "N/A"}
+            </p>
+            <p>
+              <strong>📍 Distance:</strong> {place.distance || "N/A"}
+            </p>
             {place.mapsUrl && (
-              <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
+              <a
+                href={place.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.link}
+              >
                 View on Google Maps
               </a>
             )}
@@ -87,13 +105,11 @@ const styles = {
     padding: "40px 20px",
     fontFamily: "'Inter', sans-serif",
     textAlign: "center",
-    backgroundColor: "#fff",
-    color: "#1f1f1f",
   },
   heading: {
     fontSize: "28px",
     fontWeight: "bold",
-    marginBottom: "30px",
+    marginBottom: "20px",
   },
   error: {
     color: "red",
@@ -102,34 +118,36 @@ const styles = {
   list: {
     listStyle: "none",
     padding: 0,
-    marginTop: "20px",
+    marginTop: "30px",
   },
   card: {
     backgroundColor: "#f9f9f9",
-    padding: "24px",
-    margin: "15px auto",
+    padding: "20px",
+    margin: "20px auto",
     borderRadius: "10px",
     maxWidth: "600px",
-    boxShadow: "0 4px 14px rgba(0, 0, 0, 0.08)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
     textAlign: "left",
   },
   name: {
     fontSize: "20px",
-    fontWeight: 600,
+    fontWeight: "600",
     marginBottom: "10px",
   },
-  meta: {
-    marginTop: "10px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-    fontSize: "15px",
+  rating: {
+    fontSize: "16px",
+    fontWeight: "normal",
+    marginLeft: "10px",
+    color: "#555",
+  },
+  bullets: {
+    marginBottom: "15px",
+    lineHeight: "1.6",
   },
   link: {
     display: "inline-block",
-    marginTop: "12px",
+    marginTop: "10px",
     color: "#0070f3",
-    fontWeight: "500",
     textDecoration: "underline",
   },
 };

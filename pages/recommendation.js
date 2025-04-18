@@ -59,12 +59,13 @@ export default function RecommendationPage() {
       <ul style={styles.list}>
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
-            <h3 style={styles.name}>{index + 1}. {place.name}</h3>
-            <p>★ {place.rating} ({place.reviewCount} reviews)</p>
-            <p><strong>Price:</strong> {place.price}</p>
-            <p><strong>분위기:</strong> {place.vibe}</p>
-            <p><strong>최근 리뷰:</strong> {place.topReviews?.join(" / ")}</p>
-            <p><strong>거리:</strong> {place.distance}</p>
+            <h3 style={styles.name}>
+              {index + 1}. {place.name}
+            </h3>
+            <p>★ {place.rating} {place.reviewCount ? `(${place.reviewCount} reviews)` : ""}</p>
+            <p><strong>Price:</strong> {place.priceLevel || "N/A"}</p>
+            <p><strong>Distance:</strong> {place.distance || "N/A"}</p>
+            <p><strong>Why it's recommended:</strong> {place.description}</p>
             {place.mapsUrl && (
               <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
                 View on Google Maps

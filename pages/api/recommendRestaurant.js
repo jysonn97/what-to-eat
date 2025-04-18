@@ -1,9 +1,9 @@
 import { OpenAI } from "openai";
 import fetchPlaceDetails from "@/lib/fetchPlaceDetails";
 
-// Haversine formula for distance
+// Haversine formula for walking distance
 function haversineDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Earth radius (km)
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -26,9 +26,8 @@ export default async function handler(req, res) {
 
   try {
     const { answers } = req.body;
-    console.log("📥 Recommendation Request with Answers:", answers);
-
     const locationAnswer = answers.find((a) => a.key === "location")?.answer;
+
     if (!locationAnswer) {
       return res.status(400).json({ error: "Missing location input" });
     }
@@ -40,7 +39,7 @@ export default async function handler(req, res) {
 
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    // Step 1: Geocode user location
+    // Step 1: Get user coordinates
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -52,7 +51,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
-    // Step 2: Google Places search
+    // Step 2: Text search for places
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -61,22 +60,30 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 10) || [];
 
-    // Step 3: Fetch place details + walking distance
+    // Step 3: Get detailed info and calculate distance
     const placeDetails = await Promise.all(
       rawPlaces.map(async (p) => {
         const details = await fetchPlaceDetails(p.place_id);
-
         const placeLoc = p.geometry?.location;
-        let walkDistance = null;
+
+        let walkDistance = "N/A";
         if (placeLoc?.lat && placeLoc?.lng) {
           const km = haversineDistance(userLoc.lat, userLoc.lng, placeLoc.lat, placeLoc.lng);
-          const minutes = Math.round((km * 1000) / 80); // assume ~80m/min
+          const minutes = Math.round((km * 1000) / 80);
           walkDistance = `${minutes} min walk`;
         }
 
+        const priceLevelToDollar = {
+          1: "$",
+          2: "$$",
+          3: "$$$",
+          4: "$$$$",
+        };
+
         return {
           ...details,
-          distance: walkDistance || "N/A",
+          distance: walkDistance,
+          price: priceLevelToDollar[details.price_level] || "N/A",
         };
       })
     );
@@ -85,40 +92,51 @@ export default async function handler(req, res) {
     const context = placeDetails
       .map(
         (p, i) =>
-          `Restaurant ${i + 1}:\nName: ${p.name}\nRating: ${p.rating}\nPrice: ${p.price_level}\nAddress: ${p.address}\nCuisine: ${p.cuisine}\nDistance: ${p.distance}\nReviews:\n${p.reviews}\n`
+          `Restaurant ${i + 1}:
+Name: ${p.name}
+Rating: ${p.rating}
+Review count: ${p.reviewCount}
+Price: ${p.price}
+Cuisine: ${p.cuisine}
+Distance: ${p.distance}
+Top Reviews:\n${p.reviews?.join("\n") || ""}
+`
       )
       .join("\n");
 
-    const prompt = `You are a smart restaurant recommendation assistant.
+    // GPT PROMPT
+    const prompt = `You are an intelligent restaurant recommendation assistant.
 
-Analyze these restaurants and choose the BEST 3 based on the user's needs.
-If nothing fits well, return fewer than 3.
-
-Respond in valid JSON format like:
-[
-  {
-    "name": "Restaurant Name",
-    "description": "Why this fits the user's input.",
-    "rating": 4.6,
-    "reviewCount": 312,
-    "price": "$$",
-    "cuisine": "Japanese",
-    "distance": "9 min walk",
-    "mapsUrl": "https://maps.google.com/?q=..."
-  }
-]
+Based on the user's preferences and the restaurant data below, recommend the BEST 3 restaurants. Be accurate and thoughtful.
 
 User Preferences:
 ${userPrefs}
 
-Candidate Restaurants:
+Restaurant Candidates:
 ${context}
-`;
+
+✅ Format:
+[
+  {
+    "name": "Restaurant Name",
+    "rating": 4.6,
+    "reviewCount": 312,
+    "price": "$$",
+    "cuisine": "Japanese",
+    "distance": "8 min walk",
+    "mapsUrl": "https://maps.google.com/?q=...",
+    "highlights": [
+      "Cozy, romantic vibe with ambient lighting",
+      "Recent review: 'Perfect for a quiet date night'",
+      "Within 8-minute walk from user's location"
+    ]
+  }
+]`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      temperature: 0.6,
     });
 
     const gptText = completion.choices[0].message.content;

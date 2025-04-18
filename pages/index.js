@@ -4,7 +4,7 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push("/location"); // Redirects to location selection
+    router.push("/location");
   };
 
   return (
@@ -17,38 +17,33 @@ export default function HomePage() {
   );
 }
 
-/* Styling */
 const styles = {
   container: {
+    height: "100vh",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    height: "100vh",
     backgroundColor: "#fff",
-    fontFamily: "Aptos, sans-serif",
-    textAlign: "center",
+    fontFamily: "'Inter', sans-serif",
     padding: "0 20px",
+    textAlign: "center",
   },
   title: {
-    fontSize: "clamp(28px, 4vw, 40px)", // Responsive font size
-    fontWeight: "bold",
-    marginBottom: "30px", // Increased space below title
-    marginTop: "-10vh", // Moves the title up
+    fontSize: "clamp(28px, 4vw, 42px)",
+    fontWeight: "700",
+    marginBottom: "30px",
+    color: "#111",
   },
   startButton: {
-    fontSize: "clamp(16px, 2vw, 20px)",
-    padding: "14px 28px",
-    backgroundColor: "#8B5A2B",
+    padding: "12px 28px",
+    fontSize: "18px",
+    backgroundColor: "#000",
     color: "#fff",
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "8px",
     cursor: "pointer",
-    transition: "all 0.3s ease",
-    boxShadow: "0px 4px 12px rgba(139, 90, 43, 0.2)",
-  },
-  startButtonHover: {
-    backgroundColor: "#6F4221",
-    transform: "scale(1.05)",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    transition: "all 0.2s ease-in-out",
   },
 };

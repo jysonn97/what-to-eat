@@ -24,9 +24,11 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) throw new Error("Failed to fetch recommendations.");
-        const data = await res.json();
+        if (!res.ok) {
+          throw new Error("Failed to fetch recommendations.");
+        }
 
+        const data = await res.json();
         if (Array.isArray(data.recommendations)) {
           setRecommendations(data.recommendations);
         } else {
@@ -57,24 +59,16 @@ export default function RecommendationPage() {
       <ul style={styles.list}>
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
-            <h2 style={styles.name}>
+            <h3 style={styles.name}>
               {index + 1}. {place.name}
-              <span style={styles.rating}>
-                ⭐ {place.rating} ({place.reviewCount} reviews)
-              </span>
-            </h2>
+              <span style={styles.rating}> ⭐ {place.rating} ({place.reviewCount} reviews)</span>
+            </h3>
 
-            <div style={styles.description}>
-              {place.highlights?.map((point, idx) => (
-                <p key={idx} style={styles.point}>✅ {point}</p>
-              ))}
-            </div>
+            <p style={styles.description}>{place.description}</p>
 
-            <div style={styles.meta}>
-              <p><span style={styles.label}>💰 Price:</span> {place.price || "N/A"}</p>
-              <p><span style={styles.label}>🍽️ Cuisine:</span> {place.cuisine || "N/A"}</p>
-              <p><span style={styles.label}>📍 Distance:</span> {place.distance || "N/A"}</p>
-            </div>
+            <p><strong>💰 Price:</strong> {place.price}</p>
+            <p><strong>🍽️ Cuisine:</strong> {place.cuisine}</p>
+            <p><strong>📍 Distance:</strong> {place.distance}</p>
 
             {place.mapsUrl && (
               <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
@@ -97,7 +91,7 @@ const styles = {
   heading: {
     fontSize: "28px",
     fontWeight: "bold",
-    marginBottom: "30px",
+    marginBottom: "20px",
   },
   error: {
     color: "red",
@@ -106,45 +100,35 @@ const styles = {
   list: {
     listStyle: "none",
     padding: 0,
-    marginTop: "20px",
+    marginTop: "30px",
   },
   card: {
     backgroundColor: "#f9f9f9",
     padding: "24px",
-    margin: "20px auto",
+    margin: "16px auto",
     borderRadius: "10px",
-    maxWidth: "700px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    maxWidth: "620px",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
     textAlign: "left",
   },
   name: {
     fontSize: "20px",
-    fontWeight: 600,
-    marginBottom: "8px",
+    fontWeight: "600",
+    marginBottom: "6px",
   },
   rating: {
-    fontSize: "14px",
-    fontWeight: 400,
+    fontSize: "16px",
+    fontWeight: "normal",
     marginLeft: "10px",
-    color: "#555",
   },
   description: {
-    margin: "10px 0 18px",
-  },
-  point: {
-    fontSize: "15px",
-    margin: "4px 0",
-  },
-  meta: {
-    fontSize: "15px",
-    lineHeight: 1.6,
-  },
-  label: {
-    fontWeight: 600,
+    fontSize: "16px",
+    lineHeight: 1.5,
+    margin: "12px 0",
   },
   link: {
     display: "inline-block",
-    marginTop: "14px",
+    marginTop: "12px",
     color: "#0070f3",
     textDecoration: "underline",
   },

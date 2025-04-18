@@ -84,6 +84,7 @@ export default async function handler(req, res) {
           ...details,
           distance: walkDistance,
           price: priceLevelToDollar[details.price_level] || "N/A",
+          mapsUrl: `https://www.google.com/maps/place/?q=place_id:${details.place_id}`,
         };
       })
     );
@@ -99,13 +100,14 @@ Review count: ${p.reviewCount}
 Price: ${p.price}
 Cuisine: ${p.cuisine}
 Distance: ${p.distance}
+Maps URL: ${p.mapsUrl}
 Top Reviews:\n${p.reviews?.join("\n") || ""}
 `
       )
       .join("\n");
 
     // GPT PROMPT
-  const prompt = `
+    const prompt = `
 You are an intelligent restaurant recommendation assistant. Based on the restaurant data and user's preferences below, return the top 3 recommended restaurants.
 
 ❗IMPORTANT:
@@ -128,8 +130,7 @@ You are an intelligent restaurant recommendation assistant. Based on the restaur
       "Recent review: 'Perfect for a quiet date night'",
       "Within 6-minute walk from your location"
     ],
-    mapsUrl: `https://www.google.com/maps/place/?q=place_id:${details.place_id}`,
-
+    "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ123example"
   }
 ]
 
@@ -139,7 +140,6 @@ ${userPrefs}
 🏢 Candidate Restaurants:
 ${context}
 `;
-
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",

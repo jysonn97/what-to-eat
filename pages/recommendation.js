@@ -24,9 +24,11 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) throw new Error("Failed to fetch recommendations.");
-        const data = await res.json();
+        if (!res.ok) {
+          throw new Error("Failed to fetch recommendations.");
+        }
 
+        const data = await res.json();
         if (Array.isArray(data.recommendations)) {
           setRecommendations(data.recommendations);
         } else {
@@ -58,29 +60,26 @@ export default function RecommendationPage() {
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
             <div style={styles.headerRow}>
-              <h2 style={styles.name}>{index + 1}. {place.name}</h2>
-              <span style={styles.rating}>⭐ {place.rating} ({place.reviewCount} reviews)</span>
+              <h2 style={styles.name}>
+                {index + 1}. {place.name}
+              </h2>
+              <span style={styles.rating}>
+                ⭐ {place.rating} ({place.reviewCount} reviews)
+              </span>
             </div>
 
-            {place.highlights?.length > 0 && (
-              <ul style={styles.highlights}>
-                {place.highlights.map((line, i) => (
-                  <li key={i} style={styles.bullet}>✅ {line}</li>
-                ))}
-              </ul>
-            )}
+            <ul style={styles.highlights}>
+              {place.highlights?.map((line, idx) => (
+                <li key={idx} style={styles.bullet}>✅ {line}</li>
+              ))}
+            </ul>
 
             <p><span style={styles.label}>💰 Price:</span> {place.price}</p>
             <p><span style={styles.label}>🍽️ Cuisine:</span> {place.cuisine}</p>
             <p><span style={styles.label}>📍 Distance:</span> {place.distance}</p>
 
             {place.mapsUrl && (
-              <a
-                href={place.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.link}
-              >
+              <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
                 View on Google Maps
               </a>
             )}
@@ -135,19 +134,17 @@ const styles = {
     fontSize: "15px",
     color: "#555",
   },
- highlights: {
-  margin: "15px 0 10px",
-  padding: 0,
-  listStyle: "none",
-},
-bullet: {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  marginBottom: "6px",
-  fontSize: "16px",
-},
-
+  highlights: {
+    margin: "15px 0 10px",
+    padding: 0,
+    listStyle: "none",
+  },
+  bullet: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "6px",
+    fontSize: "16px",
   },
   label: {
     fontWeight: 600,

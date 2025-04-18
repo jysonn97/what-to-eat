@@ -25,14 +25,18 @@ export default function RecommendationPage() {
         });
 
         if (!res.ok) {
-          throw new Error(`API returned status ${res.status}`);
+          throw new Error("Failed to fetch recommendations.");
         }
 
         const data = await res.json();
-        setRecommendations(data.recommendations || []);
+        if (Array.isArray(data.recommendations)) {
+          setRecommendations(data.recommendations);
+        } else {
+          throw new Error("Invalid recommendation format");
+        }
       } catch (err) {
-        console.error("❌ Error fetching recommendations:", err);
-        setError("Failed to fetch recommendations. Please try again.");
+        console.error("❌ Error:", err.message);
+        setError("Failed to load recommendations. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -43,27 +47,29 @@ export default function RecommendationPage() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.heading}>Your Top Restaurant Picks</h1>
+      <h1 style={styles.heading}>🍽️ Your Top Restaurant Picks</h1>
 
-      {loading && <p style={styles.message}>⏳ Finding your perfect match...</p>}
+      {loading && <p>⏳ Finding your perfect match...</p>}
       {error && <p style={styles.error}>{error}</p>}
 
       {!loading && !error && recommendations.length === 0 && (
-        <p style={styles.message}>No matches found. Try adjusting your preferences!</p>
+        <p>No matches found. Try different preferences.</p>
       )}
 
       <ul style={styles.list}>
         {recommendations.map((place, index) => (
           <li key={index} style={styles.card}>
-            <h3 style={styles.name}>{place.name}</h3>
-            <p style={styles.description}>{place.description}</p>
-            <p style={styles.meta}>
-              ⭐ {place.rating} | 💵 {place.priceLevel || "N/A"} | 📍{" "}
-              {place.distance || "Distance not available"}
-            </p>
-            <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
-              View on Google Maps →
-            </a>
+            <h3 style={styles.name}>{index + 1}. {place.name}</h3>
+            <p>★ {place.rating} ({place.reviewCount} reviews)</p>
+            <p><strong>Price:</strong> {place.price}</p>
+            <p><strong>분위기:</strong> {place.vibe}</p>
+            <p><strong>최근 리뷰:</strong> {place.topReviews?.join(" / ")}</p>
+            <p><strong>거리:</strong> {place.distance}</p>
+            {place.mapsUrl && (
+              <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
+                View on Google Maps
+              </a>
+            )}
           </li>
         ))}
       </ul>
@@ -75,60 +81,38 @@ const styles = {
   container: {
     padding: "40px 20px",
     fontFamily: "'Inter', sans-serif",
-    backgroundColor: "#fff",
-    minHeight: "100vh",
     textAlign: "center",
   },
   heading: {
-    fontSize: "clamp(24px, 4vw, 36px)",
-    fontWeight: "600",
-    marginBottom: "24px",
-    color: "#1f1f1f",
-  },
-  message: {
-    fontSize: "16px",
-    color: "#333",
-    marginBottom: "30px",
+    fontSize: "28px",
+    fontWeight: "bold",
+    marginBottom: "20px",
   },
   error: {
     color: "red",
     fontWeight: "bold",
-    fontSize: "16px",
   },
   list: {
     listStyle: "none",
     padding: 0,
-    marginTop: "20px",
+    marginTop: "30px",
   },
   card: {
-    backgroundColor: "#fafafa",
-    padding: "24px",
-    margin: "12px auto",
-    borderRadius: "10px",
+    backgroundColor: "#f9f9f9",
+    padding: "20px",
+    margin: "10px auto",
+    borderRadius: "8px",
     maxWidth: "600px",
-    boxShadow: "0 4px 14px rgba(0, 0, 0, 0.06)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
     textAlign: "left",
   },
   name: {
-    fontSize: "20px",
-    fontWeight: "600",
-    marginBottom: "8px",
-    color: "#111",
-  },
-  description: {
-    fontSize: "16px",
     marginBottom: "10px",
-    color: "#444",
-  },
-  meta: {
-    fontSize: "14px",
-    color: "#666",
   },
   link: {
     display: "inline-block",
-    marginTop: "12px",
-    color: "#000",
-    fontWeight: "500",
+    marginTop: "10px",
+    color: "#0070f3",
     textDecoration: "underline",
   },
 };

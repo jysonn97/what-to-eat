@@ -27,7 +27,6 @@ export default async function handler(req, res) {
   try {
     const { answers } = req.body;
     const locationAnswer = answers.find((a) => a.key === "location")?.answer;
-
     if (!locationAnswer) {
       return res.status(400).json({ error: "Missing location input" });
     }
@@ -35,11 +34,8 @@ export default async function handler(req, res) {
     const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
     const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
     const budget = answers.find((a) => a.key === "budget")?.answer || "";
-    const distancePref = answers.find((a) => a.key === "distance")?.answer || "";
-
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    // Step 1: Get user coordinates
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -51,7 +47,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
-    // Step 2: Text search for places
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -60,91 +55,71 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 10) || [];
 
-    // Step 3: Get detailed info and calculate distance
     const placeDetails = await Promise.all(
-      rawPlaces.map(async (p) => {
-        const details = await fetchPlaceDetails(p.place_id);
-        const placeLoc = p.geometry?.location;
-
-        let walkDistance = "N/A";
-        if (placeLoc?.lat && placeLoc?.lng) {
-          const km = haversineDistance(userLoc.lat, userLoc.lng, placeLoc.lat, placeLoc.lng);
-          const minutes = Math.round((km * 1000) / 80);
-          walkDistance = `${minutes} min walk`;
+      rawPlaces.map(async (place) => {
+        const detail = await fetchPlaceDetails(place.place_id);
+        const loc = place.geometry?.location;
+        let distance = "N/A";
+        if (loc?.lat && loc?.lng) {
+          const meters = haversineDistance(userLoc.lat, userLoc.lng, loc.lat, loc.lng) * 1000;
+          const mins = Math.round(meters / 80);
+          distance = `${mins} min walk`;
         }
-
-        const priceLevelToDollar = {
-          1: "$",
-          2: "$$",
-          3: "$$$",
-          4: "$$$$",
-        };
-
-        return {
-          ...details,
-          distance: walkDistance,
-          price: priceLevelToDollar[details.price_level] || "N/A",
-          mapsUrl: `https://www.google.com/maps/place/?q=place_id:${details.place_id}`,
-        };
+        return { ...detail, distance };
       })
     );
 
     const userPrefs = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
     const context = placeDetails
       .map(
-        (p, i) =>
-          `Restaurant ${i + 1}:
+        (p, i) => `Restaurant ${i + 1}:
 Name: ${p.name}
 Rating: ${p.rating}
 Review count: ${p.reviewCount}
-Price: ${p.price}
+Price: ${p.price_level}
 Cuisine: ${p.cuisine}
 Distance: ${p.distance}
-Maps URL: ${p.mapsUrl}
-Top Reviews:\n${p.reviews?.join("\n") || ""}
+Tags: ${p.vibeTags.join(", ")}
+Recent Reviews: ${p.reviews.join(" | ")}
 `
       )
       .join("\n");
 
-    // GPT PROMPT
-    const prompt = `
-You are an intelligent restaurant recommendation assistant. Based on the restaurant data and user's preferences below, return the top 3 recommended restaurants.
+    const prompt = `You are a smart restaurant recommendation assistant.
 
-❗IMPORTANT:
-- ONLY return valid JSON in the format below.
-- DO NOT include commentary or extra text.
-- Highlights must be a JSON array of bullet points.
-- If no good match exists, return fewer than 3 items.
+Choose 3 restaurants that best match the user's preferences below.
 
-📋 JSON Format Example:
+Each restaurant should have a bullet-style description.
+
+Respond in valid JSON like this:
 [
   {
-    "name": "Restaurant Name",
+    "name": "Example Restaurant",
     "rating": 4.6,
-    "reviewCount": 301,
+    "reviewCount": 320,
     "price": "$$",
-    "cuisine": "Japanese",
-    "distance": "9 min walk",
+    "cuisine": "Korean",
+    "distance": "8 min walk",
+    "mapsUrl": "https://maps.google.com/...",
     "highlights": [
-      "Cozy and romantic vibe",
-      "Recent review: 'Perfect for a quiet date night'",
-      "Within 6-minute walk from your location"
-    ],
-    "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ123example"
+      "✅ Cozy and romantic vibe",
+      "✅ Recent review: “Perfect for a quiet date night”",
+      "✅ Within 8-minute walk from your location"
+    ]
   }
 ]
 
-👤 User Preferences:
+User Input:
 ${userPrefs}
 
-🏢 Candidate Restaurants:
+Candidate Restaurants:
 ${context}
 `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.6,
+      temperature: 0.7,
     });
 
     const gptText = completion.choices[0].message.content;
@@ -160,7 +135,7 @@ ${context}
 
     return res.status(200).json({ recommendations: parsed });
   } catch (err) {
-    console.error("❌ Recommendation API Error:", err);
-    return res.status(500).json({ error: "Failed to generate recommendations" });
+    console.error("❌ API Error:", err);
+    return res.status(500).json({ error: "Something went wrong" });
   }
 }

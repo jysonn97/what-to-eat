@@ -1,16 +1,16 @@
 import { OpenAI } from "openai";
 import fetchPlaceDetails from "@/lib/fetchPlaceDetails";
 
-// Haversine formula for walking distance
+// Haversine formula to estimate walking distance
 function haversineDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
+  const R = 6371; // Earth radius (km)
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -26,6 +26,7 @@ export default async function handler(req, res) {
 
   try {
     const { answers } = req.body;
+
     const locationAnswer = answers.find((a) => a.key === "location")?.answer;
     if (!locationAnswer) {
       return res.status(400).json({ error: "Missing location input" });
@@ -34,8 +35,11 @@ export default async function handler(req, res) {
     const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
     const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
     const budget = answers.find((a) => a.key === "budget")?.answer || "";
+    const distancePref = answers.find((a) => a.key === "distance")?.answer || "";
+
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
+    // Step 1: Geocode user location
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -47,6 +51,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
+    // Step 2: Text Search from Google Maps
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -55,17 +60,21 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 10) || [];
 
+    // Step 3: Fetch details + distance
     const placeDetails = await Promise.all(
-      rawPlaces.map(async (place) => {
-        const detail = await fetchPlaceDetails(place.place_id);
-        const loc = place.geometry?.location;
-        let distance = "N/A";
-        if (loc?.lat && loc?.lng) {
-          const meters = haversineDistance(userLoc.lat, userLoc.lng, loc.lat, loc.lng) * 1000;
-          const mins = Math.round(meters / 80);
-          distance = `${mins} min walk`;
+      rawPlaces.map(async (p) => {
+        const details = await fetchPlaceDetails(p.place_id);
+        const placeLoc = p.geometry?.location;
+        let walkDistance = "N/A";
+        if (placeLoc?.lat && placeLoc?.lng) {
+          const km = haversineDistance(userLoc.lat, userLoc.lng, placeLoc.lat, placeLoc.lng);
+          const minutes = Math.round((km * 1000) / 80);
+          walkDistance = `${minutes} min walk`;
         }
-        return { ...detail, distance };
+        return {
+          ...details,
+          distance: walkDistance,
+        };
       })
     );
 
@@ -79,40 +88,42 @@ Review count: ${p.reviewCount}
 Price: ${p.price_level}
 Cuisine: ${p.cuisine}
 Distance: ${p.distance}
-Tags: ${p.vibeTags.join(", ")}
-Recent Reviews: ${p.reviews.join(" | ")}
-`
+Vibe Tags: ${p.vibeTags?.join(", ")}
+Reviews: ${p.reviews?.join(" | ")}
+Top Highlights: ${p.topHighlights?.join(" | ")}
+Google Maps URL: ${p.mapsUrl}`
       )
-      .join("\n");
+      .join("\n\n");
 
-    const prompt = `You are a smart restaurant recommendation assistant.
+    const prompt = `
+You are a smart restaurant recommendation assistant.
 
-Choose 3 restaurants that best match the user's preferences below.
+Your job is to carefully analyze the real restaurant data below and choose the BEST 3 options for the user, based on their preferences.
 
-Each restaurant should have a bullet-style description.
+NEVER make up fake links. Only use the actual 'Google Maps URL' provided.
 
-Respond in valid JSON like this:
+Respond in valid JSON format like this:
 [
   {
-    "name": "Example Restaurant",
+    "name": "Restaurant Name",
     "rating": 4.6,
-    "reviewCount": 320,
+    "reviewCount": 301,
     "price": "$$",
-    "cuisine": "Korean",
-    "distance": "8 min walk",
-    "mapsUrl": "https://maps.google.com/...",
+    "cuisine": "Japanese",
+    "distance": "9 min walk",
+    "mapsUrl": "https://maps.google.com/?q=...",
     "highlights": [
-      "✅ Cozy and romantic vibe",
-      "✅ Recent review: “Perfect for a quiet date night”",
-      "✅ Within 8-minute walk from your location"
+      "✅ Cozy vibe and great lighting",
+      "✅ Recent review: 'Perfect for a quiet date night'",
+      "✅ Within 6 min walk"
     ]
   }
 ]
 
-User Input:
+User Preferences:
 ${userPrefs}
 
-Candidate Restaurants:
+Restaurant Data:
 ${context}
 `;
 
@@ -123,7 +134,6 @@ ${context}
     });
 
     const gptText = completion.choices[0].message.content;
-    console.log("✅ GPT Raw Output:", gptText);
 
     let parsed;
     try {
@@ -135,7 +145,7 @@ ${context}
 
     return res.status(200).json({ recommendations: parsed });
   } catch (err) {
-    console.error("❌ API Error:", err);
-    return res.status(500).json({ error: "Something went wrong" });
+    console.error("❌ Recommendation API Error:", err);
+    return res.status(500).json({ error: "Failed to generate recommendations" });
   }
 }

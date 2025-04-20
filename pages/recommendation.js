@@ -24,9 +24,7 @@ export default function RecommendationPage() {
           body: JSON.stringify({ answers: decodedAnswers }),
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch recommendations.");
-        }
+        if (!res.ok) throw new Error("Failed to fetch recommendations.");
 
         const data = await res.json();
         if (Array.isArray(data.recommendations)) {
@@ -69,9 +67,14 @@ export default function RecommendationPage() {
             </div>
 
             <ul style={styles.highlights}>
-              {place.highlights?.map((line, idx) => (
-                <li key={idx} style={styles.bullet}>✅ {line}</li>
-              ))}
+              {place.highlights?.map((line, idx) => {
+                const cleanedLine = line.replace(/^✅|^✔️|^•|\s+/g, "").trim();
+                return (
+                  <li key={idx} style={styles.bullet}>
+                    ✅ {cleanedLine}
+                  </li>
+                );
+              })}
             </ul>
 
             <p><span style={styles.label}>💰 Price:</span> {place.price}</p>

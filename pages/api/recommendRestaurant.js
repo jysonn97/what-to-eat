@@ -33,7 +33,6 @@ export default async function handler(req, res) {
     const cuisine = answers.find((a) => a.key === "cuisine")?.answer || "";
     const vibe = answers.find((a) => a.key === "vibe")?.answer || "";
     const budget = answers.find((a) => a.key === "budget")?.answer || "";
-
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
     const geoRes = await fetch(
@@ -72,19 +71,16 @@ export default async function handler(req, res) {
       })
     );
 
+    // GPT로 보낼 context 최소화
     const context = placeDetails
       .map(
         (p, i) => `Restaurant ${i + 1}:
 Name: ${p.name}
 Rating: ${p.rating}
-Review Count: ${p.reviewCount}
-Price: ${p.price_level}
 Cuisine: ${p.cuisine || "Unknown"}
+Price: ${p.price_level || "?"}
 Distance: ${p.distance}
-Reviews: ${p.reviews.join(" | ")}
-Vibe Tags: ${p.vibeTags.join(", ")}
-Top Highlights: ${p.topHighlights.join(" | ")}
-Maps URL: ${p.mapsUrl}`
+Top Highlights: ${p.topHighlights.slice(0, 2).join(" | ")}` // 요약
       )
       .join("\n\n");
 
@@ -93,14 +89,14 @@ Maps URL: ${p.mapsUrl}`
     const prompt = `
 You are a smart restaurant recommendation assistant.
 
-Return the 3 best restaurants based on the user input and full reviews. Prioritize match quality and formatting.
+Return the 3 best restaurants based on the user input and brief summaries.
 
 Strict format rules:
 - Each restaurant must include exactly 3 bullet highlights.
 - Start each bullet with ✅ and 1 space.
-- Each bullet must be a grammatically correct, natural English sentence.
+- Each bullet must be a full, grammatically correct sentence with normal spacing.
 - Avoid mashing words together.
-- No HTML or markdown, just JSON.
+- Respond only in JSON.
 
 User Preferences:
 ${preferences}
@@ -119,9 +115,9 @@ Respond only in JSON:
     "distance": "6 min walk",
     "mapsUrl": "https://maps.google.com/?q=...",
     "highlights": [
-      "✅ Cozy vibe with dim lighting perfect for date nights.",
-      "✅ Known for its spicy seafood stew and generous portions.",
-      "✅ Just a 6-minute walk from your location."
+      "✅ Cozy Korean spot with great cocktails.",
+      "✅ Just a 6-minute walk from your current location.",
+      "✅ Popular for dates and casual dinners."
     ]
   }
 ]

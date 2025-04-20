@@ -66,21 +66,8 @@ export default async function handler(req, res) {
           walkDistance = `${minutes} min walk`;
         }
 
-        // Fallback: try to infer cuisine from types or reviews
-        let cuisineFallback = details.cuisine;
-        if (!cuisineFallback || cuisineFallback === "undefined") {
-          const lower = (details.reviews || []).join(" ").toLowerCase();
-          if (lower.includes("korean")) cuisineFallback = "Korean";
-          else if (lower.includes("japanese")) cuisineFallback = "Japanese";
-          else if (lower.includes("sushi")) cuisineFallback = "Japanese";
-          else if (lower.includes("taco") || lower.includes("mexican")) cuisineFallback = "Mexican";
-          else if (lower.includes("pizza")) cuisineFallback = "Italian";
-          else cuisineFallback = "Unknown";
-        }
-
         return {
           ...details,
-          cuisine: cuisineFallback,
           distance: walkDistance || "N/A",
         };
       })
@@ -88,12 +75,13 @@ export default async function handler(req, res) {
 
     const context = placeDetails
       .map(
-        (p, i) => `Restaurant ${i + 1}:
+        (p, i) => `
+Restaurant ${i + 1}:
 Name: ${p.name}
 Rating: ${p.rating}
 Review Count: ${p.reviewCount}
 Price: ${p.price_level}
-Cuisine: ${p.cuisine}
+Cuisine: ${p.cuisine || "Unknown"}
 Distance: ${p.distance}
 Reviews: ${p.reviews.join(" | ")}
 Vibe Tags: ${p.vibeTags.join(", ")}
@@ -104,34 +92,38 @@ Maps URL: ${p.mapsUrl}`
 
     const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
 
-    const prompt = `
-You are a smart restaurant recommendation assistant. Select the best 3 restaurants for the user.
+    const prompt = `You are a smart restaurant recommendation assistant.
 
-You MUST return valid JSON in this format:
-[
-  {
-    "name": "...",
-    "rating": 4.6,
-    "reviewCount": 300,
-    "price": "$$",
-    "cuisine": "Korean",
-    "distance": "6 min walk",
-    "mapsUrl": "...",
-    "highlights": [
-      "Cozy and romantic vibe",
-      "Recent review: 'Perfect for a quiet date night'",
-      "Within 6-minute walk from your location"
-    ]
-  }
-]
-
-Avoid emojis or Markdown. Keep bullet text short and readable. Add spacing between words. Use quotes. Extract helpful highlights based on reviews and tags.
+Use the restaurant data below and recommend the best 3 options.
 
 User Preferences:
 ${preferences}
 
 Candidate Restaurants:
 ${context}
+
+Return clean JSON like this:
+[
+  {
+    "name": "Restaurant Name",
+    "rating": 4.6,
+    "reviewCount": 300,
+    "price": "$$",
+    "cuisine": "Korean",
+    "distance": "6 min walk",
+    "mapsUrl": "https://maps.google.com/...",
+    "highlights": [
+      "Cozy ambiance perfect for dates",
+      "Recent review: 'The bibimbap was amazing and well-priced'",
+      "Just a 5-minute walk from your location"
+    ]
+  }
+]
+
+Rules:
+- Use real content from the reviews and highlight lines.
+- Format highlights into proper readable sentences with spaces and punctuation.
+- Do NOT return markdown, no asterisks or emojis in the JSON.
 `;
 
     const completion = await openai.chat.completions.create({

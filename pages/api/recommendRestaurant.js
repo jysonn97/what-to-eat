@@ -66,8 +66,21 @@ export default async function handler(req, res) {
           walkDistance = `${minutes} min walk`;
         }
 
+        // Fallback: try to infer cuisine from types or reviews
+        let cuisineFallback = details.cuisine;
+        if (!cuisineFallback || cuisineFallback === "undefined") {
+          const lower = (details.reviews || []).join(" ").toLowerCase();
+          if (lower.includes("korean")) cuisineFallback = "Korean";
+          else if (lower.includes("japanese")) cuisineFallback = "Japanese";
+          else if (lower.includes("sushi")) cuisineFallback = "Japanese";
+          else if (lower.includes("taco") || lower.includes("mexican")) cuisineFallback = "Mexican";
+          else if (lower.includes("pizza")) cuisineFallback = "Italian";
+          else cuisineFallback = "Unknown";
+        }
+
         return {
           ...details,
+          cuisine: cuisineFallback,
           distance: walkDistance || "N/A",
         };
       })
@@ -80,7 +93,7 @@ Name: ${p.name}
 Rating: ${p.rating}
 Review Count: ${p.reviewCount}
 Price: ${p.price_level}
-Cuisine: ${p.cuisine || "Unknown"}
+Cuisine: ${p.cuisine}
 Distance: ${p.distance}
 Reviews: ${p.reviews.join(" | ")}
 Vibe Tags: ${p.vibeTags.join(", ")}
@@ -91,41 +104,35 @@ Maps URL: ${p.mapsUrl}`
 
     const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
 
-    const prompt = `You are a thoughtful restaurant recommendation assistant.
+    const prompt = `
+You are a smart restaurant recommendation assistant. Select the best 3 restaurants for the user.
 
-Your job is to carefully analyze each restaurant based on reviews and user input.
-Use the highlights from actual user reviews to explain *why* the recommendation is relevant.
-
-Use clear, clean formatting and punctuation. Review highlights should read naturally like:
-- "Cozy atmosphere and romantic lighting"
-- "Perfect for a quiet date night"
-- "5-minute walk from user's location"
-
-Do NOT repeat the ✅ emoji. Just include each highlight once with proper spacing.
-
-Return results in this exact JSON format:
+You MUST return valid JSON in this format:
 [
   {
-    "name": "Restaurant Name",
+    "name": "...",
     "rating": 4.6,
-    "reviewCount": 301,
+    "reviewCount": 300,
     "price": "$$",
-    "cuisine": "Japanese",
-    "distance": "9 min walk",
-    "mapsUrl": "https://maps.google.com/?q=...",
+    "cuisine": "Korean",
+    "distance": "6 min walk",
+    "mapsUrl": "...",
     "highlights": [
-      "Cozy atmosphere and romantic lighting",
-      "Perfect for a quiet date night",
-      "5-minute walk from user's location"
+      "Cozy and romantic vibe",
+      "Recent review: 'Perfect for a quiet date night'",
+      "Within 6-minute walk from your location"
     ]
   }
 ]
+
+Avoid emojis or Markdown. Keep bullet text short and readable. Add spacing between words. Use quotes. Extract helpful highlights based on reviews and tags.
 
 User Preferences:
 ${preferences}
 
 Candidate Restaurants:
-${context}`;
+${context}
+`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",

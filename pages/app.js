@@ -43,7 +43,7 @@ export default function AppPage() {
   };
 
   const handleNext = () => {
-    if (!selected.length || !questionData?.key) return;
+    if (!selected || selected.length === 0 || !questionData?.key) return;
 
     let answerToSave = selected;
     if (!questionData.multi) {
@@ -52,7 +52,6 @@ export default function AppPage() {
 
     const updatedAnswers = [...answers, { key: questionData.key, answer: answerToSave }];
 
-    // Auto-fill whoWith if occasion is Business meeting
     const isOccasionBusiness = questionData.key === "occasion" && selected.includes("Business meeting");
     if (isOccasionBusiness) {
       updatedAnswers.push({ key: "whoWith", answer: "Client / Coworkers" });
@@ -93,6 +92,8 @@ export default function AppPage() {
     return false;
   };
 
+  // ✅ FIX: questionData null check 먼저
+  if (!questionData) return null;
   if (shouldHideQuestion()) {
     handleNext();
     return null;
@@ -100,11 +101,11 @@ export default function AppPage() {
 
   return (
     <div style={styles.container}>
-      {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
+      <h1 style={styles.title}>{questionData.question}</h1>
       {error && <p style={styles.error}>{error}</p>}
 
       <div style={styles.options}>
-        {questionData?.options?.map((option, index) => (
+        {questionData.options?.map((option, index) => (
           <label key={index} style={styles.optionItem}>
             <input
               type={questionData.multi ? "checkbox" : "radio"}

@@ -36,7 +36,6 @@ export default async function handler(req, res) {
 
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    // Step 1: Geocode
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -48,7 +47,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
-    // Step 2: Google Places search
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -57,7 +55,6 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 5) || [];
 
-    // Step 3: Details + walking distance
     const placeDetails = await Promise.all(
       rawPlaces.map(async (p) => {
         const details = await fetchPlaceDetails(p.place_id);
@@ -94,38 +91,40 @@ Maps URL: ${p.mapsUrl}`
     const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
 
     const prompt = `
-You are a smart restaurant recommendation assistant. Select the best 3 restaurants based on the user's preferences below.
+You are a smart restaurant recommendation assistant.
 
-Only include places that strongly fit the user's vibe, budget, and cuisine.
+Your task is to analyze the restaurant details and generate the BEST 3 recommendations for the user, based on their preferences and reviews.
 
-Each recommendation must include 3 bullet-style highlights:
-- Each bullet should be a full readable sentence (not mashed together).
-- Do NOT include more than 3 bullets.
-- Use ✅ at the beginning of each bullet.
+⚠️ DO NOT copy raw review sentences directly. Instead:
+- Extract insights from reviews
+- Write in clean, grammatically correct English
+- Properly space and format each bullet
+- Never mash multiple sentences together without spacing
+- Ensure each bullet reads naturally
+
+Return JSON in the following format:
+[
+  {
+    "name": "Restaurant Name",
+    "rating": 4.6,
+    "reviewCount": 312,
+    "price": "$$",
+    "cuisine": "Korean",
+    "distance": "5 min walk",
+    "mapsUrl": "https://...",
+    "highlights": [
+      "Cozy, casual vibe — great for groups or dates",
+      "Popular for its spicy rice cakes and fried chicken",
+      "Less than a 5-minute walk from your location"
+    ]
+  }
+]
 
 User Preferences:
 ${preferences}
 
 Candidate Restaurants:
 ${context}
-
-Respond in this JSON format:
-[
-  {
-    "name": "Restaurant Name",
-    "rating": 4.6,
-    "reviewCount": 300,
-    "price": "$$",
-    "cuisine": "Korean",
-    "distance": "6 min walk",
-    "mapsUrl": "https://maps.google.com/?q=...",
-    "highlights": [
-      "✅ Cozy vibe with dim lighting perfect for date nights.",
-      "✅ Known for its spicy seafood stew and generous portions.",
-      "✅ Just a 6-minute walk from your location."
-    ]
-  }
-]
 `;
 
     const completion = await openai.chat.completions.create({

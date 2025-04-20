@@ -68,6 +68,8 @@ export default async function handler(req, res) {
         return {
           ...details,
           distance: walkDistance || "N/A",
+          reviewCount: details.reviewCount ?? 0,
+          mapsUrl: details.mapsUrl ?? "https://maps.google.com",
         };
       })
     );
@@ -77,9 +79,11 @@ export default async function handler(req, res) {
         (p, i) => `Restaurant ${i + 1}:
 Name: ${p.name}
 Rating: ${p.rating}
-Cuisine: ${p.cuisine || "Unknown"}
+Review Count: ${p.reviewCount}
 Price: ${p.price_level || "?"}
+Cuisine: ${p.cuisine || "Unknown"}
 Distance: ${p.distance}
+Maps URL: ${p.mapsUrl}
 Top Highlights: ${p.topHighlights.slice(0, 2).join(" | ")}`
       )
       .join("\n\n");
@@ -95,9 +99,10 @@ Strict formatting rules:
 - Each restaurant must include exactly 3 bullet highlights.
 - Start each bullet with ✅ and 1 space.
 - Each bullet must be a full, natural English sentence with correct grammar and spacing.
-- DO NOT remove spaces between words. Use proper punctuation and spacing.
-- DO NOT use code block formatting like \`\`\`json.
-- Respond only in raw JSON.
+- DO NOT remove spaces between words.
+- DO NOT use undefined. If value is missing, use 0, null, "N/A", or empty string.
+- DO NOT include code block formatting like \`\`\`json
+- Respond only in raw JSON. No explanations.
 
 User Preferences:
 ${preferences}
@@ -132,7 +137,7 @@ Respond only in JSON:
 
     let text = completion.choices[0].message.content.trim();
 
-    // ✅ Remove GPT code block formatting if present
+    // ✅ Strip GPT markdown formatting (```json ...)
     if (text.startsWith("```")) {
       text = text.replace(/```json|```/g, "").trim();
     }

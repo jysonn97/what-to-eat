@@ -36,7 +36,6 @@ export default async function handler(req, res) {
 
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    // Step 1: Geocode
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -48,7 +47,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
-    // Step 2: Google Places search
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -57,7 +55,6 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 5) || [];
 
-    // Step 3: Details + walking distance
     const placeDetails = await Promise.all(
       rawPlaces.map(async (p) => {
         const details = await fetchPlaceDetails(p.place_id);
@@ -75,6 +72,8 @@ export default async function handler(req, res) {
       })
     );
 
+    const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
+
     const context = placeDetails
       .map(
         (p, i) => `Restaurant ${i + 1}:
@@ -84,24 +83,24 @@ Review Count: ${p.reviewCount}
 Price: ${p.price_level}
 Cuisine: ${p.cuisine || "Unknown"}
 Distance: ${p.distance}
-Reviews: ${p.reviews.join(" | ")}
+Reviews: ${p.reviews.slice(0, 5).join(" | ")}
 Vibe Tags: ${p.vibeTags.join(", ")}
-Top Highlights: ${p.topHighlights.join(" | ")}
+Highlights: ${p.topHighlights.join(" | ")}
 Maps URL: ${p.mapsUrl}`
       )
       .join("\n\n");
 
-    const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
-
     const prompt = `
-You are a smart restaurant recommendation assistant. Select the best 3 restaurants based on the user's preferences below.
+You are a helpful restaurant recommendation assistant. Carefully analyze the user preferences and restaurant data below.
 
-Only include places that strongly fit the user's vibe, budget, and cuisine.
+Choose the top 3 places that best match the user's vibe, cuisine, and budget. Each must include 3 **well-formatted bullet points** with the ✅ emoji.
 
-Each recommendation must include 3 bullet-style highlights:
-- Each bullet should be a full readable sentence with proper spacing and punctuation.
-- Do NOT include more than 3 bullets.
-- Use ✅ at the beginning of each bullet.
+DO NOT copy reviews verbatim. Use your judgment to summarize standout traits from reviews (food quality, vibe, value, location, etc.).
+
+Each bullet must be:
+- One readable sentence (not smashed together).
+- Begin with ✅.
+- Be clear and natural.
 
 User Preferences:
 ${preferences}
@@ -109,7 +108,7 @@ ${preferences}
 Candidate Restaurants:
 ${context}
 
-Respond in this JSON format:
+Return valid JSON like this:
 [
   {
     "name": "Restaurant Name",
@@ -143,25 +142,6 @@ Respond in this JSON format:
       console.warn("⚠️ GPT output was not valid JSON:", text);
       return res.status(500).json({ error: "Invalid GPT output" });
     }
-
-    // ✅ Final bullet formatting patch
-    parsed = parsed.map((place) => {
-      const cleanedHighlights = place.highlights.map((line) => {
-        return (
-          "✅ " +
-          line
-            .replace(/^✅|^•|^✔️/, "")
-            .replace(/([a-z])([A-Z])/g, "$1 $2") // space before capital
-            .replace(/\s+/g, " ")               // normalize spaces
-            .trim()
-            .replace(/^./, (c) => c.toUpperCase()) // capitalize first letter
-        );
-      });
-      return {
-        ...place,
-        highlights: cleanedHighlights,
-      };
-    });
 
     return res.status(200).json({ recommendations: parsed });
   } catch (err) {

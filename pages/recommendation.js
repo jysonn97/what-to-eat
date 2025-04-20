@@ -68,7 +68,7 @@ export default function RecommendationPage() {
 
             <ul style={styles.highlights}>
               {place.highlights?.map((line, idx) => {
-                const cleanedLine = line.replace(/^✅|^✔️|^•|\s+/g, "").trim();
+                const cleanedLine = line.replace(/^✅|^✔️|^•/, "").trim(); // ✅ 핵심 수정
                 return (
                   <li key={idx} style={styles.bullet}>
                     ✅ {cleanedLine}
@@ -148,7 +148,7 @@ const styles = {
     gap: "8px",
     marginBottom: "6px",
     fontSize: "16px",
-    whiteSpace: "pre-wrap", // ✅ fixes bullet wrapping issue
+    whiteSpace: "pre-wrap", // ✅ line wrapping OK
   },
   label: {
     fontWeight: 600,

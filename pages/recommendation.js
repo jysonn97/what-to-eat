@@ -148,6 +148,7 @@ const styles = {
     gap: "8px",
     marginBottom: "6px",
     fontSize: "16px",
+    whiteSpace: "pre-wrap", // ✅ fixes bullet wrapping issue
   },
   label: {
     fontWeight: 600,

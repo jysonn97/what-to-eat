@@ -98,11 +98,11 @@ Return the 3 best restaurants based on the user input and brief summaries.
 Strict formatting rules:
 - Each restaurant must include exactly 3 bullet highlights.
 - Start each bullet with ✅ and 1 space.
-- Each bullet must be a full, natural English sentence with correct grammar and spacing.
-- DO NOT remove spaces between words.
-- DO NOT use undefined. If value is missing, use 0, null, "N/A", or empty string.
-- DO NOT include code block formatting like \`\`\`json
-- Respond only in raw JSON. No explanations.
+- Each bullet must be a grammatically correct, natural English sentence with spaces between all words.
+- DO NOT remove spaces between words. DO NOT mash words together.
+- DO NOT use undefined. Use 0, "N/A", or null instead.
+- DO NOT include markdown code block formatting like \`\`\`
+- Respond only in raw JSON format. No explanations or intro text.
 
 User Preferences:
 ${preferences}
@@ -130,14 +130,14 @@ Respond only in JSON:
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4-turbo", // ✅ 여기 변경됨
       messages: [{ role: "user", content: prompt }],
       temperature: 0.6,
     });
 
     let text = completion.choices[0].message.content.trim();
 
-    // ✅ Strip GPT markdown formatting (```json ...)
+    // ✅ Strip markdown formatting if present
     if (text.startsWith("```")) {
       text = text.replace(/```json|```/g, "").trim();
     }

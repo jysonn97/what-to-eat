@@ -50,10 +50,10 @@ export default function AppPage() {
       answerToSave = selected[0];
     }
 
-    // Auto-fill whoWith if occasion is Business meeting
-    const isOccasionBusiness = questionData.key === "occasion" && selected.includes("Business meeting");
     const updatedAnswers = [...answers, { key: questionData.key, answer: answerToSave }];
 
+    // Auto-fill whoWith if occasion is Business meeting
+    const isOccasionBusiness = questionData.key === "occasion" && selected.includes("Business meeting");
     if (isOccasionBusiness) {
       updatedAnswers.push({ key: "whoWith", answer: "Client / Coworkers" });
     }

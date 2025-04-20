@@ -7,7 +7,7 @@ export default function AppPage() {
 
   const [answers, setAnswers] = useState(location ? [{ key: "location", answer: location }] : []);
   const [questionData, setQuestionData] = useState(null);
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -30,7 +30,7 @@ export default function AppPage() {
 
       if (data.nextQuestion) {
         setQuestionData(data.nextQuestion);
-        setSelected("");
+        setSelected([]);
       } else {
         router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
       }
@@ -43,10 +43,23 @@ export default function AppPage() {
   };
 
   const handleNext = () => {
-    if (!selected || !questionData?.key) return;
-    const updated = [...answers, { key: questionData.key, answer: selected }];
-    setAnswers(updated);
-    fetchNextQuestion(updated);
+    if (!selected.length || !questionData?.key) return;
+
+    let answerToSave = selected;
+    if (!questionData.multi) {
+      answerToSave = selected[0];
+    }
+
+    // Auto-fill whoWith if occasion is Business meeting
+    const isOccasionBusiness = questionData.key === "occasion" && selected.includes("Business meeting");
+    const updatedAnswers = [...answers, { key: questionData.key, answer: answerToSave }];
+
+    if (isOccasionBusiness) {
+      updatedAnswers.push({ key: "whoWith", answer: "Client / Coworkers" });
+    }
+
+    fetchNextQuestion(updatedAnswers);
+    setAnswers(updatedAnswers);
   };
 
   const handleBack = () => {
@@ -60,6 +73,31 @@ export default function AppPage() {
     fetchNextQuestion(updated);
   };
 
+  const handleOptionToggle = (option) => {
+    if (questionData.multi) {
+      setSelected((prev) =>
+        prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
+      );
+    } else {
+      setSelected([option]);
+    }
+  };
+
+  const shouldHideQuestion = () => {
+    const lastOccasion = answers.find((a) => a.key === "occasion")?.answer;
+    const whoWithAnswer = answers.find((a) => a.key === "whoWith")?.answer;
+
+    if (questionData.key === "whoWith" && lastOccasion === "Business meeting") return true;
+    if (questionData.key === "partySize" && whoWithAnswer === "Alone") return true;
+
+    return false;
+  };
+
+  if (shouldHideQuestion()) {
+    handleNext();
+    return null;
+  }
+
   return (
     <div style={styles.container}>
       {questionData && <h1 style={styles.title}>{questionData.question}</h1>}
@@ -69,11 +107,11 @@ export default function AppPage() {
         {questionData?.options?.map((option, index) => (
           <label key={index} style={styles.optionItem}>
             <input
-              type="radio"
+              type={questionData.multi ? "checkbox" : "radio"}
               name="answer"
               value={option}
-              checked={selected === option}
-              onChange={() => setSelected(option)}
+              checked={selected.includes(option)}
+              onChange={() => handleOptionToggle(option)}
               style={styles.radio}
             />
             {option}
@@ -83,7 +121,7 @@ export default function AppPage() {
 
       <div style={styles.buttons}>
         <button onClick={handleBack} style={styles.backButton}>← Go Back</button>
-        <button onClick={handleNext} disabled={!selected || loading} style={styles.nextButton}>
+        <button onClick={handleNext} disabled={!selected.length || loading} style={styles.nextButton}>
           {loading ? "Loading..." : "Next →"}
         </button>
       </div>

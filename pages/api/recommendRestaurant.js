@@ -75,8 +75,7 @@ export default async function handler(req, res) {
 
     const context = placeDetails
       .map(
-        (p, i) => `
-Restaurant ${i + 1}:
+        (p, i) => `Restaurant ${i + 1}:
 Name: ${p.name}
 Rating: ${p.rating}
 Review Count: ${p.reviewCount}
@@ -92,33 +91,41 @@ Maps URL: ${p.mapsUrl}`
 
     const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
 
-    const prompt = `
-You are a smart restaurant recommendation assistant. Select the best 3 based on the user's input.
+    const prompt = `You are a thoughtful restaurant recommendation assistant.
+
+Your job is to carefully analyze each restaurant based on reviews and user input.
+Use the highlights from actual user reviews to explain *why* the recommendation is relevant.
+
+Use clear, clean formatting and punctuation. Review highlights should read naturally like:
+- "Cozy atmosphere and romantic lighting"
+- "Perfect for a quiet date night"
+- "5-minute walk from user's location"
+
+Do NOT repeat the ✅ emoji. Just include each highlight once with proper spacing.
+
+Return results in this exact JSON format:
+[
+  {
+    "name": "Restaurant Name",
+    "rating": 4.6,
+    "reviewCount": 301,
+    "price": "$$",
+    "cuisine": "Japanese",
+    "distance": "9 min walk",
+    "mapsUrl": "https://maps.google.com/?q=...",
+    "highlights": [
+      "Cozy atmosphere and romantic lighting",
+      "Perfect for a quiet date night",
+      "5-minute walk from user's location"
+    ]
+  }
+]
 
 User Preferences:
 ${preferences}
 
 Candidate Restaurants:
-${context}
-
-Return JSON like this:
-[
-  {
-    "name": "...",
-    "rating": 4.6,
-    "reviewCount": 300,
-    "price": "$$",
-    "cuisine": "Korean",
-    "distance": "6 min walk",
-    "mapsUrl": "...",
-    "highlights": [
-      "✅ Cozy and romantic vibe",
-      "✅ Recent review: 'Perfect for a quiet date night'",
-      "✅ Within 6-minute walk from your location"
-    ]
-  }
-]
-`;
+${context}`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",

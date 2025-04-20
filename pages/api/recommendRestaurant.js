@@ -36,6 +36,7 @@ export default async function handler(req, res) {
 
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
+    // Geocode user location
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -47,6 +48,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
+    // Place search
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -55,6 +57,7 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 5) || [];
 
+    // Enrich with details
     const placeDetails = await Promise.all(
       rawPlaces.map(async (p) => {
         const details = await fetchPlaceDetails(p.place_id);
@@ -72,8 +75,7 @@ export default async function handler(req, res) {
       })
     );
 
-    const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
-
+    // Build prompt context
     const context = placeDetails
       .map(
         (p, i) => `Restaurant ${i + 1}:
@@ -83,32 +85,19 @@ Review Count: ${p.reviewCount}
 Price: ${p.price_level}
 Cuisine: ${p.cuisine || "Unknown"}
 Distance: ${p.distance}
-Reviews: ${p.reviews.slice(0, 5).join(" | ")}
+Reviews: ${p.reviews.join(" | ")}
 Vibe Tags: ${p.vibeTags.join(", ")}
-Highlights: ${p.topHighlights.join(" | ")}
+Top Highlights: ${p.topHighlights.join(" | ")}
 Maps URL: ${p.mapsUrl}`
       )
       .join("\n\n");
 
+    const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
+
     const prompt = `
-You are a helpful restaurant recommendation assistant. Carefully analyze the user preferences and restaurant data below.
+You are a smart restaurant recommendation assistant. Choose the best 3 restaurants below for the user based on their preferences.
 
-Choose the top 3 places that best match the user's vibe, cuisine, and budget. Each must include 3 **well-formatted bullet points** with the ✅ emoji.
-
-DO NOT copy reviews verbatim. Use your judgment to summarize standout traits from reviews (food quality, vibe, value, location, etc.).
-
-Each bullet must be:
-- One readable sentence (not smashed together).
-- Begin with ✅.
-- Be clear and natural.
-
-User Preferences:
-${preferences}
-
-Candidate Restaurants:
-${context}
-
-Return valid JSON like this:
+Return JSON like this:
 [
   {
     "name": "Restaurant Name",
@@ -119,12 +108,24 @@ Return valid JSON like this:
     "distance": "6 min walk",
     "mapsUrl": "https://maps.google.com/?q=...",
     "highlights": [
-      "✅ Cozy vibe with dim lighting perfect for date nights.",
-      "✅ Known for its spicy seafood stew and generous portions.",
-      "✅ Just a 6-minute walk from your location."
+      "✅ Cozy vibe with dim lighting, perfect for a relaxed date night.",
+      "✅ Generous portions and famous for their spicy seafood stew.",
+      "✅ Just a 6-minute walk from your current location."
     ]
   }
 ]
+
+Rules:
+- Each bullet must start with ✅ followed by a **space**
+- Each sentence must be clear and contain **proper spacing between words**
+- Do not return mashed-together text. Use full sentences.
+- Avoid repeating emojis or symbols inside the sentence.
+
+User Preferences:
+${preferences}
+
+Candidate Restaurants:
+${context}
 `;
 
     const completion = await openai.chat.completions.create({

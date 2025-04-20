@@ -36,7 +36,6 @@ export default async function handler(req, res) {
 
     const query = `${cuisine} ${vibe} ${budget} restaurant`.trim();
 
-    // Geocode user location
     const geoRes = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
         locationAnswer
@@ -48,7 +47,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid location" });
     }
 
-    // Place search
     const searchRes = await fetch(
       `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
         query
@@ -57,7 +55,6 @@ export default async function handler(req, res) {
     const searchData = await searchRes.json();
     const rawPlaces = searchData.results?.slice(0, 5) || [];
 
-    // Enrich with details
     const placeDetails = await Promise.all(
       rawPlaces.map(async (p) => {
         const details = await fetchPlaceDetails(p.place_id);
@@ -75,7 +72,6 @@ export default async function handler(req, res) {
       })
     );
 
-    // Build prompt context
     const context = placeDetails
       .map(
         (p, i) => `Restaurant ${i + 1}:
@@ -95,9 +91,24 @@ Maps URL: ${p.mapsUrl}`
     const preferences = answers.map((a) => `${a.key}: ${a.answer}`).join("\n");
 
     const prompt = `
-You are a smart restaurant recommendation assistant. Choose the best 3 restaurants below for the user based on their preferences.
+You are a smart restaurant recommendation assistant.
 
-Return JSON like this:
+Return the 3 best restaurants based on the user input and full reviews. Prioritize match quality and formatting.
+
+Strict format rules:
+- Each restaurant must include exactly 3 bullet highlights.
+- Start each bullet with ✅ and 1 space.
+- Each bullet must be a grammatically correct, natural English sentence.
+- Avoid mashing words together.
+- No HTML or markdown, just JSON.
+
+User Preferences:
+${preferences}
+
+Candidate Restaurants:
+${context}
+
+Respond only in JSON:
 [
   {
     "name": "Restaurant Name",
@@ -108,28 +119,16 @@ Return JSON like this:
     "distance": "6 min walk",
     "mapsUrl": "https://maps.google.com/?q=...",
     "highlights": [
-      "✅ Cozy vibe with dim lighting, perfect for a relaxed date night.",
-      "✅ Generous portions and famous for their spicy seafood stew.",
-      "✅ Just a 6-minute walk from your current location."
+      "✅ Cozy vibe with dim lighting perfect for date nights.",
+      "✅ Known for its spicy seafood stew and generous portions.",
+      "✅ Just a 6-minute walk from your location."
     ]
   }
 ]
-
-Rules:
-- Each bullet must start with ✅ followed by a **space**
-- Each sentence must be clear and contain **proper spacing between words**
-- Do not return mashed-together text. Use full sentences.
-- Avoid repeating emojis or symbols inside the sentence.
-
-User Preferences:
-${preferences}
-
-Candidate Restaurants:
-${context}
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.6,
     });

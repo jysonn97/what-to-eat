@@ -108,7 +108,7 @@ export default function AppPage() {
         {questionData.options?.map((option, index) => (
           <label key={index} style={styles.optionItem}>
             <input
-              type={questionData.multi ? "checkbox" : "radio"}
+              type=questionData.key === "specialFeatures" ? "checkbox" : "radio"}
               name="answer"
               value={option}
               checked={selected.includes(option)}

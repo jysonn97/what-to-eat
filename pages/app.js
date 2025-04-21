@@ -46,7 +46,8 @@ export default function AppPage() {
     if (!selected || selected.length === 0 || !questionData?.key) return;
 
     let answerToSave = selected;
-    if (!questionData.multi) {
+    const isMulti = questionData.key === "specialFeatures"; // ✅ 강제 다중선택 처리
+    if (!isMulti) {
       answerToSave = selected[0];
     }
 
@@ -73,7 +74,8 @@ export default function AppPage() {
   };
 
   const handleOptionToggle = (option) => {
-    if (questionData.multi) {
+    const isMulti = questionData.key === "specialFeatures";
+    if (isMulti) {
       setSelected((prev) =>
         prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
       );
@@ -92,7 +94,6 @@ export default function AppPage() {
     return false;
   };
 
-  // ✅ FIX: questionData null check 먼저
   if (!questionData) return null;
   if (shouldHideQuestion()) {
     handleNext();
@@ -108,7 +109,7 @@ export default function AppPage() {
         {questionData.options?.map((option, index) => (
           <label key={index} style={styles.optionItem}>
             <input
-              type=questionData.key === "specialFeatures" ? "checkbox" : "radio"}
+              type={questionData.key === "specialFeatures" ? "checkbox" : "radio"} // ✅ 여기도 고침
               name="answer"
               value={option}
               checked={selected.includes(option)}

@@ -73,16 +73,24 @@ export default function AppPage() {
     fetchNextQuestion(updated);
   };
 
-  const handleOptionToggle = (option) => {
-    const isMulti = questionData.key === "specialFeatures";
-    if (isMulti) {
-      setSelected((prev) =>
-        prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
-      );
-    } else {
-      setSelected([option]);
-    }
-  };
+const handleOptionToggle = (option) => {
+  const isMulti = questionData.key === "specialFeatures";
+
+  if (isMulti) {
+    setSelected((prev) => {
+      if (option === "None") {
+        return ["None"]; // ✅ "None" 선택 시 나머지 제거
+      }
+
+      const filtered = prev.filter((o) => o !== "None"); // ✅ 이미 "None" 있으면 제거
+      return filtered.includes(option)
+        ? filtered.filter((o) => o !== option)
+        : [...filtered, option];
+    });
+  } else {
+    setSelected([option]);
+  }
+};
 
   const shouldHideQuestion = () => {
     const lastOccasion = answers.find((a) => a.key === "occasion")?.answer;

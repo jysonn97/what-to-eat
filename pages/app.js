@@ -29,7 +29,6 @@ import RiceBowlIcon from "@mui/icons-material/RiceBowl";
 import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
 import PetsIcon from "@mui/icons-material/Pets";
 import NightlifeOutlinedIcon from "@mui/icons-material/NightlifeOutlined";
-import EcoIcon from "@mui/icons-material/Eco";
 import AccessibilityIcon from "@mui/icons-material/Accessibility";
 import StarRateIcon from "@mui/icons-material/StarRate";
 
@@ -73,7 +72,6 @@ const iconMap = {
   "Open to anything": <PublicIcon sx={{ color: "#000" }} fontSize="medium" />,
   "Outdoor seating": <OutdoorGrillIcon sx={{ color: "#000" }} fontSize="medium" />,
   "Good for groups": <GroupIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Vegetarian / Vegan options": <EcoIcon sx={{ color: "#000" }} fontSize="medium" />,
   "Late-night open": <NightlifeOutlinedIcon sx={{ color: "#000" }} fontSize="medium" />,
   "Pet-friendly": <PetsIcon sx={{ color: "#000" }} fontSize="medium" />,
   "Wheelchair accessible": <AccessibilityIcon sx={{ color: "#000" }} fontSize="medium" />,

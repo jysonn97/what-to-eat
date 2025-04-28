@@ -1,86 +1,61 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
-// Material UI Icons
-import BreakfastDiningIcon from "@mui/icons-material/BreakfastDining";
-import BrunchDiningIcon from "@mui/icons-material/BrunchDining";
-import LunchDiningIcon from "@mui/icons-material/LunchDining";
-import DinnerDiningIcon from "@mui/icons-material/DinnerDining";
-import IcecreamIcon from "@mui/icons-material/Icecream";
-import CelebrationIcon from "@mui/icons-material/Celebration";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-import ExploreIcon from "@mui/icons-material/TravelExplore";
-import PersonIcon from "@mui/icons-material/Person";
-import GroupIcon from "@mui/icons-material/Group";
-import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
-import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
-import NightlifeIcon from "@mui/icons-material/Nightlife";
-import ChairAltIcon from "@mui/icons-material/ChairAlt";
-import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
-import DriveEtaIcon from "@mui/icons-material/DriveEta";
-import PublicIcon from "@mui/icons-material/Public";
-import RamenDiningIcon from "@mui/icons-material/RamenDining";
-import LocalPizzaIcon from "@mui/icons-material/LocalPizza";
-import RiceBowlIcon from "@mui/icons-material/RiceBowl";
-import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
-import PetsIcon from "@mui/icons-material/Pets";
-import NightlifeOutlinedIcon from "@mui/icons-material/NightlifeOutlined";
-import AccessibilityIcon from "@mui/icons-material/Accessibility";
-import StarRateIcon from "@mui/icons-material/StarRate";
+// Phosphor Icons
+import { Egg, Coffee, ForkKnife, IceCream, Briefcase, Heart, Users, MapPin, 
+Star, CurrencyDollar, Car, Globe, BowlFood, Pizza, PawPrint, Wheelchair, Calendar, Truck, 
+Sun, Moon } from "@phosphor-icons/react";
 
 const iconMap = {
-  Breakfast: <BreakfastDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Brunch: <BrunchDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Lunch: <LunchDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Dinner: <DinnerDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Snack / Dessert": <IcecreamIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Regular meal": <ChairAltIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Special event (e.g. birthday, graduation)": <CelebrationIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Date / Romantic": <FavoriteIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Business meeting": <BusinessCenterIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Exploring a new place": <ExploreIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Alone: <PersonIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Friends: <GroupIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Family: <FamilyRestroomIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Partner / Date": <FavoriteIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Client / Coworkers": <EmojiPeopleIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Cozy & quiet": <ChairAltIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Trendy & lively": <NightlifeIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Romantic: <FavoriteIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Fancy & upscale": <EmojiObjectsIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Casual & fun": <EmojiPeopleIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Doesn't matter": <PublicIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "$": <AttachMoneyIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "$$": <AttachMoneyIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "$$$": <MonetizationOnIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "$$$$": <MonetizationOnIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Walking distance (0–10 min)": <DirectionsWalkIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "10–30 min by walk or car": <DriveEtaIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "More than 30 min": <DriveEtaIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Korean: <RiceBowlIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Japanese: <RamenDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Italian: <LocalPizzaIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Mexican: <LocalPizzaIcon sx={{ color: "#000" }} fontSize="medium" />,
-  American: <LunchDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  Indian: <RamenDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Middle Eastern": <RiceBowlIcon sx={{ color: "#000" }} fontSize="medium" />,
-  French: <RamenDiningIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Open to anything": <PublicIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Outdoor seating": <OutdoorGrillIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Good for groups": <GroupIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Late-night open": <NightlifeOutlinedIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Pet-friendly": <PetsIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Wheelchair accessible": <AccessibilityIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Accepts reservations": <BusinessCenterIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Delivery available": <DriveEtaIcon sx={{ color: "#000" }} fontSize="medium" />,
-  None: <PublicIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "4.5+ preferred": <StarRateIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "At least 4.0": <StarRateIcon sx={{ color: "#000" }} fontSize="medium" />,
-  "Anything's fine": <PublicIcon sx={{ color: "#000" }} fontSize="medium" />,
+  Breakfast: <Egg size={24} color="#000" weight="regular" />,
+  Brunch: <Coffee size={24} color="#000" weight="regular" />,
+  Lunch: <ForkKnife size={24} color="#000" weight="regular" />,
+  Dinner: <ForkKnife size={24} color="#000" weight="regular" />,
+  "Snack / Dessert": <IceCream size={24} color="#000" weight="regular" />,
+  "Regular meal": <ForkKnife size={24} color="#000" weight="regular" />,
+  "Special event (e.g. birthday, graduation)": <Calendar size={24} color="#000" weight="regular" />,
+  "Date / Romantic": <Heart size={24} color="#000" weight="regular" />,
+  "Business meeting": <Briefcase size={24} color="#000" weight="regular" />,
+  "Exploring a new place": <MapPin size={24} color="#000" weight="regular" />,
+  Alone: <User size={24} color="#000" weight="regular" />,
+  Friends: <Users size={24} color="#000" weight="regular" />,
+  Family: <Users size={24} color="#000" weight="regular" />,
+  "Partner / Date": <Heart size={24} color="#000" weight="regular" />,
+  "Client / Coworkers": <Briefcase size={24} color="#000" weight="regular" />,
+  "Cozy & quiet": <Sun size={24} color="#000" weight="regular" />,
+  "Trendy & lively": <Moon size={24} color="#000" weight="regular" />,
+  Romantic: <Heart size={24} color="#000" weight="regular" />,
+  "Fancy & upscale": <Star size={24} color="#000" weight="regular" />,
+  "Casual & fun": <Users size={24} color="#000" weight="regular" />,
+  "Doesn't matter": <Globe size={24} color="#000" weight="regular" />,
+  "$": <CurrencyDollar size={24} color="#000" weight="regular" />,
+  "$$": <CurrencyDollar size={24} color="#000" weight="regular" />,
+  "$$$": <CurrencyDollar size={24} color="#000" weight="regular" />,
+  "$$$$": <CurrencyDollar size={24} color="#000" weight="regular" />,
+  "Walking distance (0–10 min)": <MapPin size={24} color="#000" weight="regular" />,
+  "10–30 min by walk or car": <Car size={24} color="#000" weight="regular" />,
+  "More than 30 min": <Car size={24} color="#000" weight="regular" />,
+  Korean: <BowlFood size={24} color="#000" weight="regular" />,
+  Japanese: <BowlFood size={24} color="#000" weight="regular" />,
+  Italian: <Pizza size={24} color="#000" weight="regular" />,
+  Mexican: <Pizza size={24} color="#000" weight="regular" />,
+  American: <ForkKnife size={24} color="#000" weight="regular" />,
+  Indian: <BowlFood size={24} color="#000" weight="regular" />,
+  "Middle Eastern": <BowlFood size={24} color="#000" weight="regular" />,
+  French: <ForkKnife size={24} color="#000" weight="regular" />,
+  "Open to anything": <Globe size={24} color="#000" weight="regular" />,
+  "Outdoor seating": <Sun size={24} color="#000" weight="regular" />,
+  "Good for groups": <Users size={24} color="#000" weight="regular" />,
+  "Vegetarian / Vegan options": <Leaf size={24} color="#000" weight="regular" />,
+  "Late-night open": <Moon size={24} color="#000" weight="regular" />,
+  "Pet-friendly": <PawPrint size={24} color="#000" weight="regular" />,
+  "Wheelchair accessible": <Wheelchair size={24} color="#000" weight="regular" />,
+  "Accepts reservations": <Calendar size={24} color="#000" weight="regular" />,
+  "Delivery available": <Truck size={24} color="#000" weight="regular" />,
+  None: <Globe size={24} color="#000" weight="regular" />,
+  "4.5+ preferred": <Star size={24} color="#000" weight="regular" />,
+  "At least 4.0": <Star size={24} color="#000" weight="regular" />,
+  "Anything's fine": <Globe size={24} color="#000" weight="regular" />,
 };
 
 export default function AppPage() {

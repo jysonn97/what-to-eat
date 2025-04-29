@@ -1,18 +1,21 @@
-// components/OptionButton.js
+import { Check } from "lucide-react";
+import clsx from "clsx";
+
 export default function OptionButton({ option, selected, onClick }) {
   const isSelected = selected.includes(option);
 
   return (
     <button
       onClick={() => onClick(option)}
-      className={`w-full px-4 py-3 rounded-lg border text-left transition-all duration-150
-        ${
-          isSelected
-            ? "bg-black text-white border-black"
-            : "bg-white text-gray-800 border-gray-300 hover:border-black"
-        }`}
+      className={clsx(
+        "w-full flex items-center justify-between px-5 py-3 rounded-xl border transition text-left",
+        isSelected
+          ? "bg-black text-white border-black shadow-md"
+          : "bg-white text-gray-800 border-gray-300 hover:border-black"
+      )}
     >
-      {option}
+      <span>{option}</span>
+      {isSelected && <Check className="w-5 h-5" />}
     </button>
   );
 }

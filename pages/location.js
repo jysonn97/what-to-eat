@@ -46,23 +46,32 @@ export default function LocationPage() {
   };
 
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>📍 Where are you?</h1>
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
+      <div className="w-full max-w-md text-center space-y-8">
+        {/* Title */}
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          📍 Where are you?
+        </h1>
+
+        {/* Input */}
         <input
           id="location-input"
           type="text"
-          placeholder="Enter a location..."
+          placeholder="Enter your location..."
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          style={styles.input}
+          className="w-full px-5 py-3 rounded-md bg-white text-black text-center text-lg outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
         />
-        {error && <p style={styles.error}>{error}</p>}
+
+        {/* Error message */}
+        {error && (
+          <p className="text-red-400 text-sm">{error}</p>
+        )}
+
+        {/* Button */}
         <button
-          style={styles.button}
           onClick={handleNext}
-          onMouseEnter={(e) => (e.target.style.opacity = "0.9")}
-          onMouseLeave={(e) => (e.target.style.opacity = "1")}
+          className="w-full bg-white text-black font-semibold text-lg py-3 rounded-md hover:opacity-90 transition"
         >
           Next
         </button>
@@ -70,53 +79,3 @@ export default function LocationPage() {
     </div>
   );
 }
-
-const styles = {
-  wrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    backgroundColor: "#fff",
-    fontFamily: "Inter, sans-serif",
-    padding: "0 20px",
-  },
-  card: {
-    width: "100%",
-    maxWidth: "400px",
-    textAlign: "center",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: "28px",
-    fontWeight: "600",
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "14px",
-    fontSize: "16px",
-    borderRadius: "8px",
-    border: "1.5px solid #ccc",
-    outline: "none",
-    textAlign: "center",
-    marginBottom: "12px",
-  },
-  error: {
-    color: "red",
-    fontSize: "14px",
-    marginBottom: "10px",
-  },
-  button: {
-    width: "160px",
-    padding: "12px 0",
-    fontSize: "16px",
-    backgroundColor: "#000",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-  },
-};

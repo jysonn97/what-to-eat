@@ -11,7 +11,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
       <div className="text-center space-y-10">
         {/* 상단 소제목 */}
-        <p className="text-sm md:text-base tracking-widest text-gray-400 uppercase font-semibold">
+        <p className="text-sm md:text-base tracking-widest text-white uppercase font-semibold">
   Discover
 </p>
 

@@ -110,13 +110,15 @@ export default function AppPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f9f9f9] px-4 py-12">
-      <div className="w-full max-w-xl bg-white border border-gray-200 rounded-2xl shadow-xl p-8 space-y-6">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-2xl space-y-8">
         <QuestionCard question={questionData.question} />
 
-        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+        {error && (
+          <p className="text-sm text-red-500 text-center">{error}</p>
+        )}
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-3">
           {questionData.options?.map((option, index) => (
             <OptionButton
               key={index}

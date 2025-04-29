@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 // Phosphor Icons
 import { Egg, Coffee, ForkKnife, IceCream, Briefcase, Heart, Users, MapPin, 
 Star, CurrencyDollar, Car, Globe, BowlFood, Pizza, PawPrint, Wheelchair, Calendar, Truck, 
-Sun, Moon } from "@phosphor-icons/react";
+Sun, Moon, Leaf, User } from "@phosphor-icons/react";
 
 const iconMap = {
   Breakfast: <Egg size={24} color="#000" weight="regular" />,

@@ -29,10 +29,21 @@ a:hover {
 }
 
 button {
-  @apply font-medium rounded px-4 py-2 transition duration-200;
+  @apply font-medium transition duration-200;
 }
 
 input, select, textarea {
   @apply border border-gray-300 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-black;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #ffffff;
+  color: #1f1f1f;
+  line-height: 1.6;
+  min-height: 100%;
+  overflow-x: hidden;  /* 모바일에서 옆으로 밀리는 이슈 방지 */
 }
 

@@ -8,14 +8,14 @@ export default function OptionButton({ option, selected, onClick }) {
     <button
       onClick={() => onClick(option)}
       className={clsx(
-        "w-full flex items-center justify-between px-5 py-3 rounded-xl border text-left transition-all duration-200",
+        "w-full flex items-center justify-between rounded-lg px-5 py-4 border text-left transition-all duration-200",
         isSelected
-          ? "bg-black text-white border-black shadow-md"
-          : "bg-white text-gray-800 border-gray-300 hover:border-black"
+          ? "bg-neutral-900 text-white border-neutral-900"
+          : "bg-white text-neutral-800 border-neutral-300 hover:border-neutral-500 hover:bg-neutral-50"
       )}
     >
-      <span className="text-base md:text-[17px] font-medium">{option}</span>
-      {isSelected && <Check className="w-5 h-5" />}
+      <span className="text-[15px] font-medium">{option}</span>
+      {isSelected && <Check className="w-4 h-4" />}
     </button>
   );
 }

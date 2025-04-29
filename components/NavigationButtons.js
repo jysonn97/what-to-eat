@@ -3,7 +3,7 @@ export default function NavigationButtons({ onBack, onNext, disabled, loading })
     <div className="flex justify-between pt-6">
       <button
         onClick={onBack}
-        className="text-sm text-gray-600 hover:text-black transition"
+        className="text-sm text-gray-500 hover:text-black transition"
       >
         ← Go Back
       </button>

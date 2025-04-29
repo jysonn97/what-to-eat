@@ -106,100 +106,51 @@ export default function AppPage() {
   }
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>{questionData.question}</h1>
-      {error && <p style={styles.error}>{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
+      <div className="w-full max-w-xl bg-gray-50 shadow-md rounded-2xl p-8 space-y-6 border border-gray-200">
+        <h1 className="text-2xl font-semibold text-gray-900 text-center">{questionData.question}</h1>
 
-      <div style={styles.options}>
-        {questionData.options?.map((option, index) => (
-          <label key={index} style={styles.optionItem}>
-            <input
-              type={questionData.key === "specialFeatures" ? "checkbox" : "radio"}
-              name="answer"
-              value={option}
-              checked={selected.includes(option)}
-              onChange={() => handleOptionToggle(option)}
-              style={styles.radio}
-            />
-            <span>{option}</span>
-          </label>
-        ))}
-      </div>
+        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
-      <div style={styles.buttons}>
-        <button onClick={handleBack} style={styles.backButton}>← Go Back</button>
-        <button onClick={handleNext} disabled={!selected.length || loading} style={styles.nextButton}>
-          {loading ? "Loading..." : "Next →"}
-        </button>
+        <div className="flex flex-col gap-3">
+          {questionData.options?.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => handleOptionToggle(option)}
+              className={`w-full px-4 py-3 rounded-lg border text-left transition-all duration-150 
+                ${
+                  selected.includes(option)
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-gray-800 border-gray-300 hover:border-black"
+                }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex justify-between pt-6">
+          <button
+            onClick={handleBack}
+            className="text-sm text-gray-600 hover:text-black transition"
+          >
+            ← Go Back
+          </button>
+
+          <button
+            onClick={handleNext}
+            disabled={!selected.length || loading}
+            className={`px-5 py-2 text-sm rounded-lg font-medium transition duration-150 
+              ${
+                loading
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-black text-white hover:bg-gray-800"
+              }`}
+          >
+            {loading ? "Loading..." : "Next →"}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "'Inter', sans-serif",
-    padding: "40px 20px",
-    backgroundColor: "#fff",
-    color: "#1f1f1f",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: "clamp(24px, 4vw, 36px)",
-    fontWeight: 600,
-    marginBottom: "40px",
-  },
-  options: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    width: "100%",
-    maxWidth: "400px",
-    alignItems: "flex-start",
-    marginBottom: "40px",
-  },
-  optionItem: {
-    fontSize: "18px",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  radio: {
-    width: "18px",
-    height: "18px",
-    cursor: "pointer",
-  },
-  buttons: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "15px",
-    marginTop: "20px",
-  },
-  nextButton: {
-    padding: "10px 26px",
-    backgroundColor: "#000",
-    color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-  backButton: {
-    padding: "10px 26px",
-    backgroundColor: "#f1f1f1",
-    color: "#000",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    marginTop: "10px",
-  },
-};

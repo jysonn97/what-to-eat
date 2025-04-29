@@ -47,7 +47,7 @@ export default function AppPage() {
   };
 
   const handleNext = () => {
-    if (!selected || selected.length === 0 || !questionData?.key) return;
+    if (!selected.length || !questionData?.key) return;
 
     let answerToSave = selected;
     const isMulti = questionData.key === "specialFeatures";
@@ -110,13 +110,13 @@ export default function AppPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
-      <div className="w-full max-w-xl bg-white border border-gray-200 shadow-sm rounded-2xl p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#f9f9f9] px-4 py-12">
+      <div className="w-full max-w-xl bg-white border border-gray-200 rounded-2xl shadow-xl p-8 space-y-6">
         <QuestionCard question={questionData.question} />
 
         {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-4">
           {questionData.options?.map((option, index) => (
             <OptionButton
               key={index}

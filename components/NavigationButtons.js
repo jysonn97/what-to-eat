@@ -1,4 +1,3 @@
-// components/NavigationButtons.js
 export default function NavigationButtons({ onBack, onNext, disabled, loading }) {
   return (
     <div className="flex justify-between pt-6">

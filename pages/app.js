@@ -111,7 +111,7 @@ export default function AppPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
-      <div className="w-full max-w-xl bg-gray-50 shadow-md rounded-2xl p-8 space-y-6 border border-gray-200">
+      <div className="w-full max-w-xl bg-white border border-gray-200 shadow-sm rounded-2xl p-8 space-y-6">
         <QuestionCard question={questionData.question} />
 
         {error && <p className="text-red-600 text-sm text-center">{error}</p>}

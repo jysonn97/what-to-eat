@@ -1,63 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
-// Phosphor Icons
-import { Egg, Coffee, ForkKnife, IceCream, Briefcase, Heart, Users, MapPin, 
-Star, CurrencyDollar, Car, Globe, BowlFood, Pizza, PawPrint, Wheelchair, Calendar, Truck, 
-Sun, Moon, Leaf, User } from "@phosphor-icons/react";
-
-const iconMap = {
-  Breakfast: <Egg size={24} color="#000" weight="regular" />,
-  Brunch: <Coffee size={24} color="#000" weight="regular" />,
-  Lunch: <ForkKnife size={24} color="#000" weight="regular" />,
-  Dinner: <ForkKnife size={24} color="#000" weight="regular" />,
-  "Snack / Dessert": <IceCream size={24} color="#000" weight="regular" />,
-  "Regular meal": <ForkKnife size={24} color="#000" weight="regular" />,
-  "Special event (e.g. birthday, graduation)": <Calendar size={24} color="#000" weight="regular" />,
-  "Date / Romantic": <Heart size={24} color="#000" weight="regular" />,
-  "Business meeting": <Briefcase size={24} color="#000" weight="regular" />,
-  "Exploring a new place": <MapPin size={24} color="#000" weight="regular" />,
-  Alone: <User size={24} color="#000" weight="regular" />,
-  Friends: <Users size={24} color="#000" weight="regular" />,
-  Family: <Users size={24} color="#000" weight="regular" />,
-  "Partner / Date": <Heart size={24} color="#000" weight="regular" />,
-  "Client / Coworkers": <Briefcase size={24} color="#000" weight="regular" />,
-  "Cozy & quiet": <Sun size={24} color="#000" weight="regular" />,
-  "Trendy & lively": <Moon size={24} color="#000" weight="regular" />,
-  Romantic: <Heart size={24} color="#000" weight="regular" />,
-  "Fancy & upscale": <Star size={24} color="#000" weight="regular" />,
-  "Casual & fun": <Users size={24} color="#000" weight="regular" />,
-  "Doesn't matter": <Globe size={24} color="#000" weight="regular" />,
-  "$": <CurrencyDollar size={24} color="#000" weight="regular" />,
-  "$$": <CurrencyDollar size={24} color="#000" weight="regular" />,
-  "$$$": <CurrencyDollar size={24} color="#000" weight="regular" />,
-  "$$$$": <CurrencyDollar size={24} color="#000" weight="regular" />,
-  "Walking distance (0–10 min)": <MapPin size={24} color="#000" weight="regular" />,
-  "10–30 min by walk or car": <Car size={24} color="#000" weight="regular" />,
-  "More than 30 min": <Car size={24} color="#000" weight="regular" />,
-  Korean: <BowlFood size={24} color="#000" weight="regular" />,
-  Japanese: <BowlFood size={24} color="#000" weight="regular" />,
-  Italian: <Pizza size={24} color="#000" weight="regular" />,
-  Mexican: <Pizza size={24} color="#000" weight="regular" />,
-  American: <ForkKnife size={24} color="#000" weight="regular" />,
-  Indian: <BowlFood size={24} color="#000" weight="regular" />,
-  "Middle Eastern": <BowlFood size={24} color="#000" weight="regular" />,
-  French: <ForkKnife size={24} color="#000" weight="regular" />,
-  "Open to anything": <Globe size={24} color="#000" weight="regular" />,
-  "Outdoor seating": <Sun size={24} color="#000" weight="regular" />,
-  "Good for groups": <Users size={24} color="#000" weight="regular" />,
-  "Vegetarian / Vegan options": <Leaf size={24} color="#000" weight="regular" />,
-  "Late-night open": <Moon size={24} color="#000" weight="regular" />,
-  "Pet-friendly": <PawPrint size={24} color="#000" weight="regular" />,
-  "Wheelchair accessible": <Wheelchair size={24} color="#000" weight="regular" />,
-  "Accepts reservations": <Calendar size={24} color="#000" weight="regular" />,
-  "Delivery available": <Truck size={24} color="#000" weight="regular" />,
-  None: <Globe size={24} color="#000" weight="regular" />,
-  "4.5+ preferred": <Star size={24} color="#000" weight="regular" />,
-  "At least 4.0": <Star size={24} color="#000" weight="regular" />,
-  "Anything's fine": <Globe size={24} color="#000" weight="regular" />,
-};
-
 export default function AppPage() {
   const router = useRouter();
   const { location } = router.query;
@@ -178,9 +121,7 @@ export default function AppPage() {
               onChange={() => handleOptionToggle(option)}
               style={styles.radio}
             />
-            <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              {iconMap[option]} {option}
-            </span>
+            <span>{option}</span>
           </label>
         ))}
       </div>

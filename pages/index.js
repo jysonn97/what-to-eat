@@ -9,13 +9,21 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="text-center space-y-12">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+      <div className="text-center space-y-10">
+        {/* 상단 소제목 */}
+        <p className="text-sm md:text-base tracking-widest text-gray-400 uppercase">
+          Discover
+        </p>
+
+        {/* 메인 메시지 */}
+        <h1 className="text-5xl md:text-7xl font-extralight tracking-tight leading-tight">
           🍽️ What to Eat?
         </h1>
+
+        {/* 버튼 */}
         <button
           onClick={handleStart}
-          className="border border-white text-white text-lg px-8 py-3 rounded-md hover:bg-white hover:text-black transition duration-300 font-medium shadow-md"
+          className="mt-6 bg-white text-black font-semibold text-base md:text-lg px-8 py-4 rounded-sm shadow hover:opacity-90 transition"
         >
           Get Started
         </button>

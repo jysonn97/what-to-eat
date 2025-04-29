@@ -16,7 +16,7 @@ export default function HomePage() {
         </p>
 
         {/* 메인 메시지 */}
-        <h1 className="text-5xl md:text-7xl font-extralight tracking-tight leading-tight">
+        <h1 className="text-5xl md:text-7xl font-extralight tracking-tight leading-tight text-white">
           🍽️ What to Eat?
         </h1>
 

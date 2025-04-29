@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
+import QuestionCard from "@/components/QuestionCard";
+import OptionButton from "@/components/OptionButton";
+import NavigationButtons from "@/components/NavigationButtons";
+
 export default function AppPage() {
   const router = useRouter();
   const { location } = router.query;
@@ -108,48 +112,27 @@ export default function AppPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
       <div className="w-full max-w-xl bg-gray-50 shadow-md rounded-2xl p-8 space-y-6 border border-gray-200">
-        <h1 className="text-2xl font-semibold text-gray-900 text-center">{questionData.question}</h1>
+        <QuestionCard question={questionData.question} />
 
         {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
         <div className="flex flex-col gap-3">
           {questionData.options?.map((option, index) => (
-            <button
+            <OptionButton
               key={index}
-              onClick={() => handleOptionToggle(option)}
-              className={`w-full px-4 py-3 rounded-lg border text-left transition-all duration-150 
-                ${
-                  selected.includes(option)
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-gray-800 border-gray-300 hover:border-black"
-                }`}
-            >
-              {option}
-            </button>
+              option={option}
+              selected={selected}
+              onClick={handleOptionToggle}
+            />
           ))}
         </div>
 
-        <div className="flex justify-between pt-6">
-          <button
-            onClick={handleBack}
-            className="text-sm text-gray-600 hover:text-black transition"
-          >
-            ← Go Back
-          </button>
-
-          <button
-            onClick={handleNext}
-            disabled={!selected.length || loading}
-            className={`px-5 py-2 text-sm rounded-lg font-medium transition duration-150 
-              ${
-                loading
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-black text-white hover:bg-gray-800"
-              }`}
-          >
-            {loading ? "Loading..." : "Next →"}
-          </button>
-        </div>
+        <NavigationButtons
+          onBack={handleBack}
+          onNext={handleNext}
+          disabled={!selected.length}
+          loading={loading}
+        />
       </div>
     </div>
   );

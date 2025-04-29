@@ -1,9 +1,9 @@
 export default function NavigationButtons({ onBack, onNext, disabled, loading }) {
   return (
-    <div className="flex justify-between pt-6">
+    <div className="flex justify-between items-center pt-8">
       <button
         onClick={onBack}
-        className="text-sm text-gray-500 hover:text-black transition"
+        className="text-sm text-neutral-500 hover:text-neutral-800 transition"
       >
         ← Go Back
       </button>
@@ -11,11 +11,11 @@ export default function NavigationButtons({ onBack, onNext, disabled, loading })
       <button
         onClick={onNext}
         disabled={disabled || loading}
-        className={`px-5 py-2 text-sm rounded-lg font-medium transition duration-150
+        className={`px-5 py-2 rounded-lg text-sm font-medium transition duration-200
           ${
             disabled || loading
-              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-              : "bg-black text-white hover:bg-gray-800"
+              ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+              : "bg-neutral-900 text-white hover:bg-neutral-700"
           }`}
       >
         {loading ? "Loading..." : "Next →"}

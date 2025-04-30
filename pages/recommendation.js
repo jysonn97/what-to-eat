@@ -46,20 +46,20 @@ export default function RecommendationPage() {
   return (
     <div className="min-h-screen bg-black text-white font-extralight px-6 py-12">
       <div className="max-w-3xl mx-auto space-y-10 text-center">
-        <h1 className="text-3xl sm:text-4xl font-semibold">Your Top Restaurant Picks</h1>
+        <h1 className="text-3xl sm:text-4xl font-extralight text-white">Your Top Restaurant Picks</h1>
 
-        {loading && <p className="text-sm">⏳ Finding your perfect match...</p>}
+        {loading && <p className="text-sm text-white">⏳ Finding your perfect match...</p>}
         {error && <p className="text-red-400">{error}</p>}
 
         {!loading && !error && recommendations.length === 0 && (
-          <p>No matches found. Try different preferences.</p>
+          <p className="text-white">No matches found. Try different preferences.</p>
         )}
 
         <ul className="space-y-8">
           {recommendations.map((place, index) => (
             <li key={index} className="bg-neutral-900 p-6 rounded-xl shadow-lg text-left space-y-4">
               <div className="flex justify-between flex-wrap items-start">
-                <h2 className="text-lg font-medium">
+                <h2 className="text-lg font-extralight text-white">
                   {index + 1}. {place.name}
                 </h2>
                 <span className="text-sm text-neutral-400">

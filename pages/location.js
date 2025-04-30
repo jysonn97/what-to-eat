@@ -46,31 +46,35 @@ export default function LocationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="text-center space-y-9">
-        {/* Question Title */}
-        <h1 className="text-4xl md:text-5xl font-extralight tracking-tight leading-tight text-white">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
+      <div className="w-full max-w-md text-center space-y-8">
+        {/* Title */}
+        <h1 className="text-3xl md:text-4xl font-extralight tracking-tight leading-tight text-white whitespace-nowrap">
           Where are you?
         </h1>
 
-{/* Input Box */}
-<input
-  id="location-input"
-  type="text"
-  placeholder="Enter your location..."
-  value={location}
-  onChange={(e) => setLocation(e.target.value)}
-  className="w-[260px] mx-auto px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:ring-2 focus:ring-white transition"
-/>
+        {/* Input */}
+        <input
+          id="location-input"
+          type="text"
+          placeholder="Enter your location..."
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-[260px] mx-auto px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:ring-2 focus:ring-white transition"
+        />
 
-{/* Button */}
-<button
-  onClick={handleNext}
-  className="mt-4 bg-white text-black font-medium text-sm md:text-base px-6 py-2.5 rounded-md hover:opacity-90 transition"
->
-  Next
-</button>
+        {/* Error */}
+        {error && (
+          <p className="text-red-400 text-sm">{error}</p>
+        )}
 
+        {/* Button */}
+        <button
+          onClick={handleNext}
+          className="px-6 py-2.5 bg-white text-black font-medium text-sm md:text-base rounded-md hover:opacity-90 transition"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

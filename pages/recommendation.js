@@ -62,7 +62,7 @@ export default function RecommendationPage() {
                 <h2 className="text-xl font-extralight text-white">
                   {index + 1}. {place.name}
                 </h2>
-                <span className="text-sm text-neutral-400">
+                <span className="text-sm text-neutral-400 font-light">
                   ⭐ {Number(place.rating).toFixed(1)} ({place.reviewCount} reviews)
                 </span>
               </div>
@@ -85,16 +85,17 @@ export default function RecommendationPage() {
 
 <p className="text-sm text-white">
   <span className="text-white text-sm tracking-wide">💰 Price:</span>{" "}
-  <span className="font-extralight">{place.price}</span>
+  <span className="font-light">{place.price}</span>
 </p>
 <p className="text-sm text-white">
   <span className="text-white text-sm tracking-wide">🍽️ Cuisine:</span>{" "}
-  <span className="font-extralight">{place.cuisine}</span>
+  <span className="font-light">{place.cuisine}</span>
 </p>
 <p className="text-sm text-white">
   <span className="text-white text-sm tracking-wide">📍 Distance:</span>{" "}
-  <span className="font-extralight">{place.distance}</span>
+  <span className="font-light">{place.distance}</span>
 </p>
+
 
 
               {place.mapsUrl && (

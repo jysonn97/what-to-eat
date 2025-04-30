@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-
 import QuestionCard from "@/components/QuestionCard";
 import OptionButton from "@/components/OptionButton";
 import NavigationButtons from "@/components/NavigationButtons";
@@ -81,12 +80,9 @@ export default function AppPage() {
   if (!questionData) return null;
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl space-y-10">
-        {/* question title */}
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
+      <div className="w-full max-w-xl space-y-10">
         <QuestionCard question={questionData.question} />
-
-        {/* options */}
         <div className="flex flex-col gap-3">
           {questionData.options.map((option) => (
             <OptionButton
@@ -97,8 +93,6 @@ export default function AppPage() {
             />
           ))}
         </div>
-
-        {/* nav buttons */}
         <NavigationButtons
           onBack={handleBack}
           onNext={handleNext}

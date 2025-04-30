@@ -54,14 +54,14 @@ export default function LocationPage() {
         </h1>
 
         {/* Input */}
-        <input
-          id="location-input"
-          type="text"
-          placeholder="Enter your location..."
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full px-5 py-3 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
-        />
+<input
+  id="location-input"
+  type="text"
+  placeholder="Enter your location..."
+  value={location}
+  onChange={(e) => setLocation(e.target.value)}
+  className="w-full px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
+/>
 
         {/* Error */}
         {error && (
@@ -69,12 +69,12 @@ export default function LocationPage() {
         )}
 
         {/* Button (narrower) */}
-        <button
-          onClick={handleNext}
-          className="px-8 py-3 bg-white text-black font-semibold text-base rounded-md hover:opacity-90 transition"
-        >
-          Next
-        </button>
+<button
+  onClick={handleNext}
+  className="px-6 py-2.5 bg-white text-black font-medium text-sm md:text-base rounded-md hover:opacity-90 transition"
+>
+  Next
+</button>
       </div>
     </div>
   );

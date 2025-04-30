@@ -8,13 +8,13 @@ export default function OptionButton({ option, selected, onClick }) {
     <button
       onClick={() => onClick(option)}
       className={clsx(
-        "w-full flex items-center justify-between rounded-md px-4 py-2.5 border text-left transition-all duration-200",
+        "w-[280px] mx-auto flex items-center justify-between border rounded-md px-4 py-2 transition-all duration-200 text-sm",
         isSelected
-          ? "bg-white text-black border-white"
+          ? "bg-white text-black font-semibold"
           : "bg-transparent text-white border-white hover:bg-white hover:text-black"
       )}
     >
-      <span className="text-sm font-medium">{option}</span>
+      <span className="font-extralight">{option}</span>
       {isSelected && <Check className="w-4 h-4" />}
     </button>
   );

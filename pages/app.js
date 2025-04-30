@@ -51,7 +51,6 @@ export default function AppPage() {
     const answer = questionData.key === "specialFeatures" ? selected : selected[0];
     const updatedAnswers = [...answers, { key: questionData.key, answer }];
 
-    // auto-fill for business meeting
     if (questionData.key === "occasion" && selected.includes("Business meeting")) {
       updatedAnswers.push({ key: "whoWith", answer: "Client / Coworkers" });
     }
@@ -82,12 +81,12 @@ export default function AppPage() {
   if (!questionData) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-6 py-16">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
       <div className="w-full max-w-2xl space-y-10">
-        {/* 질문 */}
+        {/* question title */}
         <QuestionCard question={questionData.question} />
 
-        {/* 옵션 */}
+        {/* options */}
         <div className="flex flex-col gap-3">
           {questionData.options.map((option) => (
             <OptionButton
@@ -99,7 +98,7 @@ export default function AppPage() {
           ))}
         </div>
 
-        {/* 다음/뒤로 */}
+        {/* nav buttons */}
         <NavigationButtons
           onBack={handleBack}
           onNext={handleNext}

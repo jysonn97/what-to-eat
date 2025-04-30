@@ -9,7 +9,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="text-center space-y-12">
+      <div className="text-center space-y-9">
         <p className="text-sm md:text-base tracking-widest text-gray-400 uppercase font-semibold">
           Discover
         </p>

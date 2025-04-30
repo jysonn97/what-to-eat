@@ -47,9 +47,9 @@ export default function LocationPage() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
-      <div className="w-full max-w-md text-center space-y-8">
+      <div className="w-full max-w-md text-center space-y-10">
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+        <h1 className="text-5xl md:text-6xl font-extralight tracking-tight leading-tight text-white">
           📍 Where are you?
         </h1>
 

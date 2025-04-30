@@ -44,45 +44,51 @@ export default function RecommendationPage() {
   }, [answers]);
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>🍽️ Your Top Restaurant Picks</h1>
+    <div className="min-h-screen bg-black text-white px-4 py-16 font-extralight">
+      <h1 className="text-center text-3xl mb-10 font-extralight">Your Top Restaurant Picks</h1>
 
-      {loading && <p>⏳ Finding your perfect match...</p>}
-      {error && <p style={styles.error}>{error}</p>}
+      {loading && <p className="text-center text-sm opacity-60">⏳ Finding your perfect match...</p>}
+      {error && <p className="text-center text-red-400">{error}</p>}
 
       {!loading && !error && recommendations.length === 0 && (
-        <p>No matches found. Try different preferences.</p>
+        <p className="text-center opacity-60">No matches found. Try different preferences.</p>
       )}
 
-      <ul style={styles.list}>
+      <ul className="space-y-8 max-w-2xl mx-auto">
         {recommendations.map((place, index) => (
-          <li key={index} style={styles.card}>
-            <div style={styles.headerRow}>
-              <h2 style={styles.name}>
-                {index + 1}. {place.name}
-              </h2>
-              <span style={styles.rating}>
-                ⭐ {place.rating} ({place.reviewCount} reviews)
-              </span>
+          <li key={index} className="border border-white rounded-xl p-6 space-y-4">
+            <div className="flex justify-between items-start flex-wrap gap-2">
+              <h2 className="text-lg font-semibold">{index + 1}. {place.name}</h2>
+              <span className="text-sm text-gray-400">⭐ {place.rating} ({place.reviewCount} reviews)</span>
             </div>
 
-            <ul style={styles.highlights}>
-              {place.highlights?.map((line, idx) => {
-                const cleanedLine = line.replace(/^✅|^✔️|^•/, "").trim(); // ✅ 핵심 수정
-                return (
-                  <li key={idx} style={styles.bullet}>
-                    ✅ {cleanedLine}
-                  </li>
-                );
-              })}
-            </ul>
+            {place.highlights?.length > 0 && (
+              <ul className="space-y-1 text-sm">
+                {place.highlights.map((line, idx) => {
+                  const cleanedLine = line.replace(/^✅|^✔️|^•/, "").trim();
+                  return (
+                    <li key={idx} className="flex gap-2 items-start">
+                      <span>✔️</span>
+                      <span>{cleanedLine}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
 
-            <p><span style={styles.label}>💰 Price:</span> {place.price}</p>
-            <p><span style={styles.label}>🍽️ Cuisine:</span> {place.cuisine}</p>
-            <p><span style={styles.label}>📍 Distance:</span> {place.distance}</p>
+            <div className="text-sm space-y-1">
+              <p><span className="font-semibold">💰 Price:</span> {place.price}</p>
+              <p><span className="font-semibold">🍽️ Cuisine:</span> {place.cuisine}</p>
+              <p><span className="font-semibold">📍 Distance:</span> {place.distance}</p>
+            </div>
 
             {place.mapsUrl && (
-              <a href={place.mapsUrl} target="_blank" rel="noopener noreferrer" style={styles.link}>
+              <a
+                href={place.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 text-sm text-white underline hover:text-gray-200"
+              >
                 View on Google Maps
               </a>
             )}
@@ -92,71 +98,3 @@ export default function RecommendationPage() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: "40px 20px",
-    fontFamily: "'Inter', sans-serif",
-    textAlign: "center",
-  },
-  heading: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    marginBottom: "30px",
-  },
-  error: {
-    color: "red",
-    fontWeight: "bold",
-  },
-  list: {
-    listStyle: "none",
-    padding: 0,
-    marginTop: "30px",
-  },
-  card: {
-    backgroundColor: "#f9f9f9",
-    padding: "25px",
-    margin: "20px auto",
-    borderRadius: "12px",
-    maxWidth: "620px",
-    boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-    textAlign: "left",
-  },
-  headerRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    flexWrap: "wrap",
-  },
-  name: {
-    fontSize: "20px",
-    fontWeight: "600",
-    margin: 0,
-  },
-  rating: {
-    fontSize: "15px",
-    color: "#555",
-  },
-  highlights: {
-    margin: "15px 0 10px",
-    padding: 0,
-    listStyle: "none",
-  },
-  bullet: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    marginBottom: "6px",
-    fontSize: "16px",
-    whiteSpace: "pre-wrap", // ✅ line wrapping OK
-  },
-  label: {
-    fontWeight: 600,
-  },
-  link: {
-    display: "inline-block",
-    marginTop: "15px",
-    color: "#0070f3",
-    textDecoration: "underline",
-  },
-};

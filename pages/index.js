@@ -20,7 +20,7 @@ export default function HomePage() {
 
         <button
           onClick={handleStart}
-          className="mt-8 bg-white text-black font-semibold text-base md:text-lg px-8 py-3 rounded-sm shadow hover:opacity-90 transition"
+          className="mt-8 bg-white text-black font-medium text-sm md:text-base px-6 py-2.5 rounded-sm shadow hover:opacity-90 transition"
         >
           Get Started
         </button>

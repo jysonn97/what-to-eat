@@ -53,26 +53,24 @@ export default function LocationPage() {
           Where are you?
         </h1>
 
-        {/* Input Box */}
-        <input
-          id="location-input"
-          type="text"
-          placeholder="Enter your location..."
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-[260px] mx-auto px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:ring-2 focus:ring-white transition"
-        />
+{/* Input Box */}
+<input
+  id="location-input"
+  type="text"
+  placeholder="Enter your location..."
+  value={location}
+  onChange={(e) => setLocation(e.target.value)}
+  className="w-[260px] mx-auto px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:ring-2 focus:ring-white transition"
+/>
 
-        {/* Error Message */}
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+{/* Button */}
+<button
+  onClick={handleNext}
+  className="mt-4 bg-white text-black font-medium text-sm md:text-base px-6 py-2.5 rounded-md hover:opacity-90 transition"
+>
+  Next
+</button>
 
-        {/* Button */}
-        <button
-          onClick={handleNext}
-          className="bg-white text-black font-medium text-sm md:text-base px-6 py-2.5 rounded-md hover:opacity-90 transition"
-        >
-          Next
-        </button>
       </div>
     </div>
   );

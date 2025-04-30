@@ -58,12 +58,18 @@ export default function AppPage() {
     fetchNextQuestion(updatedAnswers);
   };
 
-  const handleBack = () => {
-    const updated = [...answers];
-    updated.pop();
-    setAnswers(updated);
-    fetchNextQuestion(updated);
-  };
+const handleBack = () => {
+  if (answers.length <= 1) {
+    router.push("/location");
+    return;
+  }
+
+  const updated = [...answers];
+  updated.pop();
+  setAnswers(updated);
+  fetchNextQuestion(updated);
+};
+
 
   const handleOptionToggle = (option) => {
     if (questionData.key === "specialFeatures") {

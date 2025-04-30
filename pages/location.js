@@ -50,7 +50,7 @@ export default function LocationPage() {
       <div className="w-full max-w-md text-center space-y-10">
         {/* Title */}
         <h1 className="text-3xl md:text-4xl font-extralight tracking-tight leading-tight text-white whitespace-nowrap">
-          📍 Where are you?
+          Where are you?
         </h1>
 
         {/* Input */}

@@ -39,7 +39,7 @@ export default function LocationPage() {
 
   const handleNext = () => {
     if (!location.trim()) {
-      setError("📍 Please enter a valid location from the dropdown.");
+      setError("📍 Please enter a valid location.");
       return;
     }
     router.push(`/app?location=${encodeURIComponent(location)}`);
@@ -49,7 +49,7 @@ export default function LocationPage() {
     <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
       <div className="w-full max-w-md text-center space-y-10">
         {/* Title */}
-        <h1 className="text-5xl md:text-6xl font-extralight tracking-tight leading-tight text-white">
+        <h1 className="text-3xl md:text-4xl font-extralight tracking-tight leading-tight text-white whitespace-nowrap">
           📍 Where are you?
         </h1>
 
@@ -60,18 +60,18 @@ export default function LocationPage() {
           placeholder="Enter your location..."
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full px-5 py-3 rounded-md bg-white text-black text-center text-lg outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
+          className="w-full px-5 py-3 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
         />
 
-        {/* Error message */}
+        {/* Error */}
         {error && (
           <p className="text-red-400 text-sm">{error}</p>
         )}
 
-        {/* Button */}
+        {/* Button (narrower) */}
         <button
           onClick={handleNext}
-          className="w-full bg-white text-black font-semibold text-lg py-3 rounded-md hover:opacity-90 transition"
+          className="px-8 py-3 bg-white text-black font-semibold text-base rounded-md hover:opacity-90 transition"
         >
           Next
         </button>

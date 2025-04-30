@@ -59,11 +59,11 @@ export default function RecommendationPage() {
           {recommendations.map((place, index) => (
             <li key={index} className="bg-neutral-900 p-6 rounded-xl shadow-lg text-left space-y-4">
               <div className="flex justify-between flex-wrap items-start">
-                <h2 className="text-lg font-extralight text-white">
+                <h2 className="text-xl font-extralight text-white">
                   {index + 1}. {place.name}
                 </h2>
                 <span className="text-sm text-neutral-400">
-                  ⭐ {place.rating} ({place.reviewCount} reviews)
+                  ⭐ {Number(place.rating).toFixed(1)} ({place.reviewCount} reviews)
                 </span>
               </div>
 
@@ -74,7 +74,7 @@ export default function RecommendationPage() {
                     .map((line, idx) => {
                       const cleanedLine = line.replace(/^✅|^✔️|^•/, "").trim();
                       return (
-                        <li key={idx} className="flex gap-2 items-start">
+                        <li key={idx} className="flex gap-2 items-start text-white">
                           <span className="text-white">✔️</span>
                           <span>{cleanedLine}</span>
                         </li>
@@ -83,13 +83,13 @@ export default function RecommendationPage() {
                 </ul>
               )}
 
-              <p>
+              <p className="text-sm font-extralight text-white">
                 <span className="font-semibold">💰 Price:</span> {place.price}
               </p>
-              <p>
+              <p className="text-sm font-extralight text-white">
                 <span className="font-semibold">🍽️ Cuisine:</span> {place.cuisine}
               </p>
-              <p>
+              <p className="text-sm font-extralight text-white">
                 <span className="font-semibold">📍 Distance:</span> {place.distance}
               </p>
 

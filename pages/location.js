@@ -46,35 +46,35 @@ export default function LocationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white font-extralight">
-      <div className="w-full max-w-xl text-center space-y-10">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 text-white">
+      <div className="w-full max-w-md text-center space-y-8">
         {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-extralight tracking-tight leading-tight text-white">
+        <h1 className="text-3xl md:text-4xl font-extralight tracking-tight leading-tight text-white whitespace-nowrap">
           Where are you?
         </h1>
 
-        {/* Input */}
-        <input
-          id="location-input"
-          type="text"
-          placeholder="Enter your location..."
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full max-w-md mx-auto px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
-        />
-
-        {/* Error */}
-        {error && <p className="text-red-400 text-sm">{error}</p>}
-
-        {/* Button – same style as app.js */}
-        <div className="pt-2">
+        {/* Input + Button vertically stacked */}
+        <div className="flex flex-col items-center space-y-4">
+          <input
+            id="location-input"
+            type="text"
+            placeholder="Enter your location..."
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="w-[260px] px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:ring-2 focus:ring-white transition"
+          />
           <button
             onClick={handleNext}
-            className="w-full max-w-[160px] px-6 py-2.5 bg-white text-black font-medium text-sm md:text-base rounded-md hover:opacity-90 transition"
+            className="px-6 py-2.5 bg-white text-black font-medium text-sm md:text-base rounded-md hover:opacity-90 transition"
           >
             Next
           </button>
         </div>
+
+        {/* Error */}
+        {error && (
+          <p className="text-red-400 text-sm">{error}</p>
+        )}
       </div>
     </div>
   );

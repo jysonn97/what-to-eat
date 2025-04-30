@@ -105,6 +105,15 @@ const handleBack = () => {
           disabled={selected.length === 0}
           loading={loading}
         />
+  <div className="pt-10 flex justify-center">
+  <button
+    onClick={() => router.push("/")}
+    className="text-xs text-neutral-400 hover:text-white transition underline"
+  >
+    ⤺ Back to Home
+  </button>
+</div>
+
       </div>
     </div>
   );

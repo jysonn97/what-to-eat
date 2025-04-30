@@ -84,15 +84,15 @@ export default function RecommendationPage() {
               )}
 
 <p className="text-sm text-white">
-  <span className="font-medium">💰 Price:</span>{" "}
+  <span className="text-white text-sm tracking-wide">💰 Price:</span>{" "}
   <span className="font-extralight">{place.price}</span>
 </p>
 <p className="text-sm text-white">
-  <span className="font-medium">🍽️ Cuisine:</span>{" "}
+  <span className="text-white text-sm tracking-wide">🍽️ Cuisine:</span>{" "}
   <span className="font-extralight">{place.cuisine}</span>
 </p>
 <p className="text-sm text-white">
-  <span className="font-medium">📍 Distance:</span>{" "}
+  <span className="text-white text-sm tracking-wide">📍 Distance:</span>{" "}
   <span className="font-extralight">{place.distance}</span>
 </p>
 

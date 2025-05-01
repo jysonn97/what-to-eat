@@ -99,17 +99,26 @@ export default function AppPage() {
       <div className="w-full max-w-xl text-center space-y-8 pt-6">
         <QuestionCard question={questionData.question} />
 
-        <div className="flex flex-col gap-3">
-          {questionData.options.map((option) => (
-            <OptionButton
-              key={option}
-              option={option}
-              selected={selected}
-              onClick={handleOptionToggle}
-            />
-          ))}
-        </div>
+{questionData.key === "cuisine" ? (
+  <CuisineGrid
+    options={questionData.options}
+    selected={selected}
+    onToggle={handleOptionToggle}
+  />
+) : (
+  <div className="flex flex-col gap-3">
+    {questionData.options.map((option) => (
+      <OptionButton
+        key={option}
+        option={option}
+        selected={selected}
+        onClick={handleOptionToggle}
+      />
+    ))}
+  </div>
+)}
 
+                
         <NavigationButtons
           onBack={handleBack}
           onNext={handleNext}

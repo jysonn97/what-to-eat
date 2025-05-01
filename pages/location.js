@@ -65,8 +65,8 @@ export default function LocationPage() {
           />
           <button
             onClick={handleNext}
-            className="px-6 py-2.5 bg-white text-black font-medium text-sm md:text-base rounded-md hover:opacity-90 transition"
-          >
+            className="w-full max-w-[160px] px-6 py-2.5 bg-white text-black font-medium text-sm md:text-base rounded-md hover:opacity-90 transition"
+>
             Next
           </button>
         </div>

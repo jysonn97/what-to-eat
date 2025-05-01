@@ -1,3 +1,4 @@
+import CuisineGrid from "@/components/CuisineGrid";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";

@@ -58,18 +58,17 @@ export default function AppPage() {
     fetchNextQuestion(updatedAnswers);
   };
 
-const handleBack = () => {
-  if (answers.length <= 1) {
-    router.push("/location");
-    return;
-  }
+  const handleBack = () => {
+    if (answers.length <= 1) {
+      router.push("/location");
+      return;
+    }
 
-  const updated = [...answers];
-  updated.pop();
-  setAnswers(updated);
-  fetchNextQuestion(updated);
-};
-
+    const updated = [...answers];
+    updated.pop();
+    setAnswers(updated);
+    fetchNextQuestion(updated);
+  };
 
   const handleOptionToggle = (option) => {
     if (questionData.key === "specialFeatures") {
@@ -86,10 +85,13 @@ const handleBack = () => {
   if (!questionData) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
-      <div className="w-full max-w-xl space-y-10">
-        <QuestionCard question={questionData.question} />
-        <div className="flex flex-col gap-3">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-12 text-white font-extralight">
+      <div className="w-full max-w-xl text-center space-y-10">
+        <h1 className="text-3xl md:text-4xl font-extralight tracking-tight leading-tight text-white">
+          {questionData.question}
+        </h1>
+
+        <div className="flex flex-col gap-3 text-left">
           {questionData.options.map((option) => (
             <OptionButton
               key={option}
@@ -99,21 +101,22 @@ const handleBack = () => {
             />
           ))}
         </div>
+
         <NavigationButtons
           onBack={handleBack}
           onNext={handleNext}
           disabled={selected.length === 0}
           loading={loading}
         />
-  <div className="pt-10 flex justify-center">
-  <button
-    onClick={() => router.push("/")}
-    className="text-xs text-neutral-400 hover:text-white transition underline"
-  >
-    ⤺ Back to Home
-  </button>
-</div>
 
+        <div className="pt-10 flex justify-center">
+          <button
+            onClick={() => router.push("/")}
+            className="text-xs text-neutral-400 hover:text-white transition underline"
+          >
+            ⤺ Back to Home
+          </button>
+        </div>
       </div>
     </div>
   );

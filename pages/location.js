@@ -61,8 +61,8 @@ export default function LocationPage() {
             placeholder="Enter your location..."
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-[260px] px-4 py-2.5 rounded-md bg-white text-black text-center text-base outline-none border border-gray-300 focus:ring-2 focus:ring-white transition"
-          />
+            className="w-full px-4 py-2.5 rounded-md bg-white text-black text-center text-sm placeholder:text-sm outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
+/>
           <button
             onClick={handleNext}
              className="px-4 py-1.5 text-sm text-black bg-white rounded-md hover:opacity-90 transition"

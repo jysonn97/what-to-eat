@@ -85,13 +85,11 @@ export default function AppPage() {
   if (!questionData) return null;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-12 text-white font-extralight">
-      <div className="w-full max-w-xl text-center space-y-10">
-        <h1 className="text-3xl md:text-4xl font-extralight tracking-tight leading-tight text-white">
-          {questionData.question}
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
+      <div className="w-full max-w-xl text-center space-y-8 pt-6">
+        <QuestionCard question={questionData.question} />
 
-        <div className="flex flex-col gap-3 text-left">
+        <div className="flex flex-col gap-3">
           {questionData.options.map((option) => (
             <OptionButton
               key={option}
@@ -109,7 +107,7 @@ export default function AppPage() {
           loading={loading}
         />
 
-        <div className="pt-10 flex justify-center">
+        <div className="pt-6 flex justify-center">
           <button
             onClick={() => router.push("/")}
             className="text-xs text-neutral-400 hover:text-white transition underline"

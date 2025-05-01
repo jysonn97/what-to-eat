@@ -70,17 +70,26 @@ export default function AppPage() {
     fetchNextQuestion(updated);
   };
 
-  const handleOptionToggle = (option) => {
-    if (questionData.key === "specialFeatures") {
-      setSelected((prev) =>
-        prev.includes(option)
-          ? prev.filter((o) => o !== option)
-          : [...prev.filter((o) => o !== "None"), option]
-      );
+ const handleOptionToggle = (option) => {
+  if (questionData.key === "specialFeatures") {
+    if (option === "None") {
+      // If "None" is clicked → clear everything else and select only "None"
+      setSelected(["None"]);
     } else {
-      setSelected([option]);
+      setSelected((prev) => {
+        // Remove "None" if it was previously selected
+        const filtered = prev.filter((o) => o !== "None");
+        // Toggle the clicked option
+        return filtered.includes(option)
+          ? filtered.filter((o) => o !== option)
+          : [...filtered, option];
+      });
     }
-  };
+  } else {
+    setSelected([option]);
+  }
+};
+
 
   if (!questionData) return null;
 

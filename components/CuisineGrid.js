@@ -10,17 +10,17 @@ import {
 } from "lucide-react";
 
 const iconMap = {
-  Korean: <Soup className="w-5 h-5 text-white" />,
-  Japanese: <ChefHat className="w-5 h-5 text-white" />,
-  Chinese: <Soup className="w-5 h-5 text-white" />,
-  Italian: <Pizza className="w-5 h-5 text-white" />,
-  Mexican: <ChefHat className="w-5 h-5 text-white" />,
-  American: <Drumstick className="w-5 h-5 text-white" />,
-  BBQ: <Drumstick className="w-5 h-5 text-white" />,
-  Seafood: <Fish className="w-5 h-5 text-white" />,
-  Vegan: <Salad className="w-5 h-5 text-white" />,
-  Pizza: <Pizza className="w-5 h-5 text-white" />,
-  Default: <Utensils className="w-5 h-5 text-white" />,
+  Korean: <Soup className="w-4 h-4 text-white" />,
+  Japanese: <ChefHat className="w-4 h-4 text-white" />,
+  Chinese: <Soup className="w-4 h-4 text-white" />,
+  Italian: <Pizza className="w-4 h-4 text-white" />,
+  Mexican: <ChefHat className="w-4 h-4 text-white" />,
+  American: <Drumstick className="w-4 h-4 text-white" />,
+  BBQ: <Drumstick className="w-4 h-4 text-white" />,
+  Seafood: <Fish className="w-4 h-4 text-white" />,
+  Vegan: <Salad className="w-4 h-4 text-white" />,
+  Pizza: <Pizza className="w-4 h-4 text-white" />,
+  Default: <Utensils className="w-4 h-4 text-white" />,
 };
 
 export default function CuisineGrid({ options, selected, onToggle }) {
@@ -35,14 +35,14 @@ export default function CuisineGrid({ options, selected, onToggle }) {
             key={cuisine}
             onClick={() => onToggle(cuisine)}
             className={clsx(
-              "flex flex-col items-center justify-center rounded-lg p-3 border text-sm transition",
+              "flex flex-col items-center justify-center rounded-lg p-2 border text-sm transition",
               isSelected
                 ? "border-white bg-white text-black"
                 : "border-neutral-600 hover:border-white text-white"
             )}
           >
             <div className="mb-1">{icon}</div>
-            <span className={clsx(isSelected ? "text-black" : "text-white")}>
+            <span className={clsx(isSelected ? "text-black" : "text-white","text-xs")}>
               {cuisine}
             </span>
           </button>

@@ -1,50 +1,50 @@
+// components/CuisineGrid.js
+import React from "react";
 import clsx from "clsx";
-import {
-  Pizza,
-  Soup,
-  Fish,
-  Drumstick,
-  Salad,
-  Utensils,
-  ChefHat
-} from "lucide-react";
 
-const iconMap = {
-  Korean: <Soup className="w-4 h-4 text-white" />,
-  Japanese: <ChefHat className="w-4 h-4 text-white" />,
-  Chinese: <Soup className="w-4 h-4 text-white" />,
-  Italian: <Pizza className="w-4 h-4 text-white" />,
-  Mexican: <ChefHat className="w-4 h-4 text-white" />,
-  American: <Drumstick className="w-4 h-4 text-white" />,
-  BBQ: <Drumstick className="w-4 h-4 text-white" />,
-  Seafood: <Fish className="w-4 h-4 text-white" />,
-  Vegan: <Salad className="w-4 h-4 text-white" />,
-  Pizza: <Pizza className="w-4 h-4 text-white" />,
-  Default: <Utensils className="w-4 h-4 text-white" />,
-};
+const CUISINE_OPTIONS = [
+  { name: "Korean", icon: "🍲" },
+  { name: "Japanese", icon: "🍣" },
+  { name: "Chinese", icon: "🥟" },
+  { name: "Thai", icon: "🍜" },
+  { name: "Italian", icon: "🍕" },
+  { name: "Mexican", icon: "🌮" },
+  { name: "American", icon: "🍔" },
+  { name: "French", icon: "🥖" },
+  { name: "Middle Eastern", icon: "🥙" },
+  { name: "Indian", icon: "🥘" },
+  { name: "Open to anything", icon: "🌀" },
+];
 
-export default function CuisineGrid({ options, selected, onToggle }) {
+export default function CuisineGrid({ selected, onSelect }) {
+  const handleSelect = (cuisine) => {
+    if (cuisine === "Open to anything") {
+      onSelect(["Open to anything"]);
+    } else {
+      const newSelected = selected.includes(cuisine)
+        ? selected.filter((item) => item !== cuisine)
+        : [...selected.filter((item) => item !== "Open to anything"), cuisine];
+      onSelect(newSelected);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {options.map((cuisine) => {
-        const isSelected = selected.includes(cuisine);
-        const icon = iconMap[cuisine] || iconMap.Default;
-
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+      {CUISINE_OPTIONS.map(({ name, icon }) => {
+        const isSelected = selected.includes(name);
         return (
           <button
-            key={cuisine}
-            onClick={() => onToggle(cuisine)}
+            key={name}
+            onClick={() => handleSelect(name)}
             className={clsx(
-              "flex flex-col items-center justify-center rounded-lg p-2 border text-sm transition",
+              "flex items-center justify-center gap-2 px-4 py-3 rounded border transition",
               isSelected
-                ? "border-white bg-white text-black"
-                : "border-neutral-600 hover:border-white text-white"
+                ? "bg-white text-black border-white"
+                : "bg-black text-white border-white hover:bg-neutral-900"
             )}
           >
-            <div className="mb-1">{icon}</div>
-            <span className={clsx(isSelected ? "text-black" : "text-white","text-xs")}>
-              {cuisine}
-            </span>
+            <span className="text-base">{icon}</span>
+            <span className="font-medium">{name}</span>
           </button>
         );
       })}

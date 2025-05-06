@@ -1,66 +1,47 @@
-// components/CuisineGrid.js
-import React from "react";
-import clsx from "clsx";
-import {
-  Pizza,
-  Soup,
-  Fish,
-  Drumstick,
-  Salad,
-  Utensils,
-  ChefHat,
-  IceCream,
-  Taco,
-  Sandwich,
-  Croissant,
-  Egg,
-  Globe,
-} from "lucide-react";
+import { Utensils, Pizza, Soup, Salad, Drumstick, Cake, Shrimp, Egg, Beef, Fish, Sandwich, IceCream } from "lucide-react";
 
-const cuisineIcons = {
-  Korean: <Soup className="w-4 h-4 text-white" />,
-  Japanese: <ChefHat className="w-4 h-4 text-white" />,
-  Chinese: <Egg className="w-4 h-4 text-white" />,
-  Thai: <Salad className="w-4 h-4 text-white" />,
-  Italian: <Pizza className="w-4 h-4 text-white" />,
-  Mexican: <Taco className="w-4 h-4 text-white" />,
-  American: <Sandwich className="w-4 h-4 text-white" />,
-  French: <Croissant className="w-4 h-4 text-white" />,
-  "Middle Eastern": <Drumstick className="w-4 h-4 text-white" />,
-  Indian: <Utensils className="w-4 h-4 text-white" />,
-  "Open to anything": <Globe className="w-4 h-4 text-white" />,
-};
+const cuisineOptions = [
+  { label: "Korean", icon: Soup },
+  { label: "Japanese", icon: Fish },
+  { label: "Chinese", icon: Egg },
+  { label: "Thai", icon: Salad },
+  { label: "Italian", icon: Pizza },
+  { label: "Mexican", icon: Sandwich },
+  { label: "American", icon: Beef },
+  { label: "French", icon: Cake },
+  { label: "Indian", icon: Utensils },
+  { label: "Middle Eastern", icon: Drumstick },
+  { label: "Open to anything", icon: IceCream }
+];
 
-export default function CuisineGrid({ options, selected, onToggle }) {
-  const handleSelect = (cuisine) => {
-    if (cuisine === "Open to anything") {
+export default function CuisineGrid({ selected, onToggle }) {
+  const handleClick = (label) => {
+    if (label === "Open to anything") {
       onToggle(["Open to anything"]);
     } else {
-      const newSelected = selected.includes(cuisine)
-        ? selected.filter((item) => item !== cuisine)
-        : [...selected.filter((item) => item !== "Open to anything"), cuisine];
-      onToggle(newSelected);
+      const filtered = selected.includes("Open to anything")
+        ? [label]
+        : selected.includes(label)
+        ? selected.filter((s) => s !== label)
+        : [...selected, label];
+      onToggle(filtered);
     }
   };
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-      {options.map((cuisine) => {
-        const isSelected = selected.includes(cuisine);
-        const icon = cuisineIcons[cuisine] || <Utensils className="w-4 h-4 text-white" />;
+      {cuisineOptions.map(({ label, icon: Icon }) => {
+        const isSelected = selected.includes(label);
         return (
           <button
-            key={cuisine}
-            onClick={() => handleSelect(cuisine)}
-            className={clsx(
-              "flex items-center justify-center gap-2 px-4 py-3 rounded border transition",
-              isSelected
-                ? "bg-white text-black border-white"
-                : "bg-black text-white border-white hover:bg-neutral-900"
-            )}
+            key={label}
+            onClick={() => handleClick(label)}
+            className={`flex flex-col items-center justify-center px-3 py-4 rounded-md border transition ${
+              isSelected ? "bg-white text-black border-white" : "border-white text-white"
+            }`}
           >
-            <span>{icon}</span>
-            <span className="text-xs">{cuisine}</span>
+            <Icon size={20} strokeWidth={1.5} className="mb-1" />
+            <span className="text-xs font-medium">{label}</span>
           </button>
         );
       })}

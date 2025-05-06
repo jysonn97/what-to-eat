@@ -11,24 +11,25 @@ import {
   Fish,
   Sandwich,
   IceCream,
-  Takeout,
-  Pepper,
+  Box,       // ✅ instead of Takeout
+  Flame,     // ✅ instead of Pepper
   Croissant
 } from "lucide-react";
 
 const cuisineOptions = [
   { label: "Korean", icon: Soup },
   { label: "Japanese", icon: Fish },
-  { label: "Chinese", icon: Takeout },
+  { label: "Chinese", icon: Box },
   { label: "Thai", icon: Salad },
   { label: "Italian", icon: Pizza },
   { label: "Mexican", icon: Sandwich },
   { label: "American", icon: Beef },
   { label: "French", icon: Croissant },
-  { label: "Indian", icon: Pepper },
+  { label: "Indian", icon: Flame },
   { label: "Middle Eastern", icon: Drumstick },
   { label: "Open to anything", icon: IceCream }
 ];
+
 
 export default function CuisineGrid({ selected, onToggle }) {
   const handleClick = (label) => {

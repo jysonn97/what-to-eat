@@ -3,7 +3,7 @@ import {
   Pizza,
   Soup,
   Salad,
-  Drumstick,   // ✅ Only once
+  Drumstick,
   Cake,
   Shrimp,
   Egg,
@@ -11,11 +11,10 @@ import {
   Fish,
   Sandwich,
   IceCream,
-  Box,         // ✅ instead of Takeout
-  Flame,       // ✅ instead of Pepper
+  Box,
+  Flame,
   Croissant
 } from "lucide-react";
-
 
 const cuisineOptions = [
   { label: "Korean", icon: Drumstick },
@@ -30,7 +29,6 @@ const cuisineOptions = [
   { label: "Middle Eastern", icon: Drumstick },
   { label: "Open to anything", icon: Utensils }
 ];
-
 
 export default function CuisineGrid({ selected, onToggle }) {
   const handleClick = (label) => {
@@ -54,9 +52,9 @@ export default function CuisineGrid({ selected, onToggle }) {
           <button
             key={label}
             onClick={() => handleClick(label)}
-            className={flex flex-col items-center justify-center px-3 py-4 rounded-md border transition ${
+            className={`flex flex-col items-center justify-center px-3 py-4 rounded-md border transition ${
               isSelected ? "bg-white text-black border-white" : "border-white text-white"
-            }}
+            }`}
           >
             <Icon size={20} strokeWidth={1.5} className="mb-1" />
             <span className="text-xs font-medium">{label}</span>

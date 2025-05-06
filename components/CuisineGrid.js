@@ -1,15 +1,15 @@
-import { Utensils, Pizza, Soup, Salad, Drumstick, Cake, Shrimp, Egg, Beef, Fish, Sandwich, IceCream } from "lucide-react";
+import { Utensils, Pizza, Soup, Salad, Drumstick, Cake, Shrimp, Egg, Beef, Fish, Sandwich, IceCream, Takeout, Beef, Pepper, Croissant } from "lucide-react";
 
 const cuisineOptions = [
   { label: "Korean", icon: Soup },
   { label: "Japanese", icon: Fish },
-  { label: "Chinese", icon: Egg },
+  { label: "Chinese", icon: Takeout },
   { label: "Thai", icon: Salad },
   { label: "Italian", icon: Pizza },
   { label: "Mexican", icon: Sandwich },
   { label: "American", icon: Beef },
-  { label: "French", icon: Cake },
-  { label: "Indian", icon: Utensils },
+  { label: "French", icon: Croissant },
+  { label: "Indian", icon: Pepper },
   { label: "Middle Eastern", icon: Drumstick },
   { label: "Open to anything", icon: IceCream }
 ];

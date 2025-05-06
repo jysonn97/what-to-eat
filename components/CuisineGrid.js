@@ -13,13 +13,14 @@ import {
   IceCream,
   Box,       // ✅ instead of Takeout
   Flame,     // ✅ instead of Pepper
-  Croissant
+  Croissant,
+  Drumstick
 } from "lucide-react";
 
 const cuisineOptions = [
-  { label: "Korean", icon: Soup },
+  { label: "Korean", icon: Drumstick },
   { label: "Japanese", icon: Fish },
-  { label: "Chinese", icon: Box },
+  { label: "Chinese", icon: Soup },
   { label: "Thai", icon: Salad },
   { label: "Italian", icon: Pizza },
   { label: "Mexican", icon: Sandwich },
@@ -27,7 +28,7 @@ const cuisineOptions = [
   { label: "French", icon: Croissant },
   { label: "Indian", icon: Flame },
   { label: "Middle Eastern", icon: Drumstick },
-  { label: "Open to anything", icon: IceCream }
+  { label: "Open to anything", icon: Utensils }
 ];
 
 

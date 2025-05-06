@@ -101,9 +101,8 @@ export default function AppPage() {
 
 {questionData.key === "cuisine" ? (
   <CuisineGrid
-    options={questionData.options}
     selected={selected}
-    onToggle={handleOptionToggle}
+    onToggle={setSelected}
   />
 ) : (
   <div className="flex flex-col gap-3">
@@ -117,6 +116,7 @@ export default function AppPage() {
     ))}
   </div>
 )}
+
 
                 
         <NavigationButtons

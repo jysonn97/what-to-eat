@@ -1,4 +1,4 @@
-import { Utensils, Pizza, Soup, Salad, Drumstick, Cake, Shrimp, Egg, Beef, Fish, Sandwich, IceCream, Takeout, Beef, Pepper, Croissant } from "lucide-react";
+import { Utensils, Pizza, Soup, Salad, Drumstick, Cake, Shrimp, Egg, Beef, Fish, Sandwich, IceCream, Takeout, Pepper, Croissant } from "lucide-react";
 
 const cuisineOptions = [
   { label: "Korean", icon: Soup },

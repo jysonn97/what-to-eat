@@ -42,6 +42,14 @@ export default function MultiQuestionPage() {
     );
   };
 
+  const clearAll = () => {
+    setSelectedPrice("");
+    setSelectedRating("");
+    setSelectedCuisine([]);
+    setSelectedParty("");
+    setSelectedFeatures([]);
+  };
+
   const handleNext = () => {
     const answers = [
       { key: "location", answer: location },
@@ -55,17 +63,17 @@ export default function MultiQuestionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-extralight px-6 py-12">
-      <div className="max-w-xl mx-auto space-y-8 text-left">
+    <div className="min-h-screen bg-black text-white font-extralight px-4 py-10">
+      <div className="max-w-xl mx-auto space-y-10 text-left">
         {/* Price */}
-        <div>
-          <p className="text-sm font-semibold mb-2 text-white">Price</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3">
+          <p className="text-base font-bold text-white">Price</p>
+          <div className="flex flex-wrap gap-2 justify-start">
             {priceOptions.map((p) => (
               <button
                 key={p}
                 onClick={() => toggle(p, selectedPrice, setSelectedPrice)}
-                className={`px-4 py-1.5 text-sm rounded-md border transition ${
+                className={`px-3 py-1 text-xs rounded-md border transition min-w-[80px] text-center ${
                   selectedPrice === p ? "bg-white text-black" : "border-white text-white"
                 }`}
               >
@@ -75,15 +83,17 @@ export default function MultiQuestionPage() {
           </div>
         </div>
 
+        <hr className="border-gray-600" />
+
         {/* Rating */}
-        <div>
-          <p className="text-sm font-semibold mb-2 text-white">Rating</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3">
+          <p className="text-base font-bold text-white">Rating</p>
+          <div className="flex flex-wrap gap-2 justify-start">
             {ratingOptions.map((r) => (
               <button
                 key={r}
                 onClick={() => toggle(r, selectedRating, setSelectedRating)}
-                className={`px-4 py-1.5 text-sm rounded-md border transition ${
+                className={`px-3 py-1 text-xs rounded-md border transition min-w-[80px] text-center ${
                   selectedRating === r ? "bg-white text-black" : "border-white text-white"
                 }`}
               >
@@ -93,21 +103,25 @@ export default function MultiQuestionPage() {
           </div>
         </div>
 
+        <hr className="border-gray-600" />
+
         {/* Cuisine */}
-        <div>
-          <p className="text-sm font-semibold mb-2 text-white">Cuisine</p>
-          <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} />
+        <div className="space-y-3">
+          <p className="text-base font-bold text-white">Cuisine</p>
+          <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} small={true} />
         </div>
 
+        <hr className="border-gray-600" />
+
         {/* Party size */}
-        <div>
-          <p className="text-sm font-semibold mb-2 text-white">Party Size</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3">
+          <p className="text-base font-bold text-white">Party Size</p>
+          <div className="flex flex-wrap gap-2 justify-start">
             {partyOptions.map((p) => (
               <button
                 key={p}
                 onClick={() => toggle(p, selectedParty, setSelectedParty)}
-                className={`px-4 py-1.5 text-sm rounded-md border transition ${
+                className={`px-3 py-1 text-xs rounded-md border transition min-w-[80px] text-center ${
                   selectedParty === p ? "bg-white text-black" : "border-white text-white"
                 }`}
               >
@@ -117,15 +131,17 @@ export default function MultiQuestionPage() {
           </div>
         </div>
 
+        <hr className="border-gray-600" />
+
         {/* Features */}
-        <div>
-          <p className="text-sm font-semibold mb-2 text-white">More Filters</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="space-y-3">
+          <p className="text-base font-bold text-white">More Filters</p>
+          <div className="flex flex-wrap gap-2 justify-start">
             {featureOptions.map((f) => (
               <button
                 key={f}
                 onClick={() => toggleFeature(f)}
-                className={`px-4 py-1.5 text-sm rounded-md border transition ${
+                className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-center ${
                   selectedFeatures.includes(f) ? "bg-white text-black" : "border-white text-white"
                 }`}
               >
@@ -135,11 +151,17 @@ export default function MultiQuestionPage() {
           </div>
         </div>
 
-        {/* Button */}
-        <div className="pt-8 flex justify-center">
+        {/* Buttons */}
+        <div className="pt-6 flex justify-between">
+          <button
+            onClick={clearAll}
+            className="text-xs underline text-white opacity-70 hover:opacity-100"
+          >
+            Clear All
+          </button>
           <button
             onClick={handleNext}
-            className="px-6 py-2.5 text-sm bg-white text-black rounded hover:opacity-90 transition"
+            className="px-5 py-2 text-sm bg-white text-black rounded hover:opacity-90 transition"
           >
             Apply
           </button>

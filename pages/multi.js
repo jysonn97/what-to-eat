@@ -138,23 +138,28 @@ export default function MultiQuestionPage() {
 
         <hr className="border-gray-600" />
 
-        {/* Additional Features */}
-        <div className="space-y-3">
-          <p className="text-base font-bold text-white">Additional Features</p>
-          <div className="flex flex-wrap gap-2 justify-start">
-            {[ ...featureOptions,"None",].map((f) => (
-              <button
-                key={f}
-                onClick={() => toggleFeature(f)}
-                className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-center ${
-                  selectedFeatures.includes(f) ? "bg-white text-black" : "border-white text-white"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-        </div>
+{/* Additional Features */}
+<div className="space-y-3">
+  <p className="text-base font-bold text-white">Additional Features</p>
+  <div className="flex flex-wrap gap-2 justify-start">
+    {[...featureOptions, "None"].map((f) => (
+      <button
+        key={f}
+        onClick={() => toggleFeature(f)}
+        className={`px-3 py-1 text-xs rounded-md transition min-w-[120px] text-center ${
+          f === "None"
+            ? "border border-dashed border-gray-400 text-gray-400 hover:bg-gray-800"
+            : selectedFeatures.includes(f)
+            ? "bg-white text-black"
+            : "border-white text-white"
+        }`}
+      >
+        {f}
+      </button>
+    ))}
+  </div>
+</div>
+
 
         {/* Buttons */}
         <div className="pt-6 flex justify-between">

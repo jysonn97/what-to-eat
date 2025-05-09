@@ -12,8 +12,6 @@ const featureOptions = [
   "Late-night open",
   "Good for groups",
   "Wheelchair accessible",
-  "Accepts reservations",
-  "Delivery available",
 ];
 
 export default function MultiQuestionPage() {
@@ -37,8 +35,15 @@ export default function MultiQuestionPage() {
   };
 
   const toggleFeature = (item) => {
+    if (item === "None") {
+      setSelectedFeatures([]);
+      return;
+    }
+
     setSelectedFeatures((prev) =>
-      prev.includes(item) ? prev.filter((f) => f !== item) : [...prev, item]
+      prev.includes(item)
+        ? prev.filter((f) => f !== item)
+        : [...prev.filter((f) => f !== "None"), item]
     );
   };
 
@@ -133,11 +138,11 @@ export default function MultiQuestionPage() {
 
         <hr className="border-gray-600" />
 
-        {/* Features */}
+        {/* Additional Features */}
         <div className="space-y-3">
-          <p className="text-base font-bold text-white">More Filters</p>
+          <p className="text-base font-bold text-white">Additional Features</p>
           <div className="flex flex-wrap gap-2 justify-start">
-            {featureOptions.map((f) => (
+            {["None", ...featureOptions].map((f) => (
               <button
                 key={f}
                 onClick={() => toggleFeature(f)}
@@ -155,7 +160,7 @@ export default function MultiQuestionPage() {
         <div className="pt-6 flex justify-between">
           <button
             onClick={clearAll}
-            className="text-xs underline text-white opacity-70 hover:opacity-100"
+            className="text-xs underline text-white font-light hover:opacity-90"
           >
             Clear All
           </button>
@@ -163,7 +168,7 @@ export default function MultiQuestionPage() {
             onClick={handleNext}
             className="px-5 py-2 text-sm bg-white text-black rounded hover:opacity-90 transition"
           >
-            Apply
+            Next
           </button>
         </div>
       </div>

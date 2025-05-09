@@ -142,7 +142,7 @@ export default function MultiQuestionPage() {
         <div className="space-y-3">
           <p className="text-base font-bold text-white">Additional Features</p>
           <div className="flex flex-wrap gap-2 justify-start">
-            {["None", ...featureOptions].map((f) => (
+            {[ ...featureOptions,"None",].map((f) => (
               <button
                 key={f}
                 onClick={() => toggleFeature(f)}

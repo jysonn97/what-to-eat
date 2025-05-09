@@ -42,7 +42,7 @@ export default function LocationPage() {
       setError("📍 Please enter a valid location.");
       return;
     }
-    router.push(`/app?location=${encodeURIComponent(location)}`);
+    router.push(`/multi?location=${encodeURIComponent(location)}`);
   };
 
   return (
@@ -62,19 +62,17 @@ export default function LocationPage() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             className="w-[240px] px-3 py-1.5 rounded-md bg-white text-black text-center text-sm placeholder:text-sm outline-none border border-gray-300 focus:border-black focus:ring-2 focus:ring-white transition"
-/>
+          />
           <button
             onClick={handleNext}
-             className="px-4 py-1.5 text-xs text-black bg-white rounded-md hover:opacity-90 transition"
->
+            className="px-4 py-1.5 text-xs text-black bg-white rounded-md hover:opacity-90 transition"
+          >
             Next
           </button>
         </div>
 
         {/* Error */}
-        {error && (
-          <p className="text-red-400 text-sm">{error}</p>
-        )}
+        {error && <p className="text-red-400 text-sm">{error}</p>}
       </div>
     </div>
   );

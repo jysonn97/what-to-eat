@@ -1,13 +1,13 @@
-import CuisineGrid from "@/components/CuisineGrid";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";
 import OptionButton from "@/components/OptionButton";
 import NavigationButtons from "@/components/NavigationButtons";
+import CuisineGrid from "@/components/CuisineGrid";
 
 export default function AppPage() {
   const router = useRouter();
-  const { location } = router.query;
+  const { location, initialAnswers } = router.query;
 
   const [answers, setAnswers] = useState([]);
   const [questionData, setQuestionData] = useState(null);
@@ -15,12 +15,26 @@ export default function AppPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const init = [];
+
     if (location) {
-      const initial = [{ key: "location", answer: location }];
-      setAnswers(initial);
-      fetchNextQuestion(initial);
+      init.push({ key: "location", answer: location });
     }
-  }, [location]);
+
+    if (initialAnswers) {
+      try {
+        const parsed = JSON.parse(initialAnswers);
+        init.push(...parsed);
+      } catch (err) {
+        console.error("Failed to parse initialAnswers");
+      }
+    }
+
+    if (init.length > 0) {
+      setAnswers(init);
+      fetchNextQuestion(init);
+    }
+  }, [location, initialAnswers]);
 
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);
@@ -48,7 +62,10 @@ export default function AppPage() {
   const handleNext = () => {
     if (!selected.length || !questionData?.key) return;
 
-    const answer = questionData.key === "specialFeatures" ? selected : selected[0];
+    const answer = questionData.key === "specialFeatures" || questionData.key === "cuisine"
+      ? selected
+      : selected[0];
+
     const updatedAnswers = [...answers, { key: questionData.key, answer }];
 
     if (questionData.key === "occasion" && selected.includes("Business meeting")) {
@@ -71,54 +88,42 @@ export default function AppPage() {
     fetchNextQuestion(updated);
   };
 
- const handleOptionToggle = (option) => {
-  if (questionData.key === "specialFeatures") {
-    if (option === "None") {
-      // If "None" is clicked → clear everything else and select only "None"
-      setSelected(["None"]);
+  const handleOptionToggle = (option) => {
+    if (questionData.key === "specialFeatures") {
+      setSelected((prev) =>
+        prev.includes(option)
+          ? prev.filter((o) => o !== option)
+          : [...prev.filter((o) => o !== "None"), option]
+      );
+    } else if (questionData.key === "cuisine") {
+      setSelected(option); // already an array in cuisine grid
     } else {
-      setSelected((prev) => {
-        // Remove "None" if it was previously selected
-        const filtered = prev.filter((o) => o !== "None");
-        // Toggle the clicked option
-        return filtered.includes(option)
-          ? filtered.filter((o) => o !== option)
-          : [...filtered, option];
-      });
+      setSelected([option]);
     }
-  } else {
-    setSelected([option]);
-  }
-};
-
+  };
 
   if (!questionData) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
-      <div className="w-full max-w-xl text-center space-y-8 pt-6">
+      <div className="w-full max-w-xl space-y-8">
         <QuestionCard question={questionData.question} />
 
-{questionData.key === "cuisine" ? (
-  <CuisineGrid
-    selected={selected}
-    onToggle={setSelected}
-  />
-) : (
-  <div className="flex flex-col gap-3">
-    {questionData.options.map((option) => (
-      <OptionButton
-        key={option}
-        option={option}
-        selected={selected}
-        onClick={handleOptionToggle}
-      />
-    ))}
-  </div>
-)}
+        {questionData.key === "cuisine" ? (
+          <CuisineGrid selected={selected} onToggle={setSelected} />
+        ) : (
+          <div className="flex flex-col gap-3">
+            {questionData.options.map((option) => (
+              <OptionButton
+                key={option}
+                option={option}
+                selected={selected}
+                onClick={handleOptionToggle}
+              />
+            ))}
+          </div>
+        )}
 
-
-                
         <NavigationButtons
           onBack={handleBack}
           onNext={handleNext}
@@ -126,7 +131,7 @@ export default function AppPage() {
           loading={loading}
         />
 
-        <div className="pt-6 flex justify-center">
+        <div className="pt-10 flex justify-center">
           <button
             onClick={() => router.push("/")}
             className="text-xs text-neutral-400 hover:text-white transition underline"

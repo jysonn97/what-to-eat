@@ -146,14 +146,10 @@ export default function MultiQuestionPage() {
       <button
         key={f}
         onClick={() => toggleFeature(f)}
-        className={`px-3 py-1 text-xs rounded-md transition min-w-[120px] text-center ${
-selectedFeatures.includes(f)
-  ? "bg-white text-black"
-  : "border-white text-white"
-            : selectedFeatures.includes(f)
-            ? "bg-white text-black"
-            : "border-white text-white"
-        }`}
+className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-center ${
+  selectedFeatures.includes(f) ? "bg-white text-black" : "border-white text-white"
+}`}
+
       >
         {f}
       </button>

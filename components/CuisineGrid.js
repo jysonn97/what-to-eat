@@ -4,26 +4,26 @@ import {
   Pizza,
   Bowl,
   Fish,
-  Sushi,
-  Pepper,
+  Flame,
   Drumstick,
-  ChefHat
+  ChefHat,
+  Egg
 } from "lucide-react";
 
 const cuisineOptions = [
-  { label: "Any", icon: null },              // no icon
-  { label: "American", icon: Utensils },     // ✅ fallback icon for now
-  { label: "French", icon: ChefHat },
-  { label: "Hamburger", icon: Hamburger },
+  { label: "Any", icon: null },
+  { label: "American", icon: Utensils },
+  { label: "Brunch", icon: Egg },
+  { label: "Burger", icon: Hamburger },
   { label: "Pizza", icon: Pizza },
-  { label: "Chinese", icon: Bowl },          // ✅ must match import
-  { label: "Mexican", icon: ChefHat },       // using same as French
+  { label: "Chinese", icon: Bowl },
+  { label: "Mexican", icon: Flame },
   { label: "Seafood", icon: Fish },
-  { label: "Japanese", icon: Sushi },        // ✅ make sure Sushi is spelled right
-  { label: "Thai", icon: Pepper },
-  { label: "Steak", icon: Drumstick }
+  { label: "Japanese", icon: Fish },
+  { label: "Thai", icon: Flame },
+  { label: "Steak", icon: Drumstick },
+  { label: "Korean", icon: ChefHat }
 ];
-
 
 export default function CuisineGrid({ selected, onToggle, small = false }) {
   const handleClick = (label) => {
@@ -47,7 +47,7 @@ export default function CuisineGrid({ selected, onToggle, small = false }) {
           <button
             key={label}
             onClick={() => handleClick(label)}
-          className={`flex flex-col items-center justify-center px-2.5 py-2.5 rounded-md border transition text-center ${
+            className={`flex flex-col items-center justify-center px-2.5 py-2.5 rounded-md border transition text-center ${
               isSelected ? "bg-white text-black border-white" : "border-white text-white"
             }`}
           >

@@ -11,18 +11,19 @@ import {
 } from "lucide-react";
 
 const cuisineOptions = [
-  { label: "Any", icon: null },                      // no icon
-  { label: "American", icon: Hamburger },             // fallback: generic utensils
+  { label: "Any", icon: null },              // no icon
+  { label: "American", icon: Utensils },     // ✅ fallback icon for now
   { label: "French", icon: ChefHat },
   { label: "Hamburger", icon: Hamburger },
   { label: "Pizza", icon: Pizza },
-  { label: "Chinese", icon: Bowl },
-  { label: "Mexican", icon: ChefHat },
+  { label: "Chinese", icon: Bowl },          // ✅ must match import
+  { label: "Mexican", icon: ChefHat },       // using same as French
   { label: "Seafood", icon: Fish },
-  { label: "Japanese", icon: Sushi },
+  { label: "Japanese", icon: Sushi },        // ✅ make sure Sushi is spelled right
   { label: "Thai", icon: Pepper },
   { label: "Steak", icon: Drumstick }
 ];
+
 
 export default function CuisineGrid({ selected, onToggle, small = false }) {
   const handleClick = (label) => {

@@ -46,7 +46,7 @@ export default function CuisineGrid({ selected, onToggle, small = false }) {
           <button
             key={label}
             onClick={() => handleClick(label)}
-            className={`flex flex-col items-center justify-center px-3 py-3 rounded-md border transition text-center ${
+          className={`flex flex-col items-center justify-center px-2.5 py-2.5 rounded-md border transition text-center ${
               isSelected ? "bg-white text-black border-white" : "border-white text-white"
             }`}
           >

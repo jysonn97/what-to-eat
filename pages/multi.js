@@ -159,11 +159,10 @@ className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-ce
 </div>
 
 {/* Buttons */}
-<div className="relative pt-6 flex flex-col items-center">
+<div className="pt-6 flex flex-col items-center gap-[4px]">
   <button
     onClick={clearAll}
-    className="text-xs underline text-white font-light hover:opacity-90 mb-6"
-    style={{ marginTop: "-30px" }}
+    className="text-xs underline text-white font-light hover:opacity-90"
   >
     Clear All
   </button>
@@ -174,6 +173,7 @@ className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-ce
     Next
   </button>
 </div>
+
 
 
 

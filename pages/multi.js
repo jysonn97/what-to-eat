@@ -163,7 +163,7 @@ className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-ce
   <button
     onClick={clearAll}
     className="text-xs underline text-white font-light hover:opacity-90 mb-6"
-    style={{ marginTop: "-40px" }}
+    style={{ marginTop: "-30px" }}
   >
     Clear All
   </button>

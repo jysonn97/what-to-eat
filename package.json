@@ -19,7 +19,7 @@
     "@phosphor-icons/react": "^2.1.0",
     "@shadcn/ui": "latest",
     "clsx": "^2.0.0",
-    "lucide-react": "^0.258.0",
+    "lucide-react": "^latest",
     "tailwind-variants": "^0.1.4"
   },
   "devDependencies": {

@@ -11,13 +11,13 @@ import {
 } from "lucide-react";
 
 const cuisineOptions = [
-  { label: "Any", icon: null },
-  { label: "American", icon: Hamburger },
-  { label: "French", icon: ChefHat },       // no croissant, using chef hat
+  { label: "Any", icon: null },                      // no icon
+  { label: "American", icon: Hamburger },             // fallback: generic utensils
+  { label: "French", icon: ChefHat },
   { label: "Hamburger", icon: Hamburger },
   { label: "Pizza", icon: Pizza },
-  { label: "Chinese", icon: Bowl },         // soup fallback
-  { label: "Mexican", icon: ChefHat },      // taco/sandwich fallback
+  { label: "Chinese", icon: Bowl },
+  { label: "Mexican", icon: ChefHat },
   { label: "Seafood", icon: Fish },
   { label: "Japanese", icon: Sushi },
   { label: "Thai", icon: Pepper },

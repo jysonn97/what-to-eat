@@ -159,20 +159,21 @@ className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-ce
 </div>
 
 {/* Buttons */}
-<div className="pt-6 flex justify-center gap-4">
+<div className="pt-6 flex flex-col items-center gap-2">
+  <button
+    onClick={handleNext}
+    className="px-4 py-1.5 text-[13px] bg-white text-black rounded hover:opacity-90 transition"
+  >
+    Next
+  </button>
   <button
     onClick={clearAll}
     className="text-xs underline text-white font-light hover:opacity-90"
   >
     Clear All
   </button>
-  <button
-    onClick={handleNext}
-    className="px-4 py-1.5 text-sm bg-white text-black rounded hover:opacity-90 transition"
-  >
-    Next
-  </button>
 </div>
+
 
 
 

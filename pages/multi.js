@@ -34,18 +34,19 @@ export default function MultiQuestionPage() {
     }
   };
 
-  const toggleFeature = (item) => {
-    if (item === "None") {
-      setSelectedFeatures([]);
-      return;
-    }
+const toggleFeature = (item) => {
+  if (item === "None") {
+    setSelectedFeatures(["None"]);
+    return;
+  }
 
-    setSelectedFeatures((prev) =>
-      prev.includes(item)
-        ? prev.filter((f) => f !== item)
-        : [...prev.filter((f) => f !== "None"), item]
-    );
-  };
+  setSelectedFeatures((prev) =>
+    prev.includes(item)
+      ? prev.filter((f) => f !== item)
+      : [...prev.filter((f) => f !== "None"), item]
+  );
+};
+
 
   const clearAll = () => {
     setSelectedPrice("");
@@ -157,22 +158,22 @@ className={`px-3 py-1 text-xs rounded-md border transition min-w-[120px] text-ce
   </div>
 </div>
 
+{/* Buttons */}
+<div className="pt-6 flex flex-col items-center gap-3">
+  <button
+    onClick={clearAll}
+    className="text-xs underline text-white font-light hover:opacity-90"
+  >
+    Clear All
+  </button>
+  <button
+    onClick={handleNext}
+    className="px-5 py-2 text-sm bg-white text-black rounded hover:opacity-90 transition"
+  >
+    Next
+  </button>
+</div>
 
-        {/* Buttons */}
-        <div className="pt-6 flex justify-between">
-          <button
-            onClick={clearAll}
-            className="text-xs underline text-white font-light hover:opacity-90"
-          >
-            Clear All
-          </button>
-          <button
-            onClick={handleNext}
-            className="px-5 py-2 text-sm bg-white text-black rounded hover:opacity-90 transition"
-          >
-            Next
-          </button>
-        </div>
       </div>
     </div>
   );

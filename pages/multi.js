@@ -147,8 +147,9 @@ export default function MultiQuestionPage() {
         key={f}
         onClick={() => toggleFeature(f)}
         className={`px-3 py-1 text-xs rounded-md transition min-w-[120px] text-center ${
-          f === "None"
-            ? "border border-dashed border-gray-400 text-gray-400 hover:bg-gray-800"
+selectedFeatures.includes(f)
+  ? "bg-white text-black"
+  : "border-white text-white"
             : selectedFeatures.includes(f)
             ? "bg-white text-black"
             : "border-white text-white"

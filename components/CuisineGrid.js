@@ -2,27 +2,33 @@ import {
   Utensils,
   Hamburger,
   Pizza,
-  Bowl,
   Fish,
   Flame,
   Drumstick,
   ChefHat,
-  Egg
+  Egg,
+  BowlHot,
+  Beef,
+  EggFried,
+  Soup,
+  Salad,
+  Shrimp
 } from "lucide-react";
+
 
 const cuisineOptions = [
   { label: "Any", icon: null },
-  { label: "American", icon: Utensils },
-  { label: "Brunch", icon: Egg },
+  { label: "American", icon: Beef },
+  { label: "Brunch", icon: EggFried },
   { label: "Burger", icon: Hamburger },
   { label: "Pizza", icon: Pizza },
-  { label: "Chinese", icon: Bowl },
+  { label: "Chinese", icon: Soup },
   { label: "Mexican", icon: Flame },
-  { label: "Seafood", icon: Fish },
+  { label: "Seafood", icon: Shrimp },
   { label: "Japanese", icon: Fish },
   { label: "Thai", icon: Flame },
   { label: "Steak", icon: Drumstick },
-  { label: "Korean", icon: ChefHat }
+  { label: "Korean", icon: Salad }
 ];
 
 export default function CuisineGrid({ selected, onToggle, small = false }) {

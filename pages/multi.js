@@ -82,16 +82,7 @@ export default function MultiQuestionPage() {
 
         {/* Price */}
         <div className="space-y-2">
-          <div className="flex items-center gap-1">
-            <p className="text-[15px] font-bold text-white">Price</p>
-            <button
-              onClick={() => alert("💸 Helps us find spots that match your budget.")}
-              className="text-xs bg-white text-black rounded-full w-4 h-4 text-center font-bold leading-3 hover:opacity-80"
-              title="More info"
-            >
-              ?
-            </button>
-          </div>
+          <p className="text-[15px] font-bold text-white">Price</p>
           <div className="flex flex-wrap gap-2 justify-start">
             {priceOptions.map((p) => (
               <button
@@ -111,16 +102,7 @@ export default function MultiQuestionPage() {
 
         {/* Rating */}
         <div className="space-y-2">
-          <div className="flex items-center gap-1">
-            <p className="text-[15px] font-bold text-white">Rating</p>
-            <button
-              onClick={() => alert("⭐ Choose the minimum review score you're okay with.")}
-              className="text-xs bg-white text-black rounded-full w-4 h-4 text-center font-bold leading-3 hover:opacity-80"
-              title="More info"
-            >
-              ?
-            </button>
-          </div>
+          <p className="text-[15px] font-bold text-white">Rating</p>
           <div className="flex flex-wrap gap-2 justify-start">
             {ratingOptions.map((r) => (
               <button
@@ -140,16 +122,7 @@ export default function MultiQuestionPage() {
 
         {/* Craving */}
         <div className="space-y-2">
-          <div className="flex items-center gap-1">
-            <p className="text-[15px] font-bold text-white">Craving</p>
-            <button
-              onClick={() => alert("🍕 Choose what kind of food you're in the mood for.")}
-              className="text-xs bg-white text-black rounded-full w-4 h-4 text-center font-bold leading-3 hover:opacity-80"
-              title="More info"
-            >
-              ?
-            </button>
-          </div>
+          <p className="text-[15px] font-bold text-white">Craving</p>
           <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} small={true} />
         </div>
 
@@ -157,16 +130,7 @@ export default function MultiQuestionPage() {
 
         {/* Party Size */}
         <div className="space-y-2">
-          <div className="flex items-center gap-1">
-            <p className="text-[15px] font-bold text-white">Party Size</p>
-            <button
-              onClick={() => alert("👥 Helps us find spots that work for your group size.")}
-              className="text-xs bg-white text-black rounded-full w-4 h-4 text-center font-bold leading-3 hover:opacity-80"
-              title="More info"
-            >
-              ?
-            </button>
-          </div>
+          <p className="text-[15px] font-bold text-white">Party Size</p>
           <div className="flex flex-wrap gap-2 justify-start">
             {partyOptions.map((p) => (
               <button
@@ -186,16 +150,7 @@ export default function MultiQuestionPage() {
 
         {/* Additional Features */}
         <div className="space-y-2">
-          <div className="flex items-center gap-1">
-            <p className="text-[15px] font-bold text-white">Additional Features</p>
-            <button
-              onClick={() => alert("🎯 Filter based on extras like outdoor seating or pet-friendliness.")}
-              className="text-xs bg-white text-black rounded-full w-4 h-4 text-center font-bold leading-3 hover:opacity-80"
-              title="More info"
-            >
-              ?
-            </button>
-          </div>
+          <p className="text-[15px] font-bold text-white">Additional Features</p>
           <div className="flex flex-wrap gap-2 justify-start">
             {[...featureOptions, "None"].map((f) => (
               <button

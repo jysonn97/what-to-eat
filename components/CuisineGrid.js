@@ -12,23 +12,23 @@ import {
   EggFried,
   Soup,
   Salad,
+  Sandwich,
   Shrimp
 } from "lucide-react";
 
 
 const cuisineOptions = [
   { label: "Any", icon: null },
-  { label: "American", icon: Beef },
+  { label: "American", icon: Hamburger },
   { label: "Brunch", icon: EggFried },
   { label: "Burger", icon: Hamburger },
   { label: "Pizza", icon: Pizza },
   { label: "Chinese", icon: Soup },
-  { label: "Mexican", icon: Flame },
+  { label: "Mexican", icon: Sandwich },
   { label: "Seafood", icon: Shrimp },
-  { label: "Japanese", icon: Fish },
   { label: "Thai", icon: Flame },
-  { label: "Steak", icon: Drumstick },
-  { label: "Korean", icon: Salad }
+  { label: "Steak", icon: Beef },
+  { label: "Japanese", icon: Salad }
 ];
 
 export default function CuisineGrid({ selected, onToggle, small = false }) {

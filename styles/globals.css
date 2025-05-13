@@ -5,10 +5,16 @@
 @tailwind utilities;
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
 html, body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
   background-color: black;
   color: #f5f5f5;
   line-height: 1.6;
+  min-height: 100%;
+  overflow-x: hidden;  /* Prevents horizontal scroll on mobile */
 }
 
 h1, h2, h3 {
@@ -30,15 +36,3 @@ button {
 input, select, textarea {
   @apply border border-gray-300 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-black;
 }
-
-html, body {
-  padding: 0;
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #ffffff;
-  color: #1f1f1f;
-  line-height: 1.6;
-  min-height: 100%;
-  overflow-x: hidden;  /* 모바일에서 옆으로 밀리는 이슈 방지 */
-}
-

@@ -72,9 +72,15 @@ export default function MultiQuestionPage() {
       <div className="max-w-xl mx-auto space-y-8 text-left">
 
         {/* Top Title */}
-        <h1 className="text-center text-base font-light text-white tracking-wide mb-1">
-          What to Eat
-        </h1>
+<div className="flex justify-between items-center text-xs mb-2">
+  <button
+    onClick={() => router.push("/")}
+    className="underline text-white hover:opacity-90"
+  >
+    Home
+  </button>
+  <span className="text-white opacity-50">Step-by-step questions</span>
+</div>
 
         {/* Price */}
         <div className="space-y-2">

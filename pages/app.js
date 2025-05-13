@@ -7,13 +7,14 @@ import CuisineGrid from "@/components/CuisineGrid";
 
 export default function AppPage() {
   const router = useRouter();
-  const { location, initialAnswers } = router.query;
+  const { location, answers: encodedAnswers } = router.query;
 
   const [answers, setAnswers] = useState([]);
   const [questionData, setQuestionData] = useState(null);
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Initialize answers from query (e.g. multi.js -> app.js)
   useEffect(() => {
     const init = [];
 
@@ -21,12 +22,12 @@ export default function AppPage() {
       init.push({ key: "location", answer: location });
     }
 
-    if (initialAnswers) {
+    if (encodedAnswers) {
       try {
-        const parsed = JSON.parse(initialAnswers);
+        const parsed = JSON.parse(encodedAnswers);
         init.push(...parsed);
       } catch (err) {
-        console.error("Failed to parse initialAnswers");
+        console.error("Failed to parse answers from query", err);
       }
     }
 
@@ -34,7 +35,7 @@ export default function AppPage() {
       setAnswers(init);
       fetchNextQuestion(init);
     }
-  }, [location, initialAnswers]);
+  }, [location, encodedAnswers]);
 
   const fetchNextQuestion = async (currentAnswers) => {
     setLoading(true);
@@ -68,6 +69,7 @@ export default function AppPage() {
 
     const updatedAnswers = [...answers, { key: questionData.key, answer }];
 
+    // Auto-answer logic
     if (questionData.key === "occasion" && selected.includes("Business meeting")) {
       updatedAnswers.push({ key: "whoWith", answer: "Client / Coworkers" });
     }
@@ -78,7 +80,11 @@ export default function AppPage() {
 
   const handleBack = () => {
     if (answers.length <= 1) {
-      router.push("/location");
+      const params = new URLSearchParams({
+        location: location || "",
+        answers: JSON.stringify(answers.slice(1)) // exclude location
+      });
+      router.push(`/multi?${params.toString()}`);
       return;
     }
 
@@ -102,10 +108,16 @@ export default function AppPage() {
     }
   };
 
-  if (!questionData) return null;
+  if (!questionData) {
+    return (
+      <div className="bg-black min-h-screen flex items-center justify-center text-white">
+        <p className="text-sm opacity-50">Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight transition-colors duration-300">
       <div className="w-full max-w-xl space-y-8">
         <QuestionCard question={questionData.question} />
 

@@ -54,17 +54,30 @@ export default function MultiQuestionPage() {
     setSelectedFeatures([]);
   };
 
-  const handleNext = () => {
-    const answers = [
-      { key: "location", answer: location },
-      { key: "price", answer: selectedPrice || "Doesn’t matter" },
-      { key: "rating", answer: selectedRating || "Doesn’t matter" },
-      { key: "cuisine", answer: selectedCuisine.length > 0 ? selectedCuisine : ["Open to anything"] },
-      { key: "partySize", answer: selectedParty },
-      { key: "specialFeatures", answer: selectedFeatures },
-    ];
-    router.push(`/app?location=${encodeURIComponent(location)}&answers=${encodeURIComponent(JSON.stringify(answers))}`);
-  };
+const handleNext = () => {
+  if (
+    !selectedPrice ||
+    !selectedRating ||
+    selectedCuisine.length === 0 ||
+    !selectedParty ||
+    selectedFeatures.length === 0
+  ) {
+    alert("Please answer all the questions before proceeding.");
+    return;
+  }
+
+  const answers = [
+    { key: "location", answer: location },
+    { key: "price", answer: selectedPrice },
+    { key: "rating", answer: selectedRating },
+    { key: "cuisine", answer: selectedCuisine },
+    { key: "partySize", answer: selectedParty },
+    { key: "specialFeatures", answer: selectedFeatures },
+  ];
+
+  router.push(`/app?location=${encodeURIComponent(location)}&answers=${encodeURIComponent(JSON.stringify(answers))}`);
+};
+
 
   return (
     <div className="min-h-screen bg-black text-white font-extralight px-3 py-8 text-xs">

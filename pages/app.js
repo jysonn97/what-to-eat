@@ -3,18 +3,52 @@ import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";
 import OptionButton from "@/components/OptionButton";
 import NavigationButtons from "@/components/NavigationButtons";
-import CuisineGrid from "@/components/CuisineGrid";
+
+const staticQuestions = [
+  {
+    key: "occasion",
+    question: "What’s the occasion?",
+    options: [
+      "Regular meal",
+      "Date",
+      "Business meeting",
+      "Special event",
+      "Traveling"
+    ]
+  },
+  {
+    key: "vibe",
+    question: "What kind of vibe are you looking for?",
+    options: [
+      "Cozy",
+      "Trendy",
+      "Quiet",
+      "Lively",
+      "Scenic",
+      "Minimalist",
+      "Fancy"
+    ]
+  },
+  {
+    key: "time",
+    question: "What time are you planning to eat?",
+    options: ["Morning", "Lunch", "Dinner", "Late night"]
+  },
+  {
+    key: "duration",
+    question: "How long do you want to stay?",
+    options: ["Quick meal", "About an hour", "Take your time"]
+  }
+];
 
 export default function AppPage() {
   const router = useRouter();
   const { location, answers: encodedAnswers } = router.query;
 
   const [answers, setAnswers] = useState([]);
-  const [questionData, setQuestionData] = useState(null);
+  const [step, setStep] = useState(0);
   const [selected, setSelected] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  // Initialize answers from query (e.g. multi.js -> app.js)
   useEffect(() => {
     const init = [];
 
@@ -31,116 +65,70 @@ export default function AppPage() {
       }
     }
 
-    if (init.length > 0) {
-      setAnswers(init);
-      fetchNextQuestion(init);
-    }
+    setAnswers(init);
   }, [location, encodedAnswers]);
 
-  const fetchNextQuestion = async (currentAnswers) => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/generateQuestion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ previousAnswers: currentAnswers }),
-      });
-      const data = await res.json();
-
-      if (data?.nextQuestion) {
-        setQuestionData(data.nextQuestion);
-        setSelected([]);
-      } else {
-        router.push(`/recommendation?answers=${encodeURIComponent(JSON.stringify(currentAnswers))}`);
-      }
-    } catch (error) {
-      console.error("API error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const currentQuestion = staticQuestions[step];
 
   const handleNext = () => {
-    if (!selected.length || !questionData?.key) return;
-
-    const answer = questionData.key === "specialFeatures" || questionData.key === "cuisine"
-      ? selected
-      : selected[0];
-
-    const updatedAnswers = [...answers, { key: questionData.key, answer }];
-
-    // Auto-answer logic
-    if (questionData.key === "occasion" && selected.includes("Business meeting")) {
-      updatedAnswers.push({ key: "whoWith", answer: "Client / Coworkers" });
-    }
-
+    if (!selected.length || !currentQuestion?.key) return;
+    const updatedAnswers = [
+      ...answers.filter((a) => a.key !== currentQuestion.key),
+      { key: currentQuestion.key, answer: selected[0] }
+    ];
     setAnswers(updatedAnswers);
-    fetchNextQuestion(updatedAnswers);
+    if (step + 1 < staticQuestions.length) {
+      setStep(step + 1);
+      setSelected([]);
+    } else {
+      router.push(
+        `/recommendation?answers=${encodeURIComponent(
+          JSON.stringify(updatedAnswers)
+        )}`
+      );
+    }
   };
 
   const handleBack = () => {
-    if (answers.length <= 1) {
+    if (step === 0) {
       const params = new URLSearchParams({
         location: location || "",
-        answers: JSON.stringify(answers.slice(1)) // exclude location
+        answers: JSON.stringify(answers.slice(1))
       });
       router.push(`/multi?${params.toString()}`);
-      return;
+    } else {
+      setStep(step - 1);
+      setSelected([]);
     }
-
-    const updated = [...answers];
-    updated.pop();
-    setAnswers(updated);
-    fetchNextQuestion(updated);
   };
 
   const handleOptionToggle = (option) => {
-    if (questionData.key === "specialFeatures") {
-      setSelected((prev) =>
-        prev.includes(option)
-          ? prev.filter((o) => o !== option)
-          : [...prev.filter((o) => o !== "None"), option]
-      );
-    } else if (questionData.key === "cuisine") {
-      setSelected(option); // already an array in cuisine grid
-    } else {
-      setSelected([option]);
-    }
+    setSelected([option]);
   };
 
-  if (!questionData) {
-    return (
-      <div className="bg-black min-h-screen flex items-center justify-center text-white">
-        <p className="text-sm opacity-50">Loading...</p>
-      </div>
-    );
-  }
+  if (!currentQuestion) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight transition-colors duration-300">
       <div className="w-full max-w-xl space-y-8">
-        <QuestionCard question={questionData.question} />
+        <QuestionCard question={currentQuestion.question} />
 
-        {questionData.key === "cuisine" ? (
-          <CuisineGrid selected={selected} onToggle={setSelected} />
-        ) : (
-          <div className="flex flex-col gap-3">
-            {questionData.options.map((option) => (
-              <OptionButton
-                key={option}
-                option={option}
-                selected={selected}
-                onClick={handleOptionToggle}
-              />
-            ))}
-          </div>
-        )}
+        <div className="flex flex-col gap-3">
+          {currentQuestion.options.map((option) => (
+            <OptionButton
+              key={option}
+              option={option}
+              selected={selected}
+              onClick={handleOptionToggle}
+            />
+          ))}
+        </div>
 
         <NavigationButtons
           onBack={handleBack}
           onNext={handleNext}
           disabled={selected.length === 0}
-          loading={loading}
+          loading={false}
         />
 
         <div className="pt-10 flex justify-center">

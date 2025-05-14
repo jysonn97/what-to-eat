@@ -41,6 +41,8 @@ const staticQuestions = [
   }
 ];
 
+const weightLabels = ["Not a big deal", "Matters a bit", "Super important"];
+
 export default function AppPage() {
   const router = useRouter();
   const { location, answers: encodedAnswers } = router.query;
@@ -48,6 +50,7 @@ export default function AppPage() {
   const [answers, setAnswers] = useState([]);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState([]);
+  const [weight, setWeight] = useState(1); // 0, 1, 2
 
   useEffect(() => {
     const init = [];
@@ -72,14 +75,22 @@ export default function AppPage() {
 
   const handleNext = () => {
     if (!selected.length || !currentQuestion?.key) return;
+
     const updatedAnswers = [
       ...answers.filter((a) => a.key !== currentQuestion.key),
-      { key: currentQuestion.key, answer: selected[0] }
+      {
+        key: currentQuestion.key,
+        answer: selected[0],
+        weight: weightLabels[weight] // "Not a big deal" | "Matters a bit" | "Super important"
+      }
     ];
+
     setAnswers(updatedAnswers);
+
     if (step + 1 < staticQuestions.length) {
       setStep(step + 1);
       setSelected([]);
+      setWeight(1); // reset weight to default
     } else {
       router.push(
         `/recommendation?answers=${encodeURIComponent(
@@ -99,6 +110,7 @@ export default function AppPage() {
     } else {
       setStep(step - 1);
       setSelected([]);
+      setWeight(1);
     }
   };
 
@@ -122,6 +134,28 @@ export default function AppPage() {
               onClick={handleOptionToggle}
             />
           ))}
+        </div>
+
+        {/* Weight Slider */}
+        <div className="pt-2">
+          <label className="block text-xs text-gray-300 mb-1">
+            How much does this matter to you?
+          </label>
+          <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1 px-1">
+            {weightLabels.map((label, i) => (
+              <span key={i} className={i === weight ? "text-white font-semibold" : ""}>
+                {label}
+              </span>
+            ))}
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="2"
+            value={weight}
+            onChange={(e) => setWeight(parseInt(e.target.value))}
+            className="w-full accent-white"
+          />
         </div>
 
         <NavigationButtons

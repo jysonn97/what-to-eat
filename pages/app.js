@@ -15,13 +15,18 @@ const question = {
   ]
 };
 
-const weightLabels = ["Not a big deal", "Matters a bit", "Super important"];
+const weightLabels = [
+  "Not really",
+  "Kinda matters",
+  "Pretty important",
+  "Super important"
+];
 
 export default function AppPage() {
   const router = useRouter();
 
   const [selected, setSelected] = useState([]);
-  const [weight, setWeight] = useState(1); // default: middle
+  const [weight, setWeight] = useState(1); // default = 'Kinda matters'
 
   const handleOptionToggle = (option) => {
     setSelected([option]);
@@ -44,12 +49,12 @@ export default function AppPage() {
 
         <h1 className="text-xl font-semibold">{question.question}</h1>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {question.options.map((option) => (
             <button
               key={option}
               onClick={() => handleOptionToggle(option)}
-              className={`px-4 py-2 border rounded-md transition text-sm text-left ${
+              className={`px-3 py-1 text-sm rounded-md border transition text-left ${
                 selected.includes(option)
                   ? "bg-white text-black"
                   : "border-white text-white"
@@ -61,11 +66,11 @@ export default function AppPage() {
         </div>
 
         {selected.length > 0 && (
-          <div className="pt-2">
-            <label className="block text-xs text-gray-300 mb-1">
+          <div className="pt-4">
+            <label className="block text-sm text-gray-200 mb-2 font-light">
               How much does this matter to you?
             </label>
-            <div className="flex justify-between text-[11px] text-gray-400 mb-1 px-1">
+            <div className="flex justify-between text-xs text-gray-400 mb-2 px-1">
               {weightLabels.map((label, i) => (
                 <span key={i} className={i === weight ? "text-white font-medium" : ""}>
                   {label}
@@ -75,7 +80,7 @@ export default function AppPage() {
             <input
               type="range"
               min="0"
-              max="2"
+              max="3"
               value={weight}
               onChange={(e) => setWeight(parseInt(e.target.value))}
               className="w-full accent-white"

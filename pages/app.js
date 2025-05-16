@@ -115,7 +115,13 @@ export default function AppPage() {
   };
 
   const handleOptionToggle = (option) => {
-    setSelected([option]);
+    setSelected((prev) =>
+      prev.includes(option) ? [] : [option]
+    );
+  };
+
+  const handleWeightLabelClick = (index) => {
+    setWeight(index);
   };
 
   if (!currentQuestion) return null;
@@ -150,11 +156,14 @@ export default function AppPage() {
             <label className="block text-[13px] text-gray-200 mb-1 font-light">
               How much does this matter to you?
             </label>
-            <div className="flex justify-between text-[12px] text-gray-400 mb-2 px-1">
+            <div className="flex justify-between text-sm text-gray-400 mb-1 px-1 cursor-pointer">
               {weightLabels.map((label, i) => (
                 <span
                   key={i}
-                  className={i === weight ? "text-white font-medium" : ""}
+                  onClick={() => handleWeightLabelClick(i)}
+                  className={`transition ${
+                    i === weight ? "text-white font-medium" : "hover:text-white"
+                  }`}
                 >
                   {label}
                 </span>
@@ -173,7 +182,7 @@ export default function AppPage() {
           </div>
         )}
 
-        <div className="pt-4 flex flex-col gap-[6px] items-center">
+        <div className="pt-3 flex flex-col gap-[10px] items-center">
           <button
             onClick={handleBack}
             className="text-xs text-neutral-400 hover:text-white transition underline"

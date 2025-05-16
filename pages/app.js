@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";
-import OptionButton from "@/components/OptionButton";
-import NavigationButtons from "@/components/NavigationButtons";
 
 const staticQuestions = [
   {
@@ -52,7 +50,7 @@ export default function AppPage() {
   const [answers, setAnswers] = useState([]);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState([]);
-  const [weight, setWeight] = useState(1); // default: "Matters a bit"
+  const [weight, setWeight] = useState(1);
 
   useEffect(() => {
     const init = [];
@@ -129,26 +127,30 @@ export default function AppPage() {
         <QuestionCard question={currentQuestion.question} />
 
         <div className="flex flex-col gap-2 items-center">
-          {currentQuestion.options.map((option) => (
-            <button
-              key={option}
-              onClick={() => handleOptionToggle(option)}
-              className={`w-52 px-3 py-1.5 text-sm rounded-md border transition text-white font-light ${
-                selected.includes(option) ? "bg-white text-black" : "border-white"
-              }`}
-            >
-              {option}
-            </button>
-          ))}
+          {currentQuestion.options.map((option) => {
+            const isSelected = selected.includes(option);
+            return (
+              <button
+                key={option}
+                onClick={() => handleOptionToggle(option)}
+                className={`w-52 px-3 py-1.5 text-sm rounded-md border transition font-light ${
+                  isSelected
+                    ? "bg-white text-black border-white"
+                    : "border-white text-white"
+                }`}
+              >
+                {option}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Show weight slider only if selection exists and it's not 'Any' */}
         {selected.length > 0 && selected[0] !== "Any" && (
           <div className="pt-4">
-            <label className="block text-sm text-gray-200 mb-2 font-light">
+            <label className="block text-[13px] text-gray-200 mb-1 font-light">
               How much does this matter to you?
             </label>
-            <div className="flex justify-between text-xs text-gray-400 mb-2 px-1">
+            <div className="flex justify-between text-[12px] text-gray-400 mb-2 px-1">
               {weightLabels.map((label, i) => (
                 <span
                   key={i}
@@ -158,18 +160,20 @@ export default function AppPage() {
                 </span>
               ))}
             </div>
-            <input
-              type="range"
-              min="0"
-              max="2"
-              value={weight}
-              onChange={(e) => setWeight(parseInt(e.target.value))}
-              className="w-full accent-white"
-            />
+            <div className="flex justify-center">
+              <input
+                type="range"
+                min="0"
+                max="2"
+                value={weight}
+                onChange={(e) => setWeight(parseInt(e.target.value))}
+                className="w-2/3 accent-white"
+              />
+            </div>
           </div>
         )}
 
-        <div className="pt-6 flex flex-col gap-2 items-center">
+        <div className="pt-4 flex flex-col gap-[6px] items-center">
           <button
             onClick={handleBack}
             className="text-xs text-neutral-400 hover:text-white transition underline"

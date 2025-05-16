@@ -151,11 +151,12 @@ export default function AppPage() {
           })}
         </div>
 
-  {selected.length > 0 && selected[0] !== "Any" && (
+{selected.length > 0 && selected[0] !== "Any" && (
   <div className="pt-4">
     <label className="block text-[15px] text-white mb-2 font-light">
       How much does this matter to you?
     </label>
+
 
             <div className="flex justify-between text-sm text-gray-400 mb-1 px-1 cursor-pointer">
               {weightLabels.map((label, i) => (

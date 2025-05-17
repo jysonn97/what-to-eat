@@ -149,20 +149,21 @@ export default function AppPage() {
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-12 flex items-center justify-center font-extralight">
-      <div className="w-full max-w-xl space-y-8 text-center">
+      <div className="w-full max-w-xl space-y-10 text-center">
+
         <QuestionCard question={current.question} />
 
-        <div className="flex flex-col gap-2 items-center">
+        <div className="grid grid-cols-1 gap-3 place-items-center">
           {current.options.map((option) => {
             const isSelected = selected.includes(option);
             return (
               <button
                 key={option}
                 onClick={() => toggle(option)}
-                className={`w-60 px-3 py-1.5 text-sm rounded-md border transition font-light ${
+                className={`w-64 px-4 py-2 rounded-md border text-sm transition-all duration-200 font-light ${
                   isSelected
-                    ? "bg-white text-black border-white"
-                    : "border-white text-white"
+                    ? "bg-white text-black border-white scale-[1.02]"
+                    : "border-white text-white hover:bg-white hover:text-black"
                 }`}
               >
                 {option}
@@ -182,7 +183,7 @@ export default function AppPage() {
                   key={i}
                   onClick={() => setWeight(i)}
                   className={`transition ${
-                    i === weight ? "text-white font-medium" : "hover:text-white"
+                    i === weight ? "text-white font-medium scale-[1.05]" : "hover:text-white"
                   }`}
                 >
                   {label}
@@ -196,7 +197,7 @@ export default function AppPage() {
                 max="2"
                 value={weight}
                 onChange={(e) => setWeight(parseInt(e.target.value))}
-                className="w-2/3 accent-white"
+                className="w-[60%] accent-white"
               />
             </div>
           </div>

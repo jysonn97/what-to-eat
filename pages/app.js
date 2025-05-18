@@ -80,7 +80,6 @@ export default function AppPage() {
 
   const handleNext = () => {
     if (selected.length === 0) return;
-
     const answer = currentQuestion.key === "avoid" ? selected : selected[0];
     const payload = currentQuestion.hasWeight
       ? { key: currentQuestion.key, answer, weight: weights }
@@ -155,21 +154,19 @@ export default function AppPage() {
         return (
           <div
             key={option}
-            className="flex items-center justify-between gap-3"
+            className="flex items-center justify-between gap-3 border border-neutral-700 rounded-lg px-3 py-2 hover:border-neutral-500 transition"
           >
             <button
               onClick={() => toggleOption(option)}
-              className={`flex-1 px-4 py-2 border rounded text-sm text-left transition-all duration-150 ${
-                isSelected
-                  ? "bg-white text-black border-white"
-                  : "border-white text-white"
+              className={`flex-1 text-left text-sm transition-colors duration-150 ${
+                isSelected ? "text-white" : "text-neutral-400"
               }`}
             >
               {option}
             </button>
 
             {isSelected && option !== "Nothing in particular" && (
-              <div className="flex flex-col items-center gap-1 w-28">
+              <div className="flex flex-col items-end w-28 text-xs text-neutral-400">
                 <input
                   type="range"
                   min="0"
@@ -179,11 +176,11 @@ export default function AppPage() {
                   onChange={(e) =>
                     updateWeight(option, parseInt(e.target.value))
                   }
-                  className="w-full appearance-none bg-neutral-700 h-[3px] rounded-full"
+                  className="w-full h-1 rounded bg-neutral-600 appearance-none"
                 />
-                <div className="text-[11px] text-neutral-400">
+                <span className="mt-1">
                   {["Not a big deal", "Matters a bit", "Really matters"][weight]}
-                </div>
+                </span>
               </div>
             )}
           </div>
@@ -209,6 +206,31 @@ export default function AppPage() {
                 onClick={toggleOption}
               />
             ))}
+
+            {currentQuestion.hasWeight &&
+              selected.length > 0 &&
+              selected[0] !== "I don’t care about ratings" && (
+                <div className="flex flex-col items-center pt-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="1"
+                    value={weights[selected[0]] ?? 1}
+                    onChange={(e) =>
+                      updateWeight(selected[0], parseInt(e.target.value))
+                    }
+                    className="w-2/3 h-1 rounded bg-neutral-600 appearance-none"
+                  />
+                  <div className="text-xs text-neutral-400 mt-1">
+                    {
+                      ["Not a big deal", "Matters a bit", "Really matters"][
+                        weights[selected[0]] ?? 1
+                      ]
+                    }
+                  </div>
+                </div>
+              )}
           </div>
         )}
 

@@ -1,6 +1,16 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import CuisineGrid from "@/components/CuisineGrid";
+import {
+  Flame,
+  Leaf,
+  Drumstick,
+  Bowl,
+  Cookie,
+  Utensils,
+  IceCream,
+  ChefHat
+} from "lucide-react";
 
 const priceOptions = ["$", "$$", "$$$", "$$$$", "Doesn’t matter"];
 const featureOptions = [
@@ -10,16 +20,6 @@ const featureOptions = [
   "Late-night open",
   "Good for groups",
   "Wheelchair accessible"
-];
-const cravingTags = [
-  "Spicy",
-  "Something light",
-  "Savory & rich",
-  "Soupy",
-  "Crunchy",
-  "Comfort food",
-  "Cold & refreshing",
-  "Fried & crispy"
 ];
 
 export default function MultiQuestionPage() {
@@ -56,7 +56,9 @@ export default function MultiQuestionPage() {
 
   const toggleCravingTag = (tag) => {
     setSelectedCravingTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : [...prev, tag]
     );
   };
 
@@ -85,9 +87,7 @@ export default function MultiQuestionPage() {
       { key: "cravingType", answer: useFlavorCraving ? "flavor" : "cuisine" },
       {
         key: "cuisine",
-        answer: useFlavorCraving
-          ? selectedCravingTags
-          : selectedCuisine
+        answer: useFlavorCraving ? selectedCravingTags : selectedCuisine
       },
       { key: "specialFeatures", answer: selectedFeatures }
     ];
@@ -134,7 +134,7 @@ export default function MultiQuestionPage() {
 
         <hr className="border-gray-600" />
 
-        {/* Craving Hybrid */}
+        {/* Craving (Cuisine or Flavor) */}
         <div className="space-y-2">
           <p className="text-[15px] font-bold text-white">Craving</p>
 
@@ -155,20 +155,33 @@ export default function MultiQuestionPage() {
             </>
           ) : (
             <>
-              <div className="pt-1 flex flex-wrap gap-2">
-                {cravingTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleCravingTag(tag)}
-                    className={`px-3 py-1 text-xs rounded-md border transition ${
-                      selectedCravingTags.includes(tag)
-                        ? "bg-white text-black"
-                        : "border-white text-white"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm pt-2">
+                {[
+                  { label: "Spicy", icon: Flame },
+                  { label: "Something light", icon: Leaf },
+                  { label: "Savory & rich", icon: Drumstick },
+                  { label: "Soupy", icon: Bowl },
+                  { label: "Crunchy", icon: Cookie },
+                  { label: "Comfort food", icon: Utensils },
+                  { label: "Cold & refreshing", icon: IceCream },
+                  { label: "Fried & crispy", icon: ChefHat }
+                ].map(({ label, icon: Icon }) => {
+                  const isSelected = selectedCravingTags.includes(label);
+                  return (
+                    <button
+                      key={label}
+                      onClick={() => toggleCravingTag(label)}
+                      className={`flex flex-col items-center justify-center px-2.5 py-2.5 rounded-md border transition text-center ${
+                        isSelected
+                          ? "bg-white text-black border-white"
+                          : "border-white text-white"
+                      }`}
+                    >
+                      <Icon size={20} strokeWidth={1.5} className="mb-1" />
+                      <span className="text-xs font-medium">{label}</span>
+                    </button>
+                  );
+                })}
               </div>
               <div className="pt-2">
                 <button

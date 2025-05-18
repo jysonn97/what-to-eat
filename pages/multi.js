@@ -9,7 +9,8 @@ import {
   Cookie,
   Utensils,
   IceCream,
-  ChefHat
+  ChefHat,
+  Soup
 } from "lucide-react";
 
 const priceOptions = ["$", "$$", "$$$", "$$$$", "Doesn’t matter"];
@@ -160,7 +161,7 @@ export default function MultiQuestionPage() {
                   { label: "Spicy", icon: Flame },
                   { label: "Something light", icon: Leaf },
                   { label: "Savory & rich", icon: Drumstick },
-                  { label: "Soupy", icon: Bowl },
+                  { label: "Soupy", icon: Soup },
                   { label: "Crunchy", icon: Cookie },
                   { label: "Comfort food", icon: Utensils },
                   { label: "Cold & refreshing", icon: IceCream },

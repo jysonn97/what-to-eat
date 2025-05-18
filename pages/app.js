@@ -57,7 +57,8 @@ const questionSet = (showQuickBite) => [
       "Nothing in particular"
     ],
     multi: true,
-    showWeight: false
+    showWeight: false,
+    hideWeightOn: "Nothing in particular"
   }
 ];
 
@@ -137,7 +138,7 @@ export default function AppPage() {
   const toggle = (option) => {
     if (current.multi) {
       if (option === current.hideWeightOn) {
-        setSelected([option]); // "Nothing in particular" 선택 시 나머지 해제
+        setSelected([option]); // reset all others
       } else {
         setSelected((prev) => {
           const withoutHide = prev.filter((o) => o !== current.hideWeightOn);
@@ -157,6 +158,13 @@ export default function AppPage() {
     return !selected.includes(current.hideWeightOn);
   };
 
+  const isOptionSelected = (option) => {
+    if (current.multi && selected.includes(current.hideWeightOn)) {
+      return option === current.hideWeightOn;
+    }
+    return selected.includes(option);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white px-4 py-12 flex items-center justify-center font-extralight">
       <div className="w-full max-w-xl space-y-10 text-center">
@@ -164,7 +172,7 @@ export default function AppPage() {
 
         <div className="grid grid-cols-1 gap-3 place-items-center">
           {current.options.map((option) => {
-            const isSelected = selected.includes(option);
+            const isSelected = isOptionSelected(option);
             return (
               <button
                 key={option}

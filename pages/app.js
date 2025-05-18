@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";
-import OptionButton from "@/components/OptionButton";
-import NavigationButtons from "@/components/NavigationButtons";
 
-const staticQuestions = [
+const weightLabels = ["Not a big deal", "Matters a bit", "Really matters"];
+
+const questionSet = (showQuickBite) => [
   {
     key: "vibe",
     question: "What’s the vibe or occasion today?",
@@ -15,9 +15,10 @@ const staticQuestions = [
       "Exploring while traveling",
       "Business-y meal",
       "Anywhere’s fine, really",
-      "Quick bite, nothing fancy"
+      ...(showQuickBite ? ["Quick bite, nothing fancy"] : [])
     ],
-    hasWeight: false
+    multi: false,
+    showWeight: false
   },
   {
     key: "distance",
@@ -27,7 +28,8 @@ const staticQuestions = [
       "Around 20 mins is fine",
       "I’m okay going further (30+ mins)"
     ],
-    hasWeight: true
+    multi: false,
+    showWeight: true
   },
   {
     key: "ratingImportance",
@@ -38,7 +40,9 @@ const staticQuestions = [
       "3.5+ is fine",
       "I don’t care about ratings"
     ],
-    hasWeight: true
+    multi: false,
+    showWeight: true,
+    hideWeightOn: "I don’t care about ratings"
   },
   {
     key: "avoid",
@@ -50,7 +54,9 @@ const staticQuestions = [
       "Long wait times",
       "Nothing in particular"
     ],
-    hasWeight: true
+    multi: true,
+    showWeight: true,
+    hideWeightOn: "Nothing in particular"
   }
 ];
 
@@ -61,45 +67,49 @@ export default function AppPage() {
   const [answers, setAnswers] = useState([]);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState([]);
-  const [weights, setWeights] = useState({});
-  const currentQuestion = staticQuestions[step];
+  const [weight, setWeight] = useState(1);
+  const [budget, setBudget] = useState(null);
 
   useEffect(() => {
-    const init = [];
-    if (location) init.push({ key: "location", answer: location });
     if (encodedAnswers) {
       try {
         const parsed = JSON.parse(encodedAnswers);
-        init.push(...parsed);
+        setAnswers(parsed);
+        const priceAnswer = parsed.find((a) => a.key === "price");
+        if (priceAnswer) setBudget(priceAnswer.answer);
       } catch (err) {
-        console.error("Failed to parse answers from query", err);
+        console.error("Error parsing answers", err);
       }
     }
-    setAnswers(init);
-  }, [location, encodedAnswers]);
+  }, [encodedAnswers]);
+
+  const questions = questionSet(budget === "$");
+  const current = questions[step];
 
   const handleNext = () => {
-    if (selected.length === 0) return;
-    const answer = currentQuestion.key === "avoid" ? selected : selected[0];
-    const payload = currentQuestion.hasWeight
-      ? { key: currentQuestion.key, answer, weight: weights }
-      : { key: currentQuestion.key, answer };
+    if (!selected.length && !current.multi) return;
 
-    const updatedAnswers = [
-      ...answers.filter((a) => a.key !== currentQuestion.key),
-      payload
-    ];
+    const finalAnswer = {
+      key: current.key,
+      answer: current.multi ? selected : selected[0],
+      weight:
+        !current.showWeight ||
+        selected.includes(current.hideWeightOn) ||
+        selected[0] === current.hideWeightOn
+          ? "Not specified"
+          : weightLabels[weight]
+    };
 
-    if (step + 1 < staticQuestions.length) {
-      setAnswers(updatedAnswers);
+    const updated = [...answers.filter((a) => a.key !== current.key), finalAnswer];
+    setAnswers(updated);
+
+    if (step + 1 < questions.length) {
       setStep(step + 1);
       setSelected([]);
-      setWeights({});
+      setWeight(1);
     } else {
       router.push(
-        `/recommendation?answers=${encodeURIComponent(
-          JSON.stringify(updatedAnswers)
-        )}`
+        `/recommendation?answers=${encodeURIComponent(JSON.stringify(updated))}`
       );
     }
   };
@@ -108,145 +118,103 @@ export default function AppPage() {
     if (step === 0) {
       const params = new URLSearchParams({
         location: location || "",
-        answers: JSON.stringify(answers.slice(1))
+        answers: JSON.stringify(answers)
       });
       router.push(`/multi?${params.toString()}`);
     } else {
       setStep(step - 1);
       setSelected([]);
-      setWeights({});
+      setWeight(1);
     }
   };
 
-  const toggleOption = (option) => {
-    if (currentQuestion.key === "avoid") {
-      if (option === "Nothing in particular") {
-        setSelected(["Nothing in particular"]);
-        setWeights({});
-      } else {
-        const updated = selected.includes(option)
-          ? selected.filter((o) => o !== option)
-          : [...selected.filter((o) => o !== "Nothing in particular"), option];
-        setSelected(updated);
-        if (!selected.includes(option)) {
-          setWeights({ ...weights, [option]: 1 });
-        } else {
-          const copy = { ...weights };
-          delete copy[option];
-          setWeights(copy);
-        }
-      }
+  const toggle = (option) => {
+    if (current.multi) {
+      setSelected((prev) =>
+        prev.includes(option)
+          ? prev.filter((o) => o !== option)
+          : [...prev.filter((o) => o !== current.hideWeightOn), option]
+      );
     } else {
-      setSelected([option === selected[0] ? null : option].filter(Boolean));
+      setSelected((prev) => (prev[0] === option ? [] : [option]));
     }
   };
 
-  const updateWeight = (option, value) => {
-    setWeights({ ...weights, [option]: value });
+  const isWeightVisible = () => {
+    if (!current.showWeight) return false;
+    if (!selected.length) return false;
+    const avoidOption = current.hideWeightOn;
+    return !selected.includes(avoidOption);
   };
-
-  const renderAvoidOptions = () => (
-    <div className="flex flex-col gap-3">
-      {currentQuestion.options.map((option) => {
-        const isSelected = selected.includes(option);
-        const weight = weights[option] ?? 1;
-
-        return (
-          <div
-            key={option}
-            className="flex items-center justify-between gap-3 border border-neutral-700 rounded-lg px-3 py-2 hover:border-neutral-500 transition"
-          >
-            <button
-              onClick={() => toggleOption(option)}
-              className={`flex-1 text-left text-sm transition-colors duration-150 ${
-                isSelected ? "text-white" : "text-neutral-400"
-              }`}
-            >
-              {option}
-            </button>
-
-            {isSelected && option !== "Nothing in particular" && (
-              <div className="flex flex-col items-end w-28 text-xs text-neutral-400">
-                <input
-                  type="range"
-                  min="0"
-                  max="2"
-                  step="1"
-                  value={weight}
-                  onChange={(e) =>
-                    updateWeight(option, parseInt(e.target.value))
-                  }
-                  className="w-full h-1 rounded bg-neutral-600 appearance-none"
-                />
-                <span className="mt-1">
-                  {["Not a big deal", "Matters a bit", "Really matters"][weight]}
-                </span>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
-      <div className="w-full max-w-xl space-y-8 text-center">
-        <QuestionCard question={currentQuestion.question} />
+    <div className="min-h-screen bg-black text-white px-4 py-12 flex items-center justify-center font-extralight">
+      <div className="w-full max-w-xl space-y-10 text-center">
 
-        {currentQuestion.key === "avoid" ? (
-          renderAvoidOptions()
-        ) : (
-          <div className="flex flex-col gap-3">
-            {currentQuestion.options.map((option) => (
-              <OptionButton
+        <QuestionCard question={current.question} />
+
+        <div className="grid grid-cols-1 gap-3 place-items-center">
+          {current.options.map((option) => {
+            const isSelected = selected.includes(option);
+            return (
+              <button
                 key={option}
-                option={option}
-                selected={selected}
-                onClick={toggleOption}
-              />
-            ))}
+                onClick={() => toggle(option)}
+                className={`w-64 px-4 py-2 rounded-md border text-sm transition-all duration-200 font-light ${
+                  isSelected
+                    ? "bg-white text-black border-white scale-[1.02]"
+                    : "border-white text-white hover:bg-white hover:text-black"
+                }`}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
 
-            {currentQuestion.hasWeight &&
-              selected.length > 0 &&
-              selected[0] !== "I don’t care about ratings" && (
-                <div className="flex flex-col items-center pt-4">
-                  <input
-                    type="range"
-                    min="0"
-                    max="2"
-                    step="1"
-                    value={weights[selected[0]] ?? 1}
-                    onChange={(e) =>
-                      updateWeight(selected[0], parseInt(e.target.value))
-                    }
-                    className="w-2/3 h-1 rounded bg-neutral-600 appearance-none"
-                  />
-                  <div className="text-xs text-neutral-400 mt-1">
-                    {
-                      ["Not a big deal", "Matters a bit", "Really matters"][
-                        weights[selected[0]] ?? 1
-                      ]
-                    }
-                  </div>
-                </div>
-              )}
+        {isWeightVisible() && (
+          <div className="pt-4">
+            <label className="block text-[15px] text-white mb-2 font-light">
+              How much does this matter to you?
+            </label>
+            <div className="flex justify-between text-sm text-gray-400 mb-1 px-1 cursor-pointer">
+              {weightLabels.map((label, i) => (
+                <span
+                  key={i}
+                  onClick={() => setWeight(i)}
+                  className={`transition ${
+                    i === weight ? "text-white font-medium scale-[1.05]" : "hover:text-white"
+                  }`}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+            <div className="flex justify-center">
+              <input
+                type="range"
+                min="0"
+                max="2"
+                value={weight}
+                onChange={(e) => setWeight(parseInt(e.target.value))}
+                className="w-[60%] accent-white"
+              />
+            </div>
           </div>
         )}
 
-        <NavigationButtons
-          onBack={handleBack}
-          onNext={handleNext}
-          disabled={selected.length === 0}
-          loading={false}
-        />
-
-        <div className="pt-10">
+        <div className="pt-3 flex flex-col gap-[10px] items-center">
           <button
-            onClick={() => router.push("/")}
+            onClick={handleBack}
             className="text-xs text-neutral-400 hover:text-white transition underline"
           >
-            ⤺ Back to Home
+            ⤺ Back
+          </button>
+          <button
+            onClick={handleNext}
+            className="px-4 py-1.5 bg-white text-black rounded hover:opacity-90 text-sm"
+          >
+            Next
           </button>
         </div>
       </div>

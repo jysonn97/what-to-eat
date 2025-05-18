@@ -84,7 +84,7 @@ export default function AppPage() {
     }
   }, [encodedAnswers]);
 
-  const questions = questionSet(budget === "$");
+  const questions = questionSet(budget === "$“);
   const current = questions[step];
 
   const handleNext = () => {
@@ -162,13 +162,10 @@ export default function AppPage() {
           {current.options.map((option) => {
             const isSelected = selected.includes(option);
             return (
-              <div
-                key={option}
-                className="flex items-center justify-between w-72"
-              >
+              <div key={option} className="w-full flex items-center justify-between gap-3">
                 <button
                   onClick={() => toggle(option)}
-                  className={`flex-1 px-4 py-2 rounded-md border text-sm text-left transition-all duration-200 font-light ${
+                  className={`w-full px-4 py-2 rounded-md border text-sm transition-all duration-200 font-light text-left ${
                     isSelected
                       ? "bg-white text-black border-white scale-[1.02]"
                       : "border-white text-white hover:bg-white hover:text-black"
@@ -180,7 +177,7 @@ export default function AppPage() {
                 {current.multi &&
                   isSelected &&
                   option !== current.hideWeightOn && (
-                    <div className="flex flex-col items-end ml-3 w-[90px]">
+                    <div className="flex flex-col items-end w-[95px]">
                       <div className="flex justify-between w-full text-[10px] text-neutral-400 mb-1 cursor-pointer">
                         {weightLabels.map((label, i) => (
                           <span
@@ -220,10 +217,10 @@ export default function AppPage() {
 
         {isWeightVisible() && !current.multi && (
           <div className="pt-4">
-            <label className="block text-[15px] text-white mb-2 font-light">
+            <label className="block text-[14px] text-white mb-2 font-light">
               How much does this matter to you?
             </label>
-            <div className="flex justify-between text-sm text-gray-400 mb-1 px-1 cursor-pointer">
+            <div className="flex justify-between text-xs text-gray-400 mb-1 px-1 cursor-pointer">
               {weightLabels.map((label, i) => (
                 <span
                   key={i}
@@ -243,7 +240,7 @@ export default function AppPage() {
                 max="2"
                 value={weight}
                 onChange={(e) => setWeight(parseInt(e.target.value))}
-                className="w-[60%] accent-white"
+                className="w-[45%] accent-white"
               />
             </div>
           </div>

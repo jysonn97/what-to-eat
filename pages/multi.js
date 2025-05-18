@@ -10,7 +10,9 @@ import {
   Utensils,
   IceCream,
   ChefHat,
-  Soup
+  Soup,
+  HandPlatter,
+  Martini,
 } from "lucide-react";
 
 const priceOptions = ["$", "$$", "$$$", "$$$$", "Doesn’t matter"];
@@ -164,8 +166,9 @@ export default function MultiQuestionPage() {
                   { label: "Soupy", icon: Soup },
                   { label: "Crunchy", icon: Cookie },
                   { label: "Comfort food", icon: Utensils },
-                  { label: "Cold & refreshing", icon: IceCream },
-                  { label: "Fried & crispy", icon: ChefHat }
+                  { label: "Cold & refreshing", icon: Martini },
+                  { label: "Fried & crispy", icon: ChefHat },
+                  { label: "Refined & upscale", icon: HandPlatter },
                 ].map(({ label, icon: Icon }) => {
                   const isSelected = selectedCravingTags.includes(label);
                   return (

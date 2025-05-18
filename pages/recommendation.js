@@ -45,21 +45,24 @@ export default function RecommendationPage() {
 
   return (
     <div className="min-h-screen bg-black text-white font-extralight px-6 py-12">
-      <div className="max-w-3xl mx-auto space-y-10 text-center">
-        <h1 className="text-3xl sm:text-4xl font-extralight text-white">Your Top Restaurant Picks</h1>
+      <div className="max-w-3xl mx-auto space-y-12">
+        <div className="text-center">
+          <h1 className="text-3xl sm:text-4xl font-light mb-2">Your Top Restaurant Picks</h1>
+          {loading && <p className="text-sm text-neutral-400">⏳ Finding your perfect match...</p>}
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {!loading && !error && recommendations.length === 0 && (
+            <p className="text-sm text-neutral-300">No matches found. Try different preferences.</p>
+          )}
+        </div>
 
-        {loading && <p className="text-sm text-white">⏳ Finding your perfect match...</p>}
-        {error && <p className="text-red-400">{error}</p>}
-
-        {!loading && !error && recommendations.length === 0 && (
-          <p className="text-white">No matches found. Try different preferences.</p>
-        )}
-
-        <ul className="space-y-8">
+        <ul className="space-y-10">
           {recommendations.map((place, index) => (
-            <li key={index} className="bg-neutral-900 p-6 rounded-xl shadow-lg text-left space-y-4">
-              <div className="flex justify-between flex-wrap items-start">
-                <h2 className="text-xl font-extralight text-white">
+            <li
+              key={index}
+              className="bg-neutral-900 p-6 rounded-2xl shadow-md border border-neutral-800 hover:border-white transition"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                <h2 className="text-lg sm:text-xl font-light text-white">
                   {index + 1}. {place.name}
                 </h2>
                 <span className="text-sm text-neutral-400 font-light">
@@ -68,14 +71,14 @@ export default function RecommendationPage() {
               </div>
 
               {place.highlights?.length > 0 && (
-                <ul className="space-y-1 text-sm">
+                <ul className="mt-4 space-y-1 text-sm">
                   {place.highlights
                     .filter((line) => !/walk from your location/i.test(line))
                     .map((line, idx) => {
                       const cleanedLine = line.replace(/^✅|^✔️|^•/, "").trim();
                       return (
                         <li key={idx} className="flex gap-2 items-start text-white">
-                          <span className="text-white">✔️</span>
+                          <span className="text-green-400">✔️</span>
                           <span>{cleanedLine}</span>
                         </li>
                       );
@@ -83,27 +86,27 @@ export default function RecommendationPage() {
                 </ul>
               )}
 
-<p className="text-sm text-white">
-  <span className="text-white text-sm tracking-wide">💰 Price:</span>{" "}
-  <span className="font-light">{place.price}</span>
-</p>
-<p className="text-sm text-white">
-  <span className="text-white text-sm tracking-wide">🍽️ Cuisine:</span>{" "}
-  <span className="font-light">{place.cuisine}</span>
-</p>
-<p className="text-sm text-white">
-  <span className="text-white text-sm tracking-wide">📍 Distance:</span>{" "}
-  <span className="font-light">{place.distance}</span>
-</p>
-
-
+              <div className="mt-4 space-y-1 text-sm text-neutral-300">
+                <p>
+                  <span className="text-white font-light">💰 Price:</span>{" "}
+                  <span>{place.price}</span>
+                </p>
+                <p>
+                  <span className="text-white font-light">🍽️ Cuisine:</span>{" "}
+                  <span>{place.cuisine}</span>
+                </p>
+                <p>
+                  <span className="text-white font-light">📍 Distance:</span>{" "}
+                  <span>{place.distance}</span>
+                </p>
+              </div>
 
               {place.mapsUrl && (
                 <a
                   href={place.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 underline inline-block pt-2"
+                  className="inline-block mt-4 text-sm px-4 py-1.5 border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-black transition"
                 >
                   View on Google Maps
                 </a>
@@ -112,12 +115,14 @@ export default function RecommendationPage() {
           ))}
         </ul>
 
-        <button
-          onClick={() => router.push("/")}
-          className="mt-8 px-6 py-2 text-sm border border-white rounded hover:bg-white hover:text-black transition"
-        >
-          ⬅ Back to Home
-        </button>
+        <div className="text-center">
+          <button
+            onClick={() => router.push("/")}
+            className="mt-10 px-6 py-2 text-sm border border-white rounded hover:bg-white hover:text-black transition"
+          >
+            ⬅ Back to Home
+          </button>
+        </div>
       </div>
     </div>
   );

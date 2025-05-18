@@ -13,7 +13,8 @@ import {
   Soup,
   Salad,
   Sandwich,
-  Shrimp
+  Shrimp,
+  CookingPot 
 } from "lucide-react";
 
 
@@ -28,7 +29,8 @@ const cuisineOptions = [
   { label: "Seafood", icon: Shrimp },
   { label: "Thai", icon: Flame },
   { label: "Steak", icon: Beef },
-  { label: "Japanese", icon: Salad }
+  { label: "Japanese", icon: Salad },
+  { label: "Korean", icon: CookingPot },
 ];
 
 export default function CuisineGrid({ selected, onToggle, small = false }) {

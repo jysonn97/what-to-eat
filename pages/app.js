@@ -150,6 +150,8 @@ export default function AppPage() {
     <div className="flex flex-col gap-3">
       {currentQuestion.options.map((option) => {
         const isSelected = selected.includes(option);
+        const weight = weights[option] ?? 1;
+
         return (
           <div
             key={option}
@@ -157,7 +159,7 @@ export default function AppPage() {
           >
             <button
               onClick={() => toggleOption(option)}
-              className={`flex-1 px-4 py-2 border rounded transition text-sm text-left ${
+              className={`flex-1 px-4 py-2 border rounded text-sm text-left transition-all duration-150 ${
                 isSelected
                   ? "bg-white text-black border-white"
                   : "border-white text-white"
@@ -165,18 +167,24 @@ export default function AppPage() {
             >
               {option}
             </button>
+
             {isSelected && option !== "Nothing in particular" && (
-              <input
-                type="range"
-                min="0"
-                max="2"
-                step="1"
-                value={weights[option] || 1}
-                onChange={(e) =>
-                  updateWeight(option, parseInt(e.target.value))
-                }
-                className="w-28"
-              />
+              <div className="flex flex-col items-center gap-1 w-28">
+                <input
+                  type="range"
+                  min="0"
+                  max="2"
+                  step="1"
+                  value={weight}
+                  onChange={(e) =>
+                    updateWeight(option, parseInt(e.target.value))
+                  }
+                  className="w-full appearance-none bg-neutral-700 h-[3px] rounded-full"
+                />
+                <div className="text-[11px] text-neutral-400">
+                  {["Not a big deal", "Matters a bit", "Really matters"][weight]}
+                </div>
+              </div>
             )}
           </div>
         );

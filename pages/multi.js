@@ -13,6 +13,7 @@ import {
   Soup,
   HandPlatter,
   Martini,
+  Salad,
 } from "lucide-react";
 
 const priceOptions = ["$", "$$", "$$$", "$$$$", "Doesn’t matter"];
@@ -161,7 +162,7 @@ export default function MultiQuestionPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm pt-2">
                 {[
                   { label: "Spicy", icon: Flame },
-                  { label: "Something light", icon: Leaf },
+                  { label: "Something light", icon: Salad },
                   { label: "Savory & rich", icon: Drumstick },
                   { label: "Soupy", icon: Soup },
                   { label: "Crunchy", icon: Cookie },

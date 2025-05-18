@@ -84,7 +84,7 @@ export default function AppPage() {
     }
   }, [encodedAnswers]);
 
-  const questions = questionSet(budget === "$“);
+  const questions = questionSet(budget === "$");
   const current = questions[step];
 
   const handleNext = () => {

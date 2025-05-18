@@ -3,10 +3,13 @@ import { useState } from "react";
 import CuisineGrid from "@/components/CuisineGrid";
 
 const priceOptions = ["$", "$$", "$$$", "$$$$", "Doesn’t matter"];
-const cravingModes = [
-  "I know what I want to eat",
-  "I feel like something...",
-  "I have no idea what to eat"
+const featureOptions = [
+  "Outdoor seating",
+  "Vegetarian options",
+  "Pet-friendly",
+  "Late-night open",
+  "Good for groups",
+  "Wheelchair accessible"
 ];
 const cravingTags = [
   "Spicy",
@@ -18,21 +21,13 @@ const cravingTags = [
   "Cold & refreshing",
   "Fried & crispy"
 ];
-const featureOptions = [
-  "Outdoor seating",
-  "Vegetarian options",
-  "Pet-friendly",
-  "Late-night open",
-  "Good for groups",
-  "Wheelchair accessible"
-];
 
 export default function MultiQuestionPage() {
   const router = useRouter();
   const { location } = router.query;
 
   const [selectedPrice, setSelectedPrice] = useState("");
-  const [cravingMode, setCravingMode] = useState("");
+  const [useFlavorCraving, setUseFlavorCraving] = useState(false);
   const [selectedCuisine, setSelectedCuisine] = useState([]);
   const [selectedCravingTags, setSelectedCravingTags] = useState([]);
   const [selectedFeatures, setSelectedFeatures] = useState([]);
@@ -61,26 +56,23 @@ export default function MultiQuestionPage() {
 
   const toggleCravingTag = (tag) => {
     setSelectedCravingTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
   const clearAll = () => {
     setSelectedPrice("");
-    setCravingMode("");
     setSelectedCuisine([]);
     setSelectedCravingTags([]);
     setSelectedFeatures([]);
+    setUseFlavorCraving(false);
   };
 
   const handleNext = () => {
     if (
       !selectedPrice ||
-      !cravingMode ||
-      (cravingMode === "I know what I want to eat" && selectedCuisine.length === 0) ||
-      (cravingMode === "I feel like something..." && selectedCravingTags.length === 0) ||
+      (!useFlavorCraving && selectedCuisine.length === 0) ||
+      (useFlavorCraving && selectedCravingTags.length === 0) ||
       selectedFeatures.length === 0
     ) {
       alert("Please answer all the questions before proceeding.");
@@ -90,23 +82,26 @@ export default function MultiQuestionPage() {
     const answers = [
       { key: "location", answer: location },
       { key: "price", answer: selectedPrice },
-      { key: "cravingType", answer: cravingMode },
-      { key: "cuisine", answer: cravingMode === "I know what I want to eat"
-        ? selectedCuisine
-        : cravingMode === "I feel like something..."
-        ? selectedCravingTags
-        : ["Open to anything"]
+      { key: "cravingType", answer: useFlavorCraving ? "flavor" : "cuisine" },
+      {
+        key: "cuisine",
+        answer: useFlavorCraving
+          ? selectedCravingTags
+          : selectedCuisine
       },
       { key: "specialFeatures", answer: selectedFeatures }
     ];
 
-    router.push(`/app?location=${encodeURIComponent(location)}&answers=${encodeURIComponent(JSON.stringify(answers))}`);
+    router.push(
+      `/app?location=${encodeURIComponent(location)}&answers=${encodeURIComponent(
+        JSON.stringify(answers)
+      )}`
+    );
   };
 
   return (
     <div className="min-h-screen bg-black text-white font-extralight px-3 py-8 text-xs">
       <div className="max-w-xl mx-auto space-y-8 text-left">
-
         {/* Home Button */}
         <div className="flex justify-center mb-3">
           <button
@@ -126,7 +121,9 @@ export default function MultiQuestionPage() {
                 key={p}
                 onClick={() => toggle(p, selectedPrice, setSelectedPrice)}
                 className={`px-2.5 py-1 text-xs rounded-md border transition min-w-[80px] text-center ${
-                  selectedPrice === p ? "bg-white text-black" : "border-white text-white"
+                  selectedPrice === p
+                    ? "bg-white text-black"
+                    : "border-white text-white"
                 }`}
               >
                 {p}
@@ -137,48 +134,54 @@ export default function MultiQuestionPage() {
 
         <hr className="border-gray-600" />
 
-        {/* Craving Mode */}
+        {/* Craving Hybrid */}
         <div className="space-y-2">
           <p className="text-[15px] font-bold text-white">Craving</p>
-          <div className="flex flex-wrap gap-2">
-            {cravingModes.map((mode) => (
-              <button
-                key={mode}
-                onClick={() => {
-                  setCravingMode(mode);
-                  setSelectedCuisine([]);
-                  setSelectedCravingTags([]);
-                }}
-                className={`px-3 py-1 text-xs rounded-md border transition ${
-                  cravingMode === mode ? "bg-white text-black" : "border-white text-white"
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
 
-          {/* Craving Sub-Options */}
-          {cravingMode === "I know what I want to eat" && (
-            <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} small={true} />
-          )}
-
-          {cravingMode === "I feel like something..." && (
-            <div className="pt-2 flex flex-wrap gap-2">
-              {cravingTags.map((tag) => (
+          {!useFlavorCraving ? (
+            <>
+              <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} small={true} />
+              <div className="pt-2">
                 <button
-                  key={tag}
-                  onClick={() => toggleCravingTag(tag)}
-                  className={`px-3 py-1 text-xs rounded-md border transition ${
-                    selectedCravingTags.includes(tag)
-                      ? "bg-white text-black"
-                      : "border-white text-white"
-                  }`}
+                  onClick={() => {
+                    setUseFlavorCraving(true);
+                    setSelectedCuisine([]);
+                  }}
+                  className="text-xs underline text-white hover:text-gray-200 transition"
                 >
-                  {tag}
+                  Not sure? Choose by flavor instead
                 </button>
-              ))}
-            </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="pt-1 flex flex-wrap gap-2">
+                {cravingTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleCravingTag(tag)}
+                    className={`px-3 py-1 text-xs rounded-md border transition ${
+                      selectedCravingTags.includes(tag)
+                        ? "bg-white text-black"
+                        : "border-white text-white"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    setUseFlavorCraving(false);
+                    setSelectedCravingTags([]);
+                  }}
+                  className="text-xs underline text-white hover:text-gray-200 transition"
+                >
+                  ⤺ Back to cuisine selection
+                </button>
+              </div>
+            </>
           )}
         </div>
 
@@ -193,7 +196,9 @@ export default function MultiQuestionPage() {
                 key={f}
                 onClick={() => toggleFeature(f)}
                 className={`px-2.5 py-1 text-xs rounded-md border transition min-w-[120px] text-center ${
-                  selectedFeatures.includes(f) ? "bg-white text-black" : "border-white text-white"
+                  selectedFeatures.includes(f)
+                    ? "bg-white text-black"
+                    : "border-white text-white"
                 }`}
               >
                 {f}

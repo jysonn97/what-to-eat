@@ -136,13 +136,16 @@ export default function AppPage() {
 
   const toggle = (option) => {
     if (current.multi) {
-      setSelected((prev) => {
-        if (option === current.hideWeightOn) return [option];
-        const withoutHideOption = prev.filter((o) => o !== current.hideWeightOn);
-        return prev.includes(option)
-          ? withoutHideOption.filter((o) => o !== option)
-          : [...withoutHideOption, option];
-      });
+      if (option === current.hideWeightOn) {
+        setSelected([option]); // "Nothing in particular" 선택 시 나머지 해제
+      } else {
+        setSelected((prev) => {
+          const withoutHide = prev.filter((o) => o !== current.hideWeightOn);
+          return prev.includes(option)
+            ? withoutHide.filter((o) => o !== option)
+            : [...withoutHide, option];
+        });
+      }
     } else {
       setSelected((prev) => (prev[0] === option ? [] : [option]));
     }

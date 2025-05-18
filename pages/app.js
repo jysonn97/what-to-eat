@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";
+import OptionButton from "@/components/OptionButton";
+import NavigationButtons from "@/components/NavigationButtons";
 
-const weightLabels = ["Not a big deal", "Matters a bit", "Really matters"];
-
-const questionSet = (showQuickBite) => [
+const staticQuestions = [
   {
     key: "vibe",
     question: "What’s the vibe or occasion today?",
@@ -15,10 +15,9 @@ const questionSet = (showQuickBite) => [
       "Exploring while traveling",
       "Business-y meal",
       "Anywhere’s fine, really",
-      ...(showQuickBite ? ["Quick bite, nothing fancy"] : [])
+      "Quick bite, nothing fancy"
     ],
-    multi: false,
-    showWeight: false
+    hasWeight: false
   },
   {
     key: "distance",
@@ -28,8 +27,7 @@ const questionSet = (showQuickBite) => [
       "Around 20 mins is fine",
       "I’m okay going further (30+ mins)"
     ],
-    multi: false,
-    showWeight: true
+    hasWeight: true
   },
   {
     key: "ratingImportance",
@@ -40,9 +38,7 @@ const questionSet = (showQuickBite) => [
       "3.5+ is fine",
       "I don’t care about ratings"
     ],
-    multi: false,
-    showWeight: true,
-    hideWeightOn: "I don’t care about ratings"
+    hasWeight: true
   },
   {
     key: "avoid",
@@ -54,9 +50,7 @@ const questionSet = (showQuickBite) => [
       "Long wait times",
       "Nothing in particular"
     ],
-    multi: true,
-    showWeight: true,
-    hideWeightOn: "Nothing in particular"
+    hasWeight: true
   }
 ];
 
@@ -67,49 +61,46 @@ export default function AppPage() {
   const [answers, setAnswers] = useState([]);
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState([]);
-  const [weight, setWeight] = useState(1);
-  const [budget, setBudget] = useState(null);
+  const [weights, setWeights] = useState({});
+  const currentQuestion = staticQuestions[step];
 
   useEffect(() => {
+    const init = [];
+    if (location) init.push({ key: "location", answer: location });
     if (encodedAnswers) {
       try {
         const parsed = JSON.parse(encodedAnswers);
-        setAnswers(parsed);
-        const priceAnswer = parsed.find((a) => a.key === "price");
-        if (priceAnswer) setBudget(priceAnswer.answer);
+        init.push(...parsed);
       } catch (err) {
-        console.error("Error parsing answers", err);
+        console.error("Failed to parse answers from query", err);
       }
     }
-  }, [encodedAnswers]);
-
-  const questions = questionSet(budget === "$");
-  const current = questions[step];
+    setAnswers(init);
+  }, [location, encodedAnswers]);
 
   const handleNext = () => {
-    if (!selected.length && !current.multi) return;
+    if (selected.length === 0) return;
 
-    const finalAnswer = {
-      key: current.key,
-      answer: current.multi ? selected : selected[0],
-      weight:
-        !current.showWeight ||
-        selected.includes(current.hideWeightOn) ||
-        selected[0] === current.hideWeightOn
-          ? "Not specified"
-          : weightLabels[weight]
-    };
+    const answer = currentQuestion.key === "avoid" ? selected : selected[0];
+    const payload = currentQuestion.hasWeight
+      ? { key: currentQuestion.key, answer, weight: weights }
+      : { key: currentQuestion.key, answer };
 
-    const updated = [...answers.filter((a) => a.key !== current.key), finalAnswer];
-    setAnswers(updated);
+    const updatedAnswers = [
+      ...answers.filter((a) => a.key !== currentQuestion.key),
+      payload
+    ];
 
-    if (step + 1 < questions.length) {
+    if (step + 1 < staticQuestions.length) {
+      setAnswers(updatedAnswers);
       setStep(step + 1);
       setSelected([]);
-      setWeight(1);
+      setWeights({});
     } else {
       router.push(
-        `/recommendation?answers=${encodeURIComponent(JSON.stringify(updated))}`
+        `/recommendation?answers=${encodeURIComponent(
+          JSON.stringify(updatedAnswers)
+        )}`
       );
     }
   };
@@ -118,110 +109,114 @@ export default function AppPage() {
     if (step === 0) {
       const params = new URLSearchParams({
         location: location || "",
-        answers: JSON.stringify(answers)
+        answers: JSON.stringify(answers.slice(1))
       });
       router.push(`/multi?${params.toString()}`);
     } else {
       setStep(step - 1);
       setSelected([]);
-      setWeight(1);
+      setWeights({});
     }
   };
 
-  const toggle = (option) => {
-    if (current.multi) {
-setSelected((prev) => {
-  if (option === current.hideWeightOn) {
-    return [option]; // selecting "Nothing in particular" clears others
-  }
-
-  const withoutHideOption = prev.filter((o) => o !== current.hideWeightOn);
-
-  return prev.includes(option)
-    ? withoutHideOption.filter((o) => o !== option)
-    : [...withoutHideOption, option];
-});
-
+  const toggleOption = (option) => {
+    if (currentQuestion.key === "avoid") {
+      if (option === "Nothing in particular") {
+        setSelected(["Nothing in particular"]);
+        setWeights({});
+      } else {
+        const updated = selected.includes(option)
+          ? selected.filter((o) => o !== option)
+          : [...selected.filter((o) => o !== "Nothing in particular"), option];
+        setSelected(updated);
+        if (!selected.includes(option)) {
+          setWeights({ ...weights, [option]: 1 });
+        } else {
+          const copy = { ...weights };
+          delete copy[option];
+          setWeights(copy);
+        }
+      }
     } else {
-      setSelected((prev) => (prev[0] === option ? [] : [option]));
+      setSelected([option === selected[0] ? null : option].filter(Boolean));
     }
   };
 
-  const isWeightVisible = () => {
-    if (!current.showWeight) return false;
-    if (!selected.length) return false;
-    const avoidOption = current.hideWeightOn;
-    return !selected.includes(avoidOption);
+  const updateWeight = (option, value) => {
+    setWeights({ ...weights, [option]: value });
   };
 
-  return (
-    <div className="min-h-screen bg-black text-white px-4 py-12 flex items-center justify-center font-extralight">
-      <div className="w-full max-w-xl space-y-10 text-center">
-
-        <QuestionCard question={current.question} />
-
-        <div className="grid grid-cols-1 gap-3 place-items-center">
-          {current.options.map((option) => {
-            const isSelected = selected.includes(option);
-            return (
-              <button
-                key={option}
-                onClick={() => toggle(option)}
-                className={`w-64 px-4 py-2 rounded-md border text-sm transition-all duration-200 font-light ${
-                  isSelected
-                    ? "bg-white text-black border-white scale-[1.02]"
-                    : "border-white text-white hover:bg-white hover:text-black"
-                }`}
-              >
-                {option}
-              </button>
-            );
-          })}
-        </div>
-
-        {isWeightVisible() && (
-          <div className="pt-4">
-            <label className="block text-[15px] text-white mb-2 font-light">
-              How much does this matter to you?
-            </label>
-            <div className="flex justify-between text-sm text-gray-400 mb-1 px-1 cursor-pointer">
-              {weightLabels.map((label, i) => (
-                <span
-                  key={i}
-                  onClick={() => setWeight(i)}
-                  className={`transition ${
-                    i === weight ? "text-white font-medium scale-[1.05]" : "hover:text-white"
-                  }`}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-            <div className="flex justify-center">
+  const renderAvoidOptions = () => (
+    <div className="flex flex-col gap-3">
+      {currentQuestion.options.map((option) => {
+        const isSelected = selected.includes(option);
+        return (
+          <div
+            key={option}
+            className="flex items-center justify-between gap-3"
+          >
+            <button
+              onClick={() => toggleOption(option)}
+              className={`flex-1 px-4 py-2 border rounded transition text-sm text-left ${
+                isSelected
+                  ? "bg-white text-black border-white"
+                  : "border-white text-white"
+              }`}
+            >
+              {option}
+            </button>
+            {isSelected && option !== "Nothing in particular" && (
               <input
                 type="range"
                 min="0"
                 max="2"
-                value={weight}
-                onChange={(e) => setWeight(parseInt(e.target.value))}
-                className="w-[60%] accent-white"
+                step="1"
+                value={weights[option] || 1}
+                onChange={(e) =>
+                  updateWeight(option, parseInt(e.target.value))
+                }
+                className="w-28"
               />
-            </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-black px-4 py-12 text-white font-extralight">
+      <div className="w-full max-w-xl space-y-8 text-center">
+        <QuestionCard question={currentQuestion.question} />
+
+        {currentQuestion.key === "avoid" ? (
+          renderAvoidOptions()
+        ) : (
+          <div className="flex flex-col gap-3">
+            {currentQuestion.options.map((option) => (
+              <OptionButton
+                key={option}
+                option={option}
+                selected={selected}
+                onClick={toggleOption}
+              />
+            ))}
           </div>
         )}
 
-        <div className="pt-3 flex flex-col gap-[10px] items-center">
+        <NavigationButtons
+          onBack={handleBack}
+          onNext={handleNext}
+          disabled={selected.length === 0}
+          loading={false}
+        />
+
+        <div className="pt-10">
           <button
-            onClick={handleBack}
+            onClick={() => router.push("/")}
             className="text-xs text-neutral-400 hover:text-white transition underline"
           >
-            ⤺ Back
-          </button>
-          <button
-            onClick={handleNext}
-            className="px-4 py-1.5 bg-white text-black rounded hover:opacity-90 text-sm"
-          >
-            Next
+            ⤺ Back to Home
           </button>
         </div>
       </div>

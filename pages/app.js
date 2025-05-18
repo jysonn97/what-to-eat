@@ -130,11 +130,18 @@ export default function AppPage() {
 
   const toggle = (option) => {
     if (current.multi) {
-      setSelected((prev) =>
-        prev.includes(option)
-          ? prev.filter((o) => o !== option)
-          : [...prev.filter((o) => o !== current.hideWeightOn), option]
-      );
+setSelected((prev) => {
+  if (option === current.hideWeightOn) {
+    return [option]; // selecting "Nothing in particular" clears others
+  }
+
+  const withoutHideOption = prev.filter((o) => o !== current.hideWeightOn);
+
+  return prev.includes(option)
+    ? withoutHideOption.filter((o) => o !== option)
+    : [...withoutHideOption, option];
+});
+
     } else {
       setSelected((prev) => (prev[0] === option ? [] : [option]));
     }

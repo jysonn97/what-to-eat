@@ -26,10 +26,12 @@ const questionSet = (showQuickBite) => [
     options: [
       "Walking distance (~10 mins)",
       "Around 20 mins is fine",
-      "I’m okay going further (30+ mins)"
+      "I’m okay going further (30+ mins)",
+      "I don’t care about the distance"
     ],
     multi: false,
-    showWeight: true
+    showWeight: true,
+    hideWeightOn: "I don’t care about the distance"
   },
   {
     key: "ratingImportance",
@@ -55,8 +57,7 @@ const questionSet = (showQuickBite) => [
       "Nothing in particular"
     ],
     multi: true,
-    showWeight: true,
-    hideWeightOn: "Nothing in particular"
+    showWeight: false
   }
 ];
 
@@ -162,58 +163,17 @@ export default function AppPage() {
           {current.options.map((option) => {
             const isSelected = selected.includes(option);
             return (
-              <div
+              <button
                 key={option}
-                className="flex items-center justify-between w-72"
+                onClick={() => toggle(option)}
+                className={`w-72 px-4 py-2 rounded-md border text-sm transition-all duration-200 font-light ${
+                  isSelected
+                    ? "bg-white text-black border-white scale-[1.02]"
+                    : "border-white text-white hover:bg-white hover:text-black"
+                }`}
               >
-                <button
-                  onClick={() => toggle(option)}
-                  className={`flex-1 px-4 py-2 rounded-md border text-sm text-left transition-all duration-200 font-light ${
-                    isSelected
-                      ? "bg-white text-black border-white scale-[1.02]"
-                      : "border-white text-white hover:bg-white hover:text-black"
-                  }`}
-                >
-                  {option}
-                </button>
-
-                {current.multi &&
-                  isSelected &&
-                  option !== current.hideWeightOn && (
-                    <div className="flex flex-col items-end ml-3 w-[90px]">
-                      <div className="flex justify-between w-full text-[10px] text-neutral-400 mb-1 cursor-pointer">
-                        {weightLabels.map((label, i) => (
-                          <span
-                            key={i}
-                            onClick={() =>
-                              setWeights((prev) => ({ ...prev, [option]: i }))
-                            }
-                            className={`${
-                              i === (weights[option] ?? 1)
-                                ? "text-white font-medium"
-                                : "hover:text-white"
-                            }`}
-                          >
-                            {i === 0 ? "Not" : i === 1 ? "Bit" : "Really"}
-                          </span>
-                        ))}
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="2"
-                        value={weights[option] ?? 1}
-                        onChange={(e) =>
-                          setWeights((prev) => ({
-                            ...prev,
-                            [option]: parseInt(e.target.value)
-                          }))
-                        }
-                        className="w-full h-[3px] rounded bg-neutral-600 accent-white"
-                      />
-                    </div>
-                  )}
-              </div>
+                {option}
+              </button>
             );
           })}
         </div>

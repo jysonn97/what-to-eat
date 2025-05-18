@@ -3,15 +3,28 @@ import { useState } from "react";
 import CuisineGrid from "@/components/CuisineGrid";
 
 const priceOptions = ["$", "$$", "$$$", "$$$$", "Doesn’t matter"];
-const ratingOptions = ["3.5+", "4.0+", "4.5+", "Doesn’t matter"];
-const partyOptions = ["Just me", "2", "3–4", "5+"];
+const cravingModes = [
+  "I know what I want to eat",
+  "I feel like something...",
+  "I have no idea what to eat"
+];
+const cravingTags = [
+  "Spicy",
+  "Something light",
+  "Savory & rich",
+  "Soupy",
+  "Crunchy",
+  "Comfort food",
+  "Cold & refreshing",
+  "Fried & crispy"
+];
 const featureOptions = [
   "Outdoor seating",
   "Vegetarian options",
   "Pet-friendly",
   "Late-night open",
   "Good for groups",
-  "Wheelchair accessible",
+  "Wheelchair accessible"
 ];
 
 export default function MultiQuestionPage() {
@@ -19,9 +32,9 @@ export default function MultiQuestionPage() {
   const { location } = router.query;
 
   const [selectedPrice, setSelectedPrice] = useState("");
-  const [selectedRating, setSelectedRating] = useState("");
+  const [cravingMode, setCravingMode] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState([]);
-  const [selectedParty, setSelectedParty] = useState("");
+  const [selectedCravingTags, setSelectedCravingTags] = useState([]);
   const [selectedFeatures, setSelectedFeatures] = useState([]);
 
   const toggle = (value, current, set) => {
@@ -46,38 +59,49 @@ export default function MultiQuestionPage() {
     );
   };
 
+  const toggleCravingTag = (tag) => {
+    setSelectedCravingTags((prev) =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
   const clearAll = () => {
     setSelectedPrice("");
-    setSelectedRating("");
+    setCravingMode("");
     setSelectedCuisine([]);
-    setSelectedParty("");
+    setSelectedCravingTags([]);
     setSelectedFeatures([]);
   };
 
-const handleNext = () => {
-  if (
-    !selectedPrice ||
-    !selectedRating ||
-    selectedCuisine.length === 0 ||
-    !selectedParty ||
-    selectedFeatures.length === 0
-  ) {
-    alert("Please answer all the questions before proceeding.");
-    return;
-  }
+  const handleNext = () => {
+    if (
+      !selectedPrice ||
+      !cravingMode ||
+      (cravingMode === "I know what I want to eat" && selectedCuisine.length === 0) ||
+      (cravingMode === "I feel like something..." && selectedCravingTags.length === 0) ||
+      selectedFeatures.length === 0
+    ) {
+      alert("Please answer all the questions before proceeding.");
+      return;
+    }
 
-  const answers = [
-    { key: "location", answer: location },
-    { key: "price", answer: selectedPrice },
-    { key: "rating", answer: selectedRating },
-    { key: "cuisine", answer: selectedCuisine },
-    { key: "partySize", answer: selectedParty },
-    { key: "specialFeatures", answer: selectedFeatures },
-  ];
+    const answers = [
+      { key: "location", answer: location },
+      { key: "price", answer: selectedPrice },
+      { key: "cravingType", answer: cravingMode },
+      { key: "cuisine", answer: cravingMode === "I know what I want to eat"
+        ? selectedCuisine
+        : cravingMode === "I feel like something..."
+        ? selectedCravingTags
+        : ["Open to anything"]
+      },
+      { key: "specialFeatures", answer: selectedFeatures }
+    ];
 
-  router.push(`/app?location=${encodeURIComponent(location)}&answers=${encodeURIComponent(JSON.stringify(answers))}`);
-};
-
+    router.push(`/app?location=${encodeURIComponent(location)}&answers=${encodeURIComponent(JSON.stringify(answers))}`);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white font-extralight px-3 py-8 text-xs">
@@ -95,7 +119,7 @@ const handleNext = () => {
 
         {/* Price */}
         <div className="space-y-2">
-          <p className="text-[15px] font-bold text-white">Price</p>
+          <p className="text-[15px] font-bold text-white">Budget</p>
           <div className="flex flex-wrap gap-2 justify-start">
             {priceOptions.map((p) => (
               <button
@@ -113,50 +137,49 @@ const handleNext = () => {
 
         <hr className="border-gray-600" />
 
-        {/* Rating */}
-        <div className="space-y-2">
-          <p className="text-[15px] font-bold text-white">Rating</p>
-          <div className="flex flex-wrap gap-2 justify-start">
-            {ratingOptions.map((r) => (
-              <button
-                key={r}
-                onClick={() => toggle(r, selectedRating, setSelectedRating)}
-                className={`px-2.5 py-1 text-xs rounded-md border transition min-w-[80px] text-center ${
-                  selectedRating === r ? "bg-white text-black" : "border-white text-white"
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <hr className="border-gray-600" />
-
-        {/* Craving */}
+        {/* Craving Mode */}
         <div className="space-y-2">
           <p className="text-[15px] font-bold text-white">Craving</p>
-          <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} small={true} />
-        </div>
-
-        <hr className="border-gray-600" />
-
-        {/* Party Size */}
-        <div className="space-y-2">
-          <p className="text-[15px] font-bold text-white">Party Size</p>
-          <div className="flex flex-wrap gap-2 justify-start">
-            {partyOptions.map((p) => (
+          <div className="flex flex-wrap gap-2">
+            {cravingModes.map((mode) => (
               <button
-                key={p}
-                onClick={() => toggle(p, selectedParty, setSelectedParty)}
-                className={`px-2.5 py-1 text-xs rounded-md border transition min-w-[80px] text-center ${
-                  selectedParty === p ? "bg-white text-black" : "border-white text-white"
+                key={mode}
+                onClick={() => {
+                  setCravingMode(mode);
+                  setSelectedCuisine([]);
+                  setSelectedCravingTags([]);
+                }}
+                className={`px-3 py-1 text-xs rounded-md border transition ${
+                  cravingMode === mode ? "bg-white text-black" : "border-white text-white"
                 }`}
               >
-                {p}
+                {mode}
               </button>
             ))}
           </div>
+
+          {/* Craving Sub-Options */}
+          {cravingMode === "I know what I want to eat" && (
+            <CuisineGrid selected={selectedCuisine} onToggle={setSelectedCuisine} small={true} />
+          )}
+
+          {cravingMode === "I feel like something..." && (
+            <div className="pt-2 flex flex-wrap gap-2">
+              {cravingTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleCravingTag(tag)}
+                  className={`px-3 py-1 text-xs rounded-md border transition ${
+                    selectedCravingTags.includes(tag)
+                      ? "bg-white text-black"
+                      : "border-white text-white"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <hr className="border-gray-600" />
@@ -194,7 +217,6 @@ const handleNext = () => {
             Next
           </button>
         </div>
-
       </div>
     </div>
   );

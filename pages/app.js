@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import QuestionCard from "@/components/QuestionCard";
 
+// ...기존 import 유지
 const weightLabels = ["Not a big deal", "Matters a bit", "Really matters"];
 
 const questionSet = (showQuickBite) => [
@@ -59,8 +60,16 @@ const questionSet = (showQuickBite) => [
     multi: true,
     showWeight: false,
     hideWeightOn: "Nothing in particular"
+  },
+  {
+    key: "reservationWanted",
+    question: "Do you want to see only restaurants that accept reservations?",
+    options: ["Yes", "No"],
+    multi: false,
+    showWeight: false
   }
 ];
+
 
 export default function AppPage() {
   const router = useRouter();

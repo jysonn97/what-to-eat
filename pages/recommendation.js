@@ -72,92 +72,88 @@ export default function RecommendationPage() {
         {loading && <p>⏳ Searching...</p>}
         {error && <p className="text-red-400">{error}</p>}
 
-{!loading && !error && current && (
-  <>
-    {console.log("🖼️ imageUrl (from API):", current.imageUrl)}
-    <div className="bg-neutral-900 rounded-2xl shadow-md overflow-hidden border border-neutral-700 text-left">
-      {current.imageUrl ? (
-        <img
-          src={current.imageUrl}
-          alt={current.name}
-          className="w-full h-52 object-cover"
-        />
-      ) : (
-        <div className="w-full h-52 bg-neutral-800 flex items-center justify-center text-sm text-neutral-400">
-          No image available
-        </div>
-      )}
-      ...
-    </div>
-  </>
-)}
+        {!loading && !error && current && (
+          <>
+            {console.log("🖼️ imageUrl (from API):", current.imageUrl)}
+            <div className="bg-neutral-900 rounded-2xl shadow-md overflow-hidden border border-neutral-700 text-left">
+              {current.imageUrl ? (
+                <img
+                  src={current.imageUrl}
+                  alt={current.name}
+                  className="w-full h-52 object-cover"
+                />
+              ) : (
+                <div className="w-full h-52 bg-neutral-800 flex items-center justify-center text-sm text-neutral-400">
+                  No image available
+                </div>
+              )}
 
+              <div className="p-5 space-y-3">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-medium text-white">{current.name}</h2>
+                  <span className="text-sm text-gray-400">
+                    ⭐ {Number(current.rating).toFixed(1)} ({current.reviewCount})
+                  </span>
+                </div>
 
-            <div className="p-5 space-y-3">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-medium text-white">{current.name}</h2>
-                <span className="text-sm text-gray-400">
-                  ⭐ {Number(current.rating).toFixed(1)} ({current.reviewCount})
-                </span>
-              </div>
+                <div className="text-sm text-neutral-300 space-y-1">
+                  {current.highlights?.slice(0, 2).map((line, i) => (
+                    <p key={i}>• {line.replace(/^✅\s*/, "")}</p>
+                  ))}
+                </div>
 
-              <div className="text-sm text-neutral-300 space-y-1">
-                {current.highlights?.slice(0, 2).map((line, i) => (
-                  <p key={i}>• {line.replace(/^✅\s*/, "")}</p>
-                ))}
-              </div>
+                <div className="flex flex-wrap gap-3 pt-2 text-sm text-neutral-400">
+                  <span>📍 {current.distance}</span>
+                  <span>💰 {current.price}</span>
+                  <span>🍽️ {current.cuisine}</span>
+                </div>
 
-              <div className="flex flex-wrap gap-3 pt-2 text-sm text-neutral-400">
-                <span>📍 {current.distance}</span>
-                <span>💰 {current.price}</span>
-                <span>🍽️ {current.cuisine}</span>
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-4">
-                {current.mapsUrl && (
+                <div className="flex flex-wrap gap-3 pt-4">
+                  {current.mapsUrl && (
+                    <a
+                      href={current.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-1.5 text-sm border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-black transition"
+                    >
+                      Google Maps
+                    </a>
+                  )}
                   <a
-                    href={current.mapsUrl}
+                    href={generateYelpUrl(current.name, locationText, reservationWanted)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-1.5 text-sm border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-black transition"
+                    className="px-4 py-1.5 text-sm border border-pink-400 text-pink-400 rounded hover:bg-pink-400 hover:text-black transition"
                   >
-                    Google Maps
+                    Yelp
                   </a>
-                )}
-                <a
-                  href={generateYelpUrl(current.name, locationText, reservationWanted)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-1.5 text-sm border border-pink-400 text-pink-400 rounded hover:bg-pink-400 hover:text-black transition"
-                >
-                  Yelp
-                </a>
-                <a
-                  href={generateUberUrl(current.name, locationText)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-1.5 text-sm border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition"
-                >
-                  Uber Eats
-                </a>
-              </div>
+                  <a
+                    href={generateUberUrl(current.name, locationText)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-1.5 text-sm border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition"
+                  >
+                    Uber Eats
+                  </a>
+                </div>
 
-              <div className="flex justify-center gap-4 pt-6">
-                <button
-                  onClick={handlePass}
-                  className="px-5 py-2 text-sm border border-neutral-600 text-white rounded hover:bg-neutral-800 transition"
-                >
-                  👎 Pass
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="px-5 py-2 text-sm border border-white text-white rounded hover:bg-white hover:text-black transition"
-                >
-                  ⭐ Save
-                </button>
+                <div className="flex justify-center gap-4 pt-6">
+                  <button
+                    onClick={handlePass}
+                    className="px-5 py-2 text-sm border border-neutral-600 text-white rounded hover:bg-neutral-800 transition"
+                  >
+                    👎 Pass
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-5 py-2 text-sm border border-white text-white rounded hover:bg-white hover:text-black transition"
+                  >
+                    ⭐ Save
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {!loading && !error && currentIndex >= recommendations.length && (

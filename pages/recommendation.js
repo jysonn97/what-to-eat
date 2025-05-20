@@ -66,36 +66,41 @@ export default function RecommendationPage() {
     `https://www.ubereats.com/search?q=${encodeURIComponent(name)}&pl=${encodeURIComponent(loc)}`;
 
   return (
-    <div className="min-h-screen bg-neutral-100 text-black px-4 py-12 flex justify-center font-light">
+    <div className="min-h-screen bg-black text-white px-4 py-12 flex justify-center font-light">
       <div className="w-full max-w-xl space-y-8 text-center">
         <h1 className="text-2xl font-light">Your Restaurant Picks</h1>
         {loading && <p>⏳ Searching...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-400">{error}</p>}
 
         {!loading && !error && current && (
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-300 text-left">
-            {current.imageUrl && (
+          <div className="bg-neutral-900 rounded-2xl shadow-md overflow-hidden border border-neutral-700 text-left">
+            {current.imageUrl ? (
               <img
                 src={current.imageUrl}
                 alt={current.name}
                 className="w-full h-52 object-cover"
               />
+            ) : (
+              <div className="w-full h-52 bg-neutral-800 flex items-center justify-center text-sm text-neutral-400">
+                No image available
+              </div>
             )}
+
             <div className="p-5 space-y-3">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-medium">{current.name}</h2>
-                <span className="text-sm text-gray-500">
+                <h2 className="text-xl font-medium text-white">{current.name}</h2>
+                <span className="text-sm text-gray-400">
                   ⭐ {Number(current.rating).toFixed(1)} ({current.reviewCount})
                 </span>
               </div>
 
-              <div className="text-sm text-gray-700 space-y-1">
+              <div className="text-sm text-neutral-300 space-y-1">
                 {current.highlights?.slice(0, 2).map((line, i) => (
                   <p key={i}>• {line.replace(/^✅\s*/, "")}</p>
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-3 pt-2 text-sm text-gray-600">
+              <div className="flex flex-wrap gap-3 pt-2 text-sm text-neutral-400">
                 <span>📍 {current.distance}</span>
                 <span>💰 {current.price}</span>
                 <span>🍽️ {current.cuisine}</span>
@@ -107,7 +112,7 @@ export default function RecommendationPage() {
                     href={current.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-1.5 text-sm border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition"
+                    className="px-4 py-1.5 text-sm border border-blue-400 text-blue-400 rounded hover:bg-blue-400 hover:text-black transition"
                   >
                     Google Maps
                   </a>
@@ -116,7 +121,7 @@ export default function RecommendationPage() {
                   href={generateYelpUrl(current.name, locationText, reservationWanted)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-1.5 text-sm border border-pink-500 text-pink-500 rounded hover:bg-pink-500 hover:text-white transition"
+                  className="px-4 py-1.5 text-sm border border-pink-400 text-pink-400 rounded hover:bg-pink-400 hover:text-black transition"
                 >
                   Yelp
                 </a>
@@ -124,7 +129,7 @@ export default function RecommendationPage() {
                   href={generateUberUrl(current.name, locationText)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-1.5 text-sm border border-green-500 text-green-500 rounded hover:bg-green-500 hover:text-white transition"
+                  className="px-4 py-1.5 text-sm border border-green-400 text-green-400 rounded hover:bg-green-400 hover:text-black transition"
                 >
                   Uber Eats
                 </a>
@@ -133,13 +138,13 @@ export default function RecommendationPage() {
               <div className="flex justify-center gap-4 pt-6">
                 <button
                   onClick={handlePass}
-                  className="px-5 py-2 text-sm border border-gray-400 text-gray-600 rounded hover:bg-gray-100 transition"
+                  className="px-5 py-2 text-sm border border-neutral-600 text-white rounded hover:bg-neutral-800 transition"
                 >
                   👎 Pass
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-5 py-2 text-sm border border-black text-black rounded hover:bg-black hover:text-white transition"
+                  className="px-5 py-2 text-sm border border-white text-white rounded hover:bg-white hover:text-black transition"
                 >
                   ⭐ Save
                 </button>
@@ -153,19 +158,19 @@ export default function RecommendationPage() {
             <h2 className="text-xl font-light">You're all done!</h2>
             {saved.length > 0 ? (
               <div className="space-y-3 text-left">
-                <p className="text-sm text-gray-500">Saved restaurants:</p>
-                <ul className="text-sm text-black space-y-1">
+                <p className="text-sm text-neutral-400">Saved restaurants:</p>
+                <ul className="text-sm text-white space-y-1">
                   {saved.map((place, i) => (
                     <li key={i}>• {place.name}</li>
                   ))}
                 </ul>
               </div>
             ) : (
-              <p className="text-sm text-gray-500">You didn’t save any spots.</p>
+              <p className="text-sm text-neutral-400">You didn’t save any spots.</p>
             )}
             <button
               onClick={() => router.push("/")}
-              className="px-6 py-2 text-sm border border-black rounded hover:bg-black hover:text-white transition"
+              className="px-6 py-2 text-sm border border-white text-white rounded hover:bg-white hover:text-black transition"
             >
               ⬅ Back to Home
             </button>

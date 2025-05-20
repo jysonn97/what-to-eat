@@ -72,19 +72,26 @@ export default function RecommendationPage() {
         {loading && <p>⏳ Searching...</p>}
         {error && <p className="text-red-400">{error}</p>}
 
-        {!loading && !error && current && (
-          <div className="bg-neutral-900 rounded-2xl shadow-md overflow-hidden border border-neutral-700 text-left">
-            {current.imageUrl ? (
-              <img
-                src={current.imageUrl}
-                alt={current.name}
-                className="w-full h-52 object-cover"
-              />
-            ) : (
-              <div className="w-full h-52 bg-neutral-800 flex items-center justify-center text-sm text-neutral-400">
-                No image available
-              </div>
-            )}
+{!loading && !error && current && (
+  <>
+    {console.log("🖼️ imageUrl (from API):", current.imageUrl)}
+    <div className="bg-neutral-900 rounded-2xl shadow-md overflow-hidden border border-neutral-700 text-left">
+      {current.imageUrl ? (
+        <img
+          src={current.imageUrl}
+          alt={current.name}
+          className="w-full h-52 object-cover"
+        />
+      ) : (
+        <div className="w-full h-52 bg-neutral-800 flex items-center justify-center text-sm text-neutral-400">
+          No image available
+        </div>
+      )}
+      ...
+    </div>
+  </>
+)}
+
 
             <div className="p-5 space-y-3">
               <div className="flex justify-between items-center">
